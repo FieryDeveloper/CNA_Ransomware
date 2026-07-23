@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+
+# Raw API pulls are ~90 MB and fully regenerable:
+#   python scripts/fetch_ransomware_live.py --years 2015-2026
+# Comment this out if you want the snapshot under version control.
+data/raw/

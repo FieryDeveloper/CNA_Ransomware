@@ -1,0 +1,248 @@
+{
+  "cross_industry_comparison": "Ransomware is often discussed as a single peril, but the underwriting reality across these fourteen industries is that the peril's shape changes with what the victim cannot afford to lose. The clearest dividing line is between uptime-driven extortion leverage and data-sensitivity-driven leverage. In manufacturing, energy and utilities, transportation and warehousing, and agriculture/food production, the attacker's leverage is the clock. A stopped production line, an idled pipeline scheduling system, a freight dispatch outage, or a cold-chain failure converts directly into per-hour revenue loss, spoilage, or contractual penalty, and the loss accrues whether or not any data is ever published. Manufacturing has been the single most-targeted sector for five consecutive years through 2025 (4,434 leak-site postings on the ransomware.live Manufacturing tag) precisely because this pressure reliably shortens the decision cycle toward payment. Energy (~826 indexed victims) adds cascading physical and public-safety consequence on top of revenue loss, and agriculture/food adds perishability: a processor cannot bank a week of downtime because the inventory itself degrades. In these sectors the ransom demand is effectively priced against business-interruption cost, and the IT/OT boundary is the critical underwriting question, because segmentation failure is what turns an IT encryption event into a physical production halt.\n\nAgainst that sits data-sensitivity-driven leverage, which dominates healthcare, finance and insurance, education, and the professional-services group. Here the threat is publication, regulatory consequence, and downstream liability rather than lost output per hour. Healthcare is the hybrid worst case and the reason it consistently prices worst: it carries both severe data sensitivity (PHI, 2,443 posted victims) and a genuine safety-driven uptime constraint, since diverted ambulances and delayed oncology treatment are patient-harm events, not inconvenience. Finance carries acute data sensitivity plus real-time settlement obligations, but generally has the maturity, redundancy, and capital to recover without paying. Education and the professional-services group are closer to pure data-leverage plays: a law firm's privileged client files or a university's student records create liability and reputational damage on publication, but a two-week outage, while painful, is rarely existential. The 1,295 education victim records show the classic data-extortion signature, dominated by LockBit3 (114), Qilin (73), INC Ransom (72), Vice Society (63) and Rhysida (57), with Vice Society's and Rhysida's prominence reflecting deliberate specialization in schools and universities as soft, data-rich, under-defended targets.\n\nRegulatory exposure differs enough to change loss composition, not merely loss size. HIPAA gives healthcare the most punitive and most mechanically triggered regime: breach notification thresholds, OCR investigation, and near-automatic class-action follow-on mean that third-party liability and regulatory defense frequently exceed first-party restoration cost. Finance faces GLBA and, for EU-touching entities, DORA, which shifts the burden upstream into operational-resilience testing, ICT third-party register maintenance, and rapid incident reporting — a compliance-failure exposure that exists independent of whether an attack succeeds. Education sits under FERPA, which is substantively strict but historically weak on financial penalty, so education's regulatory tail is thinner than healthcare's even at comparable data sensitivity; the real education tail is state student-privacy statutes and litigation. Critical-infrastructure sectors — energy, transportation, water, manufacturing, food — are increasingly shaped by CIRCIA reporting obligations, which compress disclosure timelines and raise the cost of an unprepared incident-response function. Public administration adds political and public-records exposure that has no private-sector analogue: the incident becomes a governance event, with disclosure often mandatory and negotiation frequently prohibited by policy.\n\nDowntime tolerance and ability to pay interact in ways that matter for expected severity. Healthcare, energy, transportation and food production have the lowest tolerance measured in hours; retail and hospitality tolerate hours-to-days but suffer disproportionately in peak season, where a POS outage over a holiday weekend or a casino floor outage during a major event compresses an entire quarter's margin; construction, education and much of professional services tolerate days-to-weeks, since project schedules and academic calendars absorb slippage. Ability to pay cuts across this and often inverts it. Corporate victims in finance, IT, telecom and large manufacturing can fund both ransom and rapid restoration. Public administration and education frequently cannot: budgets are appropriated, not discretionary, ransom payment may be legally or politically foreclosed, and the practical consequence is longer outages, deeper reliance on insurance and public funds, and greater restoration cost even where the ransom itself is never paid. This is why public-sector and education severity should not be underwritten off ransom-demand size — the loss migrates into extended business interruption, forensic and rebuild cost, and notification expense. Small organizations across every sector show the same asymmetry: Verizon's 2025 DBIR found ransomware present in 88% of SMB breaches versus 39% at large organizations, and Sophos's 2026 data shows only 34% of 100-250 employee firms stopped attacks before encryption versus 46% at 3,001-5,000 employees.\n\nFinally, third-party and supply-chain concentration varies enormously and is the dominant driver of correlated, portfolio-level loss. Information technology is the extreme case: MSPs, SaaS platforms, managed file-transfer products and distributors sit upstream of thousands of customers, and Kaseya, MOVEit, CDK Global and Ingram Micro each demonstrated that one intrusion produces simultaneous outages across an entire book. Telecommunications is structurally similar — carriers are single points of failure for downstream connectivity — and its 357 tracked victims with sharp 2025-2026 acceleration (124 in 2025, 62 in the first seven months of 2026) suggest attackers have recognized this. Manufacturing and transportation carry tiered supplier concentration where a single Tier-2 supplier outage idles multiple OEMs, producing contingent business interruption that the direct victim's own policy never captures. Healthcare concentrates through claims clearinghouses and billing intermediaries, finance through fintech partners and market infrastructure, retail through shared dealer-management and CRM platforms, and agriculture through a small number of processors and cooperatives controlling large shares of throughput. Construction and hospitality, by contrast, are comparatively fragmented — losses there are more numerous but far less correlated. For a cyber portfolio, this distinction matters more than raw frequency: fragmented sectors generate attritional loss, concentrated sectors generate the accumulation event that threatens solvency.",
+  "common_hazard_themes": [
+    "Identity-based initial access as the dominant entry route: compromised credentials, infostealer-harvested session tokens, unenforced or bypassable MFA, and exposed VPN/RDP and edge appliances appear as the leading access vector in every one of the fourteen industries.",
+    "Edge-device and internet-facing vulnerability exploitation: unpatched VPN concentrators, firewalls, file-transfer appliances and remote-management tooling recur across all sectors, with exploitation windows now measured in days after disclosure.",
+    "Multi-extortion as the default model: encryption plus exfiltration plus leak-site publication, increasingly extended with direct customer/patient/student notification, regulator tip-offs, harassment of executives, and DDoS pressure.",
+    "Exfiltration-only and encryption-less extortion growth: a rising share of incidents involve no encryption at all, defeating backup-based recovery strategies and shifting loss from restoration cost to liability and notification cost.",
+    "Ransomware-as-a-service commoditization and affiliate churn: a small set of high-volume brands (Qilin, Akira, INC Ransom, Play, Medusa, SafePay, DragonForce, Lynx, RansomHub successors) dominate postings across every sector, with affiliates migrating between brands after takedowns so that law-enforcement disruption suppresses names, not volume.",
+    "Third-party, vendor and MSP compromise as an access and aggregation path: intrusion at a shared service provider yields many victims from one operation, appearing in every industry's incident record.",
+    "Backup and recovery-infrastructure targeting: deliberate destruction of backups, snapshots, hypervisor volumes and Active Directory before detonation, converting a recoverable event into a payment-pressure event.",
+    "Human-factor and social-engineering risk: phishing, business-email compromise, help-desk and MFA-reset impersonation, and voice-based social engineering of IT support recur across all sectors regardless of technical maturity.",
+    "Insider and privileged-access risk, both malicious and negligent, including contractor and offshore-support access that expands the effective trust boundary.",
+    "Regulatory and notification exposure attaching to nearly every incident, with mandatory disclosure timelines compressing incident-response decision-making and creating loss independent of ransom.",
+    "Legacy and end-of-life technology debt: unsupported operating systems, unpatchable embedded and control-system devices, and long refresh cycles that make compensating controls the only viable mitigation.",
+    "Business interruption and contingent business interruption as the primary severity driver, frequently exceeding the ransom demand itself by an order of magnitude.",
+    "Litigation and class-action follow-on: consumer, employee and shareholder claims now routinely follow any incident involving personal-data exfiltration."
+  ],
+  "common_exposure_themes": [
+    "Core enterprise IT and business-critical applications (ERP, finance, email, collaboration, file shares) whose loss halts revenue-generating and administrative operations in every sector.",
+    "Identity and access infrastructure: Active Directory, single sign-on, privileged access management and cloud identity tenants, which function as the universal blast-radius multiplier across all fourteen industries.",
+    "Personal data holdings creating notification and liability exposure: customer, patient, student, citizen, employee and counterparty PII, plus special categories (PHI, financial account data, biometric and minor data) that raise per-record cost.",
+    "Third-party, vendor, MSP and supply-chain interconnections, including the credentials, VPN tunnels and API integrations that link organizations to partners and downstream customers.",
+    "Backup, disaster-recovery and virtualization infrastructure, whose integrity determines whether an incident is a restoration exercise or a forced negotiation.",
+    "Remote access and edge infrastructure: VPN gateways, firewalls, RDP, remote monitoring and management tools, and managed file-transfer platforms.",
+    "Cloud and SaaS platform dependencies, where concentration in a small number of providers creates correlated exposure not visible on the insured's own network.",
+    "Operational, production and service-delivery technology: OT/ICS/SCADA, medical devices, POS terminals, fleet and dispatch systems, building management and IoT, which convert cyber events into physical and safety consequence.",
+    "Employee and HR data, including payroll, benefits and background-check records, exposed in nearly every incident and a reliable driver of employee class actions.",
+    "Intellectual property, trade secrets, source code, designs, bid and pricing data, and privileged client material, where the loss is competitive and contractual rather than regulatory.",
+    "Physical and multi-site infrastructure, where distributed locations and inconsistent local security maturity widen the attack surface and complicate uniform control deployment.",
+    "Brand, reputation and customer-trust assets, realized through churn, contract loss, procurement disqualification and public-sector political consequence."
+  ],
+  "industry_differentiators": [
+    {
+      "industry": "Manufacturing",
+      "what_makes_it_distinct": "The most-targeted sector for five consecutive years through 2025, with 4,434 leak-site postings. Combines legacy OT/ICS estates on decade-plus refresh cycles with deep tiered supply-chain interdependency and valuable trade-secret data. A weak IT/OT boundary means an IT-side encryption event routinely halts physical production, and a single Tier-2 supplier outage idles multiple OEMs, producing contingent business interruption invisible on the direct victim's own policy.",
+      "primary_extortion_leverage": "Production downtime. Ransom is priced against per-hour output loss and contractual delivery penalties, secondarily against theft of designs, process IP and trade secrets.",
+      "downtime_tolerance": "Very low. Hours to a few days; continuous-process and just-in-time operations tolerate least, and idle-line cost accrues immediately regardless of data outcome."
+    },
+    {
+      "industry": "Accommodation, Food Services, Arts and Entertainment",
+      "what_makes_it_distinct": "771 tracked victims across 65+ countries spanning hotels, casinos, restaurants, theme parks, cruise lines and museums. Distinctively franchised and multi-site, with inconsistent security maturity across properties and heavy seasonal revenue concentration. Casino and gaming operations add regulator-supervised systems and cage/loyalty data. Guest-facing outages are immediately public and directly convert to booking loss and brand damage.",
+      "primary_extortion_leverage": "Guest-facing service disruption timed to peak periods, combined with exposure of guest PII, payment card data and loyalty records.",
+      "downtime_tolerance": "Low to moderate. Days in the ordinary course, but effectively hours during peak season or a major event, when a single weekend outage can absorb a quarter's margin."
+    },
+    {
+      "industry": "Finance and Insurance",
+      "what_makes_it_distinct": "Combines the highest-value regulated data with real-time payment, trading and claims obligations and dense interconnection through fintech partners and market infrastructure that permits contagion beyond the direct victim. Generally the most mature sector in controls, capital and recovery capability, which lowers payment likelihood while raising regulatory and systemic-risk scrutiny under GLBA and, for EU-touching entities, DORA.",
+      "primary_extortion_leverage": "Exposure of customer PII/PFI, account and counterparty data, plus regulatory and market-confidence consequence. Availability leverage is real for payments and trading but blunted by mature redundancy.",
+      "downtime_tolerance": "Very low for transaction processing and settlement (minutes to hours); moderate for back-office and underwriting functions."
+    },
+    {
+      "industry": "Professional, Scientific, Technical Services, Real Estate and Wholesale Trade",
+      "what_makes_it_distinct": "One of the most heavily populated leak-site categories, logging dozens of new claimed victims weekly in mid-2026. Spans consultancies, MSPs, law and accounting firms, engineering, staffing/BPO, commercial real estate and wholesale distribution. The defining feature is custodianship of other organizations' confidential material: privileged legal files, audit workpapers, M&A data and client PII. A single firm's breach becomes many clients' breach, and MSPs within this group double as an access path into downstream victims.",
+      "primary_extortion_leverage": "Confidentiality of privileged and client-owned data, with professional-liability, contractual and regulatory consequence flowing to clients rather than only the insured.",
+      "downtime_tolerance": "Moderate to high. Days to weeks for most advisory work; wholesale/logistics sub-segments are materially tighter due to order and fulfilment obligations."
+    },
+    {
+      "industry": "Healthcare and Social Assistance",
+      "what_makes_it_distinct": "2,443 posted victims with sharply accelerating pace. The only sector where both extortion levers are simultaneously severe: PHI carries the most punitive and mechanically triggered regulatory regime (HIPAA breach notification, OCR investigation, near-automatic class-action follow-on), while downtime is a patient-safety event producing ambulance diversion and delayed treatment. Fragmented estates, unpatchable connected medical devices, and a long tail of small under-resourced providers sit alongside a few giant claims processors whose compromise cascades industry-wide.",
+      "primary_extortion_leverage": "Dual: patient-safety-driven urgency to restore clinical operations, plus PHI publication carrying regulatory penalty and litigation exposure.",
+      "downtime_tolerance": "Lowest of any sector. Hours for clinical and emergency systems, where outage translates directly into patient harm rather than financial loss alone."
+    },
+    {
+      "industry": "Telecommunications",
+      "what_makes_it_distinct": "357 tracked victims with pronounced acceleration — 124 in 2025, the sector's most active year on record, plus 62 more in the first seven months of 2026. Carriers are single points of failure for downstream connectivity, so an outage propagates into every dependent business and household. Uniquely combines mass subscriber PII, core network and signaling systems functioning as OT-equivalents, and lawful-intercept and critical-infrastructure systems whose compromise carries national-security consequence beyond commercial loss.",
+      "primary_extortion_leverage": "Service availability affecting large downstream populations, plus mass subscriber PII and call-detail records with regulatory and surveillance sensitivity.",
+      "downtime_tolerance": "Very low. Minutes to hours for core network and signaling; regulatory service-obligation and SLA penalties begin accruing almost immediately."
+    },
+    {
+      "industry": "Transportation and Warehousing",
+      "what_makes_it_distinct": "Sits at the intersection of critical infrastructure, thin operating margins and tightly coupled IT/OT. Produced both the costliest cyber incident on record (Maersk/NotPetya, roughly $300 million) and a documented insolvency directly caused by ransomware (KNP Logistics, roughly 730 jobs lost) — the clearest evidence that thin margins convert a survivable outage into a terminal one. Dispatch, freight and warehouse management systems have no manual fallback at modern volume.",
+      "primary_extortion_leverage": "Halted freight movement and dispatch, with cascading contractual penalties and downstream customer disruption across the shipping chain.",
+      "downtime_tolerance": "Very low. Hours. Perishable and time-definite freight has effectively no tolerance, and margin structure leaves little buffer to absorb extended interruption."
+    },
+    {
+      "industry": "Public Administration (Government)",
+      "what_makes_it_distinct": "Large, heterogeneous, chronically under-funded legacy estates holding vast citizen PII, delivering essential services that cannot simply be suspended — 911 dispatch, tax collection, benefits, permitting, courts. Uniquely constrained on the payment decision: appropriated budgets, public-records disclosure obligations and political scrutiny mean payment is often legally or politically foreclosed, so loss migrates into extended interruption, forensic rebuild and notification cost rather than ransom. Incidents become governance and electoral events.",
+      "primary_extortion_leverage": "Disruption of essential and public-safety services combined with citizen PII exposure and acute political/reputational pressure on officials.",
+      "downtime_tolerance": "Bifurcated. Near-zero for public-safety and emergency dispatch; weeks to months tolerated in practice for administrative functions, largely because recovery capacity rather than acceptable risk sets the timeline."
+    },
+    {
+      "industry": "Agriculture, Forestry, Fishing and Food Production",
+      "what_makes_it_distinct": "A designated critical-infrastructure sector and one of the fastest-growing targets, spanning farm-to-fork from primary producers through cooperatives, processors, cold-storage and distribution. Defining characteristic is perishability: unlike any other sector, the inventory itself degrades during an outage, so downtime destroys assets rather than merely deferring revenue. Heavy concentration in a few large processors and cooperatives controlling large throughput shares, paired with generally low security maturity among producers, creates food-security consequence at national scale.",
+      "primary_extortion_leverage": "Spoilage-driven urgency and disruption of processing and cold chain, amplified by food-security and public-health visibility.",
+      "downtime_tolerance": "Extremely low during harvest, processing and cold-chain operation — hours before irreversible product loss; higher in off-season and administrative functions."
+    },
+    {
+      "industry": "Retail Trade and Consumer Services",
+      "what_makes_it_distinct": "One of the highest-volume targeting categories, spanning single-location dealerships and gyms up to multinational chains, and dominated by high-volume opportunistic RaaS affiliates rather than targeted operators. Distinguished by extreme seasonal revenue concentration and by shared-platform concentration: dealer-management and CRM systems used across thousands of franchises mean one platform compromise produces simultaneous outages across an entire franchise network, as CDK Global demonstrated. PCI-DSS obligations and payment-card liability attach to nearly every incident.",
+      "primary_extortion_leverage": "POS and store-network outage timed to peak trading periods, plus customer payment-card and loyalty data exposure with PCI and consumer-notification consequence.",
+      "downtime_tolerance": "Low. Hours to days, collapsing to near-zero during peak seasonal trading when a short outage consumes a disproportionate share of annual margin."
+    },
+    {
+      "industry": "Construction",
+      "what_makes_it_distinct": "1,362 distinct victims posted 2019 through mid-July 2026, with 2025 alone accounting for 513 — more than any prior full year, and 267 already recorded through mid-July 2026. Distinguished by project-based rather than continuous operations, low IT maturity relative to revenue, and a highly fragmented subcontractor web that widens the trust boundary. Bid and tender data is uniquely sensitive: its exposure creates competitive rather than regulatory harm. Government-owner project work pulls public-sector data and clearance obligations into scope.",
+      "primary_extortion_leverage": "Exposure of confidential bid, contract and design data plus project schedule delay and associated liquidated damages; encryption leverage is comparatively weaker.",
+      "downtime_tolerance": "Moderate to high. Days to weeks. Physical site work continues during an IT outage, though payroll, procurement and design-file access degrade progressively."
+    },
+    {
+      "industry": "Energy and Utilities",
+      "what_makes_it_distinct": "Roughly 826 indexed victims across oil and gas, pipelines, refining, power generation and transmission, and water/wastewater. Blends critical-national-infrastructure status — where downtime carries cascading physical, economic and public-safety consequence — with large, aged, geographically dispersed OT estates. Uniquely, the precautionary IT/OT shutdown is itself the loss event: operators halt physical operations defensively when IT is compromised, as Colonial Pipeline showed, so business interruption occurs even where OT is never touched. Heaviest regulatory overlay including CIRCIA and sector-specific mandates.",
+      "primary_extortion_leverage": "Threat to physical operational continuity and public-safety consequence, giving attackers extraordinary leverage disproportionate to the data actually held.",
+      "downtime_tolerance": "Extremely low. Minutes to hours for grid, pipeline and water operations, where interruption is a public-safety and regulatory event, not merely a commercial one."
+    },
+    {
+      "industry": "Information Technology",
+      "what_makes_it_distinct": "One of the two most-targeted industries, behind only manufacturing. Its defining feature is systemic aggregation exposure: software vendors, MSPs, SaaS hosts and distributors sit upstream of thousands of customers, so a single intrusion cascades into mass downstream outage and data loss — Kaseya, MOVEit, CDK Global and Ingram Micro each proved this at scale. For a cyber portfolio this is the sector most capable of generating a single correlated accumulation event across an entire book, and privileged remote-management access makes IT firms both victim and weapon.",
+      "primary_extortion_leverage": "Downstream customer impact and reputational destruction of the platform, plus source code, IP and customer data theft. Contractual liability to thousands of customers often dwarfs the insured's own restoration cost.",
+      "downtime_tolerance": "Very low. Minutes to hours for SaaS and hosting under contractual SLAs, with customer attrition and contractual penalties beginning almost immediately."
+    },
+    {
+      "industry": "Educational Services",
+      "what_makes_it_distinct": "1,295 tracked victim records, rising from 15 in 2020 to 307 in 2023 and 328 in 2025, with 157 already in the first seven months of 2026 — a sustained upward trajectory. Heavily US-concentrated (519 of 946 country-attributed records) and dominated by LockBit3 (114), Qilin (73), INC Ransom (72), Vice Society (63) and Rhysida (57); the prominence of Vice Society and Rhysida reflects deliberate specialization in schools and universities as soft, data-rich, under-defended targets. Distinctive combination of open-by-design networks, BYOD and research-collaboration culture, minors' data raising notification sensitivity, and constrained appropriated budgets that limit both prevention spend and ransom payment. FERPA is substantively strict but historically weak on financial penalty, so the regulatory tail is thinner than healthcare's at comparable data sensitivity, with state student-privacy statutes and litigation carrying the real exposure. Universities add research IP of nation-state interest.",
+      "primary_extortion_leverage": "Exposure of student records including minors' data, staff PII and research IP, plus disruption timed to enrollment, examination and term-start pressure points.",
+      "downtime_tolerance": "Moderate to high in absolute terms — days to weeks absorbed by academic calendars — but sharply lower at term start, enrollment and examination periods. Weak budget capacity for both ransom and rapid restoration means outages run longer than tolerance alone would predict."
+    }
+  ],
+  "global_aggregate_losses": [
+    {
+      "metric": "Total on-chain ransomware payments, 2025",
+      "value": "Approximately $820 million, the lowest full-year total since 2021 and an 8% decline from 2024's revised $892 million. Chainalysis notes the figure may approach or exceed $900 million as further incidents are attributed.",
+      "source": "Chainalysis 2026 Crypto Crime Report",
+      "source_url": "https://www.chainalysis.com/blog/crypto-ransomware-2026/"
+    },
+    {
+      "metric": "Median on-chain ransom payment, 2025",
+      "value": "$59,556, up 368% from $12,738 in 2024",
+      "source": "Chainalysis 2026 Crypto Crime Report",
+      "source_url": "https://www.chainalysis.com/blog/crypto-ransomware-2026/"
+    },
+    {
+      "metric": "Share of ransom demands paid, 2025",
+      "value": "Potentially an all-time low of approximately 28%",
+      "source": "Chainalysis 2026 Crypto Crime Report",
+      "source_url": "https://www.chainalysis.com/blog/crypto-ransomware-2026/"
+    },
+    {
+      "metric": "Claimed victims posted to leak sites, 2025",
+      "value": "7,874 globally, a 50% year-over-year increase and the most active year on record. The United States remains the most heavily targeted country, followed by Canada, Germany and the UK. US targeting of critical infrastructure, supply chain/logistics and government rose 45-56% year over year.",
+      "source": "Chainalysis 2026 Crypto Crime Report (citing eCrime.ch data)",
+      "source_url": "https://www.chainalysis.com/blog/crypto-ransomware-2026/"
+    },
+    {
+      "metric": "Median ransom payment, 2026",
+      "value": "$769,000, down from $1 million the prior year",
+      "source": "Sophos State of Ransomware 2026",
+      "source_url": "https://www.sophos.com/en-us/blog/sophos-state-of-ransomware-2026"
+    },
+    {
+      "metric": "Median ransom demand, 2026",
+      "value": "$698,000, down 65% over two years",
+      "source": "Sophos State of Ransomware 2026",
+      "source_url": "https://www.sophos.com/en-us/blog/sophos-state-of-ransomware-2026"
+    },
+    {
+      "metric": "Average recovery cost excluding ransom, 2026",
+      "value": "$1.7 million per incident, up 11% year over year (2025 figure was $1.53 million, itself down 44% from $2.73 million in 2024)",
+      "source": "Sophos State of Ransomware 2026",
+      "source_url": "https://www.sophos.com/en-us/blog/sophos-state-of-ransomware-2026"
+    },
+    {
+      "metric": "Ransom payment rate among encrypted victims, 2026",
+      "value": "48% paid, the second-lowest rate on record after 2023 (46%); four-year average payment rate is 50%. Among those paying, 51% negotiated below the initial demand.",
+      "source": "Sophos State of Ransomware 2026",
+      "source_url": "https://www.sophos.com/en-us/blog/sophos-state-of-ransomware-2026"
+    },
+    {
+      "metric": "Attack encryption success rate, 2026",
+      "value": "56% of attacks succeeded in encrypting data, up from 50% the prior year but below the 75% peak in 2023",
+      "source": "Sophos State of Ransomware 2026",
+      "source_url": "https://www.sophos.com/en-us/blog/sophos-state-of-ransomware-2026"
+    },
+    {
+      "metric": "Identity-based attack origin, 2026",
+      "value": "79% of ransomware attacks started with an identity-based approach. Root causes: malicious email 26%, phishing 24%, compromised credentials 23%, exploited vulnerabilities 18%, brute-force 6%.",
+      "source": "Sophos State of Ransomware 2026",
+      "source_url": "https://www.sophos.com/en-us/blog/sophos-state-of-ransomware-2026"
+    },
+    {
+      "metric": "Recovery speed, 2025",
+      "value": "53% of victims recovered within one week, up from 35% in 2024",
+      "source": "Sophos State of Ransomware 2025",
+      "source_url": "https://www.sophos.com/en-us/blog/the-state-of-ransomware-2025"
+    },
+    {
+      "metric": "Average and median ransom payment, Q4 2025",
+      "value": "Average $591,988; median $325,000. Quarterly averages were volatile across 2025, moving from $1.13 million (Q2) to $376,941 (Q3) to $591,988 (Q4); the mean-median gap reflects a small number of multi-million-dollar settlements.",
+      "source": "Coveware Quarterly Report, Q4 2025",
+      "source_url": "https://www.coveware.com/ransomware-quarterly-reports"
+    },
+    {
+      "metric": "Ransom payment rate, Q4 2025",
+      "value": "Approximately 20%, a historic low (23% in Q3 2025)",
+      "source": "Coveware Quarterly Report, Q4 2025",
+      "source_url": "https://www.coveware.com/ransomware-quarterly-reports"
+    },
+    {
+      "metric": "Ransomware share of all data breaches, 2025",
+      "value": "Present in 44% of breaches, up from 32% the prior year",
+      "source": "Verizon 2025 Data Breach Investigations Report",
+      "source_url": "https://www.verizon.com/business/resources/reports/2025-dbir-data-breach-investigations-report.pdf"
+    },
+    {
+      "metric": "Median ransom paid and non-payment rate, 2025",
+      "value": "Median payment $115,000, down from $150,000; 64% of victim organizations did not pay, up from 50% two years earlier",
+      "source": "Verizon 2025 Data Breach Investigations Report",
+      "source_url": "https://www.verizon.com/business/resources/reports/2025-dbir-data-breach-investigations-report.pdf"
+    },
+    {
+      "metric": "SMB versus large-organization ransomware exposure, 2025",
+      "value": "Ransomware was a component of 88% of SMB breaches versus 39% of breaches at large organizations",
+      "source": "Verizon 2025 Data Breach Investigations Report",
+      "source_url": "https://www.verizon.com/business/resources/reports/2025-dbir-data-breach-investigations-report.pdf"
+    },
+    {
+      "metric": "Average cost of an extortion or ransomware incident, 2025",
+      "value": "$5.08 million, against a global all-cause data breach average of $4.44 million (down 9% from $4.88 million in 2024). US average breach cost rose 9% to an all-time high of $10.22 million.",
+      "source": "IBM Cost of a Data Breach Report 2025",
+      "source_url": "https://www.ibm.com/reports/data-breach"
+    },
+    {
+      "metric": "Breach identification and containment time, 2025",
+      "value": "241 days on average to identify and contain a breach, a nine-year low. 63% of organizations refused to pay ransom demands, up from 59%.",
+      "source": "IBM Cost of a Data Breach Report 2025",
+      "source_url": "https://www.ibm.com/reports/data-breach"
+    }
+  ],
+  "highest_risk_industries": [
+    "Manufacturing — highest frequency. The single most-targeted sector for five consecutive years through 2025, with 4,434 leak-site postings, the largest count in the dataset. Severity is driven by production-halt business interruption priced per hour, and aggregation risk arrives through tiered supplier concentration where one Tier-2 outage idles multiple OEMs.",
+    "Healthcare and Social Assistance — highest severity. 2,443 posted victims with accelerating pace, and uniquely both extortion levers at maximum: patient-safety downtime intolerance measured in hours plus the most punitive regulatory regime (HIPAA notification, OCR enforcement, near-automatic class actions). Loss composition skews heavily toward third-party liability and regulatory defense, and IBM's 2025 data places extortion-incident cost at $5.08 million on average before healthcare's sector premium.",
+    "Information Technology — highest systemic/accumulation risk. Second most-targeted industry and the one most capable of producing a single correlated loss across an entire portfolio. Kaseya, MOVEit, CDK Global and Ingram Micro each converted one intrusion into thousands of simultaneous downstream victims. Chainalysis records US supply-chain and logistics targeting up 45-56% year over year, indicating attackers are deliberately pursuing this multiplier.",
+    "Public Administration (Government) — high frequency with structurally extended severity. Chronically under-funded legacy estates and vast citizen PII holdings, combined with a constrained payment decision: where payment is politically or legally foreclosed, loss migrates into prolonged interruption, forensic rebuild and notification cost. Outage durations run longer than in any comparably targeted private sector.",
+    "Energy and Utilities — highest consequence severity. Roughly 826 indexed victims, but severity is disproportionate to frequency because the precautionary IT/OT shutdown is itself the loss event, as Colonial Pipeline demonstrated: business interruption occurs even where control systems are never touched. Downtime carries cascading physical, public-safety and regulatory consequence under CIRCIA and sector mandates.",
+    "Transportation and Warehousing — highest tail risk relative to revenue. The only sector with both the costliest recorded cyber loss (Maersk/NotPetya, roughly $300 million) and a documented ransomware-caused insolvency (KNP Logistics, roughly 730 jobs). Thin operating margins mean an outage survivable elsewhere becomes terminal here, making this the clearest sector for total-loss rather than partial-loss outcomes.",
+    "Educational Services — high and sharply rising frequency with weak recovery capacity. 1,295 tracked victims on a sustained upward trajectory, targeted by groups (Vice Society, Rhysida) that specialize in the sector precisely because it is soft and data-rich. Minors' data raises notification sensitivity while appropriated budgets constrain both prevention and recovery, so incidents resolve slowly and expensively even at modest ransom demands."
+  ],
+  "key_takeaways": [
+    "Frequency and severity are decoupling, and pricing must follow both curves separately. Leak-site victims hit a record 7,874 in 2025, up 50%, while total on-chain ransom payments fell 8% to roughly $820 million and payment rates hit historic lows — approximately 28% per Chainalysis, around 20% in Coveware's Q4 2025 book, 48% of encrypted victims per Sophos. More insureds are being hit and fewer are paying, so portfolio loss is migrating out of ransom reimbursement and into business interruption, restoration and liability. Sophos's average recovery cost rose 11% to $1.7 million in 2026 even as median payments fell to $769,000.",
+    "Underwrite the extortion lever, not the sector label. Uptime-leveraged sectors (manufacturing, energy, transportation, agriculture/food) generate BI-dominated loss where the IT/OT segmentation question and documented manual-fallback procedures are the decisive controls. Data-leveraged sectors (healthcare, finance, education, professional services) generate liability-dominated loss where data minimization, retention discipline and encryption-at-rest matter more than recovery speed. Healthcare is the only sector where both levers are simultaneously severe, which is why it prices worst.",
+    "Identity is now the control that matters most. Sophos found 79% of 2026 attacks began with an identity-based approach, with compromised credentials (23%) rivaling malicious email (26%) and phishing (24%) as root cause. Phishing-resistant MFA on all remote access and privileged accounts, help-desk identity-verification procedures resistant to voice social engineering, and tiered Active Directory administration should be treated as baseline binding requirements rather than credits.",
+    "Backup existence is not backup resilience, and the distinction is now the primary determinant of severity. Attackers routinely destroy backups, snapshots, hypervisor volumes and Active Directory before detonation. Require evidence of immutable or air-gapped backups, tested full-environment restoration within a stated RTO, and AD forest recovery capability. Sophos found 53% of victims recovered within a week in 2025 versus 35% the prior year — that gap is where severity is won or lost.",
+    "Exfiltration-only extortion defeats the backup-based recovery story entirely. A rising share of incidents involve no encryption, so an insured with excellent restoration capability can still face full notification, regulatory and litigation cost. Data-liability limits should be underwritten independently of business-interruption limits, and questions about data inventory, retention schedules and volume of retained personal records should carry real weight.",
+    "Third-party and supply-chain concentration is the accumulation exposure that threatens portfolio solvency, and it differs by an order of magnitude across sectors. Information technology and telecommunications are structurally concentrated — Kaseya, MOVEit, CDK Global and Ingram Micro each turned one intrusion into thousands of simultaneous claims. Manufacturing, transportation, healthcare claims processing and agriculture concentrate through tiered suppliers and intermediaries; construction and hospitality are comparatively fragmented and produce attritional rather than correlated loss. Map shared platform dependencies across the book, not just insured-by-insured controls, and consider explicit aggregation limits for shared SaaS and MSP platforms.",
+    "Ability to pay is inversely related to severity in the public sector and education, which inverts the usual intuition. Where appropriated budgets, policy or politics foreclose ransom payment, loss does not disappear — it lengthens into extended interruption, forensic rebuild and notification cost. Do not underwrite these segments off ransom-demand size, and expect longer claim durations and higher restoration expense than the demand would suggest.",
+    "Small insureds carry disproportionate ransomware exposure across every sector. Verizon's 2025 DBIR found ransomware in 88% of SMB breaches versus 39% at large organizations, and Sophos found only 34% of 100-250 employee firms stopped attacks before encryption versus 46% at 3,001-5,000 employees. SME cyber books need materially different control expectations and pricing assumptions than mid-market, and control credits validated at enterprise scale should not be extended downmarket unexamined.",
+    "Regulatory regime drives loss composition, not just loss size, and should shape limit structure. HIPAA produces the deepest liability tail; GLBA and DORA create compliance-failure exposure independent of attack success and demand evidence of resilience testing and ICT third-party registers; CIRCIA compresses disclosure timelines for critical-infrastructure insureds, raising the cost of an unprepared IR function; FERPA is strict but financially weak, leaving education's real tail in state statutes and litigation. Pre-arranged breach counsel and IR retainers measurably reduce this component."
+  ]
+}

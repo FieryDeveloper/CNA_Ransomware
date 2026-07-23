@@ -1,0 +1,87 @@
+node {
+  diameter: 50px;
+  color: #A5ABB6;
+  border-color: #9AA1AC;
+  border-width: 2px;
+  text-color-internal: #FFFFFF;
+  font-size: 10px;
+}
+relationship {
+  color: #C6CBD1;
+  shaft-width: 1px;
+  font-size: 8px;
+  padding: 3px;
+  text-color-external: #4A5158;
+  text-color-internal: #FFFFFF;
+  caption: '<type>';
+}
+
+/* Level 1 - the hubs you navigate from */
+node.Industry {
+  color: #2B3238; border-color: #11151A; diameter: 80px;
+  text-color-internal: #FFFFFF; caption: '{id}'; font-size: 12px;
+}
+
+/* Level 2 - the two taxonomy axes. Warm = threat, cool = asset. */
+node.Hazard {
+  color: #A2432B; border-color: #7C3121; diameter: 65px;
+  text-color-internal: #FFFFFF; caption: '{name}';
+}
+node.Exposure {
+  color: #2A5578; border-color: #1D3D57; diameter: 65px;
+  text-color-internal: #FFFFFF; caption: '{name}';
+}
+
+/* Level 3 - the specifics under each category */
+node.Subcategory {
+  color: #C9BDB6; border-color: #A99A91; diameter: 30px;
+  text-color-internal: #2B3238; caption: '{name}';
+}
+
+/* The evidence layer */
+node.Incident {
+  color: #8A6023; border-color: #6A4919; diameter: 60px;
+  text-color-internal: #FFFFFF; caption: '{victim}';
+}
+node.Company {
+  color: #5A6268; border-color: #434A4F; diameter: 45px;
+  text-color-internal: #FFFFFF; caption: '{id}';
+}
+node.Group {
+  color: #6E3B5C; border-color: #532B45; diameter: 50px;
+  text-color-internal: #FFFFFF; caption: '{id}';
+}
+node.Country {
+  color: #3F6B5F; border-color: #2E5046; diameter: 40px;
+  text-color-internal: #FFFFFF; caption: '{id}';
+}
+node.Statistic {
+  color: #4A5A6B; border-color: #374553; diameter: 40px;
+  text-color-internal: #FFFFFF; caption: '{metric}';
+}
+node.Source {
+  color: #9AA1A7; border-color: #7C8288; diameter: 25px;
+  text-color-internal: #FFFFFF; caption: '{host}';
+}
+node.Theme {
+  color: #6B5E8B; border-color: #51476A; diameter: 40px;
+  text-color-internal: #FFFFFF; caption: '{name}';
+}
+
+/* The bulk layer. Small on purpose - these come in thousands. */
+node.Victim {
+  color: #B0B6BA; border-color: #949A9E; diameter: 20px;
+  text-color-internal: #2B3238; caption: '{name}';
+}
+
+/* Relationship colours follow their target */
+relationship.FACES { color: #A2432B; shaft-width: 2px; }
+relationship.EXPOSES { color: #2A5578; shaft-width: 2px; }
+relationship.INCLUDES { color: #C9BDB6; }
+relationship.HAD_INCIDENT { color: #8A6023; shaft-width: 2px; }
+relationship.PERPETRATED_BY { color: #6E3B5C; shaft-width: 2px; }
+relationship.ATTACKED_BY { color: #6E3B5C; }
+relationship.HIT { color: #5A6268; }
+relationship.OCCURRED_IN { color: #3F6B5F; }
+relationship.MEASURED_BY { color: #4A5A6B; }
+relationship.CITED_BY { color: #C6CBD1; }
