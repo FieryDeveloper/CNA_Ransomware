@@ -1,4 +1,25 @@
 // ===========================================================================
+// DEMO - the three to show live. Apply style.grass first (drag onto Browser).
+// ===========================================================================
+
+// D1. WHAT THE DATA IS. One industry, both axes: warm hazards, cool exposures.
+MATCH p = (i:Industry {id:'Healthcare and Social Assistance'})-[:FACES|EXPOSES]->()
+RETURN p;
+
+// D2. IT IS GROUNDED. One incident fully wired; reads like a sentence.
+//     Swap the name for 'MGM Resorts' or 'CDK Global' to show it generalises.
+MATCH p = (:Industry)-[:HAD_INCIDENT]->(n:Incident)-->()
+WHERE n.victim STARTS WITH 'Change Healthcare'
+RETURN p;
+
+// D3. THE FINDING. Two hazards (initial access, extortion) reach almost every
+//     industry - a dense fan. Exposures never do. That contrast is the headline.
+MATCH (h:Hazard)<-[:FACES]-(:Industry)
+WITH h, count(*) AS reach WHERE reach >= 10
+MATCH p = (h)<-[:FACES]-(:Industry)
+RETURN p;
+
+// ===========================================================================
 // PART 1 - VISUAL queries. Run these in Neo4j Browser to SEE the graph.
 // Browser only draws a picture when the query returns NODES, RELATIONSHIPS or
 // PATHS. Returning scalars (counts, strings) gives you a table instead, which
