@@ -5,3 +5,12 @@ __pycache__/
 #   python scripts/fetch_ransomware_live.py --years 2015-2026
 # Comment this out if you want the snapshot under version control.
 data/raw/
+
+# MongoDB collection JSON is regenerable and victims.json is 14 MB. A fresh
+# clone rebuilds it from the committed graph CSV:
+#   node scripts/export_mongo.js
+data/mongo/
+
+# Local model cache / secrets
+.env
+sentence_transformers_cache/

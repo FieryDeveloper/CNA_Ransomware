@@ -21,7 +21,8 @@ data/
   synthesis.json       cross-industry comparison + global loss statistics
   sources.txt          every distinct URL cited
   raw/                 unprocessed API pulls (created by the fetch scripts)
-  graph/               knowledge-graph export: node/rel CSVs, load.cypher, queries.cypher
+  graph/               knowledge-graph export: node/rel CSVs, load.cypher, queries.cypher, style.grass
+  mongo/               the 6 MongoDB collections as JSON, ready for Atlas
 
 scripts/
   fetch_ransomware_live.py   pull victims from ransomware.live (by sector or by year)
@@ -29,7 +30,11 @@ scripts/
   build_dataset.js           assemble agent output into the final dataset
   validate.js                coverage + integrity checks on the built dataset
   export_graph.js            reshape into a knowledge graph (Neo4j + explorer feed)
-  build_explorer.js          regenerate explorer.html with data inlined
+  build_explorer.js          regenerate explorer.html with data inlined (incl. Insights tab)
+  export_mongo.js            shape the dataset into the 6 MongoDB collections
+  load_mongo.py              upsert the collections into Atlas + build indexes
+  embed_graph.py             add a local-embedding vector index to Neo4j (for GraphRAG)
+  ask.py                     natural-language querying: semantic / relational / analytical
 ```
 
 ## Two layers of data
@@ -265,6 +270,80 @@ node, the universality is visible structurally instead of being buried in 14 nea
 rows. Subcategories stay per-category, since that is where industry-specific detail lives.
 
 `build_dataset.js` handles two real complications from how this was produced: the research run was interrupted by usage limits and resumed, so results span **multiple runs** (it takes the union), and agents named the same sector inconsistently (it canonicalises names and keeps the **richest** duplicate).
+
+---
+
+## MongoDB (Atlas)
+
+The document database is the **source of record + analytics store + app backend**. All the
+shaping logic lives in one place (`export_mongo.js`, Node) so there is a single implementation
+of the business rules; the Python loader only moves JSON into Atlas and builds indexes.
+
+```bash
+node scripts/export_mongo.js          # data/*.json  ->  data/mongo/*.json (6 collections)
+python scripts/load_mongo.py --dry-run # validate, no connection needed
+python scripts/load_mongo.py           # upsert into Atlas + create indexes
+```
+
+**Setup (one time):** create a free M0 cluster at [cloud.mongodb.com](https://cloud.mongodb.com),
+add a database user, allow your IP under Network Access, copy the connection string, then:
+
+```bash
+export MONGODB_URI='mongodb+srv://USER:PASS@cluster0.xxxx.mongodb.net/'
+pip install pymongo
+```
+
+### Collections
+
+| Collection | Docs | Shape |
+|---|---:|---|
+| `industries` | 14 | Curated taxonomy, one doc per industry. Embeds hazards/exposures (with subcategories), aggregate stats, a `bulk_summary`, and `incident_ids` referencing `incidents`. Serves the explorer directly. |
+| `incidents` | 107 | Normalized, one per researched attack. `financial` and `ransom` each carry `{text, usd}` — the raw reported string **and** a parsed number, so analytics never re-parse. |
+| `victims` | 27,108 | The flat bulk scrape. Indexed on `sector_key`, `group`, `year`, `country` (+ compound `sector_key+year`) so group-bys are fast. |
+| `taxonomy` | 136 | Deduped hazard/exposure categories with the industries each spans, its family, and reach. Powers the matrix without recomputation. |
+| `insights` | 1 | Materialized dashboard aggregates (by sector/year/group/country, heatmap, parsed losses) so charts never scan 27k rows. |
+| `synthesis` | 1 | Cross-industry narrative, themes, global statistics, takeaways. |
+
+**Idempotent:** every document is keyed by `_id` and replaced in place, so re-running after a
+re-scrape updates rather than duplicates.
+
+**Design note — the denormalization line.** `incidents` are their own collection (updatable,
+good for the archive role) but referenced from `industries` via `incident_ids`; the app joins
+with a `$lookup`. Victims are separate because 27k is too much to embed. This keeps the app
+fast, analytics flat, and the archive normalized — the three jobs a single store had to serve.
+
+---
+
+## Natural-language querying (GraphRAG)
+
+Asking "anything" is really three problems, so `ask.py` routes between three lanes:
+
+| Lane | Example | How |
+|---|---|---|
+| **Semantic** | *"why is healthcare targeted so heavily?"* | Embed the question, vector-search the graph, pull 1-hop context. **This is GraphRAG.** |
+| **Relational** | *"what's exposed in healthcare but not manufacturing?"* | A graph **traversal**. Vectors can't do this; Cypher can. |
+| **Analytical** | *"top 5 groups in manufacturing"* | An **aggregation** over the bulk layer. Not RAG. |
+
+The vector index lives in **Neo4j** (native, 5.11+), so semantic retrieval can vector-search
+**then traverse** — the thing Atlas vector search alone can't do. Embeddings are computed by a
+**local model** (`all-MiniLM-L6-v2`, ~1,300 short texts, seconds on CPU, **no API, no cost**).
+Your OpenAI/Anthropic key is used only, and only if you opt in with `--answer`, to phrase a
+final prose answer from the retrieved evidence.
+
+```bash
+pip install neo4j sentence-transformers
+export NEO4J_URI='bolt://localhost:7687' NEO4J_USER='neo4j' NEO4J_PASSWORD='...'
+
+python scripts/embed_graph.py          # once: embeds nodes + builds the vector index
+python scripts/ask.py "why is healthcare targeted so heavily?"
+python scripts/ask.py "top 5 groups in manufacturing"
+python scripts/ask.py "what's exposed in healthcare but not manufacturing?"
+python scripts/ask.py "why is healthcare unique?" --answer   # + optional LLM synthesis
+```
+
+By default the tool **shows you the evidence** (matched nodes + their graph links). `--answer`
+adds a synthesized paragraph — the only step that touches an API. Routing is keyword-heuristic,
+and the semantic lane is the fallback, so a question never hard-fails.
 
 ---
 
