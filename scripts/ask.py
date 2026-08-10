@@ -46,6 +46,7 @@ MODEL_NAME = "all-MiniLM-L6-v2"
 ANALYTICAL = re.compile(r"\b(how many|count|number of|total|most active|top \d|top |busiest|by year|per year|how much|average|biggest|largest|costliest)\b", re.I)
 RELATIONAL = re.compile(r"\b(both|also hit|shared|in common|but not|as well as|across (industries|sectors)|footprint|which groups?.*(and|both))\b", re.I)
 
+# keyword -> Industry node id (DBIR name), used by the relational lane.
 INDUSTRY_HINTS = {
     "healthcare": "Healthcare and Social Assistance", "finance": "Finance and Insurance",
     "financial": "Finance and Insurance", "manufacturing": "Manufacturing",
@@ -56,6 +57,25 @@ INDUSTRY_HINTS = {
     "telecom": "Telecommunications", "agriculture": "Agriculture, Forestry, Fishing and Food Production",
     "hospitality": "Accommodation, Food Services, Arts and Entertainment",
 }
+
+# keyword -> ransomware.live sector tag on Victim nodes (differs from the DBIR
+# name: victims are tagged "Education", not "Educational Services"). Used by the
+# analytical lane, which queries the bulk :Victim layer.
+SECTOR_TAG = {
+    "healthcare": "Healthcare", "finance": "Financial Services", "financial": "Financial Services",
+    "manufacturing": "Manufacturing", "education": "Education", "energy": "Energy",
+    "retail": "Consumer Services", "government": "Public Sector", "public": "Public Sector",
+    "technology": "Technology", "transportation": "Transportation/Logistics", "construction": "Construction",
+    "telecom": "Telecommunication", "agriculture": "Agriculture and Food Production",
+    "hospitality": "Hospitality and Tourism", "business": "Business Services",
+}
+
+
+def find_sector_tag(q: str):
+    for k, v in SECTOR_TAG.items():
+        if k in q.lower():
+            return v
+    return None
 
 
 def find_industries(q: str) -> list[str]:
@@ -83,20 +103,18 @@ def connect():
 
 # --- lanes ------------------------------------------------------------------
 def lane_analytical(session, q: str):
-    inds = find_industries(q)
     if "by year" in q.lower() or "per year" in q.lower():
         rows = session.run(
             "MATCH (v:Victim) WHERE v.attackdate <> '' "
             "RETURN left(v.attackdate,4) AS year, count(*) AS n ORDER BY year").data()
         return "victims per year", [(r["year"], r["n"]) for r in rows]
-    if inds:
-        sector = inds[0]
+    tag = find_sector_tag(q)
+    if tag:
         rows = session.run(
             "MATCH (v:Victim)-[:ATTACKED_BY]->(g:Group) WHERE toLower(v.sector) = toLower($s) "
-            "RETURN g.id AS group, count(*) AS n ORDER BY n DESC LIMIT 10",
-            s=sector.split(" and ")[0]).data()
+            "RETURN g.id AS group, count(*) AS n ORDER BY n DESC LIMIT 10", s=tag).data()
         if rows:
-            return f"top groups in {sector}", [(r["group"], r["n"]) for r in rows]
+            return f"top groups in {tag}", [(r["group"], r["n"]) for r in rows]
     rows = session.run(
         "MATCH (v:Victim)-[:ATTACKED_BY]->(g:Group) "
         "RETURN g.id AS group, count(*) AS n ORDER BY n DESC LIMIT 10").data()
