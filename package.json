@@ -1,0 +1,13 @@
+{
+  "name": "cna-ransomware",
+  "version": "1.0.0",
+  "description": "Ransomware industry risk taxonomy — dataset, explorer, knowledge graph, and live Atlas API.",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/export_graph.js && node scripts/export_mongo.js && node scripts/build_explorer.js",
+    "serve": "node scripts/server.js"
+  },
+  "dependencies": {
+    "mongodb": "^6.8.0"
+  }
+}

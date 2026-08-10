@@ -307,6 +307,25 @@ pip install pymongo
 **Idempotent:** every document is keyed by `_id` and replaced in place, so re-running after a
 re-scrape updates rather than duplicates.
 
+### Live mode — the explorer reading from Atlas
+
+`explorer.html` ships with a baked-in snapshot so it works when opened as a plain file. Served
+by `scripts/server.js`, the Insights tab instead fetches **live** from Atlas and shows a
+"live from Atlas" badge. A static file can't reach MongoDB directly, so this tiny read-only
+server sits between them (Node's built-in http + the mongodb driver, no framework).
+
+```bash
+npm install                                  # the mongodb driver
+export MONGODB_URI='mongodb+srv://...'        # same string as load_mongo.py
+npm run serve                                 # -> http://localhost:8080
+```
+
+Read-only endpoints: `/api/health`, `/api/insights` (mapped to the chart shape), `/api/industries`,
+`/api/synthesis`. The fetch is same-origin, so there's no CORS to configure. Opened as a file
+with no server, the fetch simply fails and the snapshot stands — the self-contained file never
+breaks. Refresh the data any time with `node scripts/export_mongo.js && python scripts/load_mongo.py`;
+the page reflects it on next load.
+
 **Design note — the denormalization line.** `incidents` are their own collection (updatable,
 good for the archive role) but referenced from `industries` via `incident_ids`; the app joins
 with a `$lookup`. Victims are separate because 27k is too much to embed. This keeps the app

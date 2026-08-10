@@ -14,3 +14,6 @@ data/mongo/
 # Local model cache / secrets
 .env
 sentence_transformers_cache/
+
+# Node deps for the live server (reinstall with `npm install`)
+node_modules/

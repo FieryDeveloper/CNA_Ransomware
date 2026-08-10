@@ -540,6 +540,8 @@ a{color:var(--accent)}
 #tt{position:fixed;z-index:60;background:var(--accent);color:var(--accent-ink);font-size:11.5px;line-height:1.4;padding:6px 9px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .1s;max-width:240px;font-family:ui-monospace,Consolas,monospace}
 #tt.on{opacity:1}
 #tt b{font-family:Georgia,serif}
+.live{display:inline-block;font-size:10.5px;font-family:ui-monospace,Consolas,monospace;color:var(--exposure);border:1px solid var(--exposure);border-radius:2px;padding:1px 6px;margin-left:6px}
+.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--exposure);margin-right:5px;vertical-align:middle}
 :root{--freq:#2A5578;--sev:#A2432B;--hm1:#E7EEF4;--hm2:#BBD0E0;--hm3:#7FA6C4;--hm4:#4A7BA1;--hm5:#24557A}
 @media (prefers-color-scheme:dark){:root{--freq:#5E8FB8;--sev:#C9714F;--hm1:#1B2A38;--hm2:#254A66;--hm3:#356B90;--hm4:#5A8DB4;--hm5:#8FBCDD}}
 :root[data-theme="dark"]{--freq:#5E8FB8;--sev:#C9714F;--hm1:#1B2A38;--hm2:#254A66;--hm3:#356B90;--hm4:#5A8DB4;--hm5:#8FBCDD}
@@ -847,7 +849,7 @@ $('#syn').innerHTML = '<h2 style="font-size:19px;margin-bottom:10px">How ransomw
       + '<span class="s">' + (s.u ? '<a href="' + esc(s.u) + '" target="_blank" rel="noopener">' + esc(s.s) + '</a>' : esc(s.s)) + '</span></div>').join('') : '');
 
 /* ---------- insights ---------- */
-const I = D.insights;
+let I = D.insights;                 // inlined snapshot; replaced by live Atlas data if served
 const tt = $('#tt');
 const fmtN = (n) => n.toLocaleString('en-US');
 const fmtUSD = (v) => v >= 1e9 ? '$' + (v / 1e9).toFixed(v % 1e9 ? 1 : 0) + 'B'
@@ -966,7 +968,25 @@ function renderInsights() {
   $('#inote').innerHTML = 'Sector, year, group and country charts come from the full <b>' + fmtN(I.total)
     + '</b>-victim leak-site scrape and measure <b>frequency</b>. The two money charts come from the '
     + '<b>107 researched incidents</b> and measure <b>severity</b> &mdash; blanks in that layer are undisclosed figures, not zeros, '
-    + 'so these are the disclosed subset. Frequency is blue, money is red throughout.';
+    + 'so these are the disclosed subset. Frequency is blue, money is red throughout.'
+    + '<span id="livebadge"></span>';
+}
+
+/* Live mode: when served by scripts/server.js, replace the baked-in snapshot
+   with fresh Atlas data. Opened as a plain file, this fetch fails and the
+   snapshot stands — so the self-contained file keeps working either way. */
+async function goLive() {
+  try {
+    const r = await fetch('api/insights', { cache: 'no-store' });
+    if (!r.ok) return;
+    const live = await r.json();
+    if (!live || !live.total) return;
+    I = live;
+    renderInsights();
+    const when = live.generated_at ? new Date(live.generated_at).toISOString().slice(0, 10) : '';
+    const b = $('#livebadge');
+    if (b) b.innerHTML = ' <span class="live">live from Atlas' + (when ? ' · ' + when : '') + '</span>';
+  } catch (e) { /* offline / static file — keep snapshot */ }
 }
 
 /* ---------- wiring ---------- */
@@ -988,7 +1008,7 @@ $('#qi').addEventListener('input', (e) => renderInds(e.target.value));
 $('#qc').addEventListener('input', (e) => renderCats(e.target.value));
 $('#qn').addEventListener('input', (e) => renderIncs(e.target.value));
 
-buildMatrix(); renderInds(); renderCats(); renderIncs(); renderInsights();
+buildMatrix(); renderInds(); renderCats(); renderIncs(); renderInsights(); goLive();
 </script>
 </body>
 </html>`;
