@@ -20,6 +20,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const hash = (s) => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 16);
 
 const DATA = path.resolve(__dirname, '..', 'data');
 const RAW = path.join(DATA, 'raw');
@@ -153,7 +155,10 @@ const sectorCasing = {};
       if (v.ransom) s.ransom++;
 
       victims.push({
-        _id: v.url || `${slug(v.victim)}--${slug(v.group)}--${(v.attackdate || '').slice(0, 10)}`,
+        // Prefer the ransomware.live URL (a stable natural key). Fall back to a
+        // hash of the RAW fields, not slugs — non-Latin victim names slug to ''
+        // and would otherwise collide into one _id, silently dropping victims.
+        _id: v.url || ('rw-' + hash([v.victim, v.group, v.attackdate, v.domain, v.country].join('|'))),
         victim: v.victim,
         group: (v.group || '').trim() || null,
         sector_key: sk,
