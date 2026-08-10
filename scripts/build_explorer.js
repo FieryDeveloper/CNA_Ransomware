@@ -135,6 +135,108 @@ const sectorOf = (ind) => {
   return guess || null;
 };
 
+// ---------------------------------------------------------------------------
+// Insights: cross-sector aggregates over the full ~27k bulk victim records,
+// plus parsed dollar figures from the 107 researched incidents.
+// ---------------------------------------------------------------------------
+function buildInsights() {
+  const bySector = {}, byYear = {}, byGroup = {}, byCountry = {}, gxs = {};
+  // Upstream sometimes tags the same sector with two casings ("Consumer
+  // Services" vs "Consumer services"). Key sectors case-insensitively and
+  // remember the most-frequent casing for display.
+  const secName = {}, secCasing = {};
+  const secKey = (s) => s.trim().toLowerCase();
+  const noteCasing = (s) => { const k = secKey(s); (secCasing[k] ||= {})[s] = (secCasing[k][s] || 0) + 1; };
+  let total = 0;
+  if (fs.existsSync(RAW)) {
+    for (const f of fs.readdirSync(RAW).filter((x) => x.startsWith('sector_') && x.endsWith('.json'))) {
+      let recs;
+      try { recs = JSON.parse(fs.readFileSync(path.join(RAW, f), 'utf8').replace(/^﻿/, '')); }
+      catch { continue; }
+      if (!Array.isArray(recs)) continue;
+      for (const v of recs) {
+        if (!v || !v.victim) continue;
+        total++;
+        const sec = secKey(v.activity || 'Unclassified');
+        noteCasing(v.activity || 'Unclassified');
+        const yr = String(v.attackdate || '').slice(0, 4);
+        const grp = (v.group || '').trim();
+        const ctry = (v.country || '').trim();
+        bySector[sec] = (bySector[sec] || 0) + 1;
+        if (/^\d{4}$/.test(yr)) byYear[yr] = (byYear[yr] || 0) + 1;
+        if (grp) byGroup[grp] = (byGroup[grp] || 0) + 1;
+        if (ctry) byCountry[ctry] = (byCountry[ctry] || 0) + 1;
+        if (grp) { (gxs[grp] ||= {})[sec] = (gxs[grp][sec] || 0) + 1; }
+      }
+    }
+  }
+  for (const k of Object.keys(secCasing)) {
+    secName[k] = Object.entries(secCasing[k]).sort((a, b) => b[1] - a[1])[0][0];
+  }
+  const sortDesc = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]);
+
+  // Parse USD from free-text impact strings. Guards against the ICBC trap:
+  // strings that lead with a negation ("not a disclosed loss...") are skipped,
+  // and figures above $5B are dropped as almost certainly not a single-company
+  // loss (the one such value here is ICBC's $62B Treasury settlement volume).
+  const NEG = /^\s*(not\s+(a\s+)?(publicly\s+|single\s+)*disclos|no\s+(publicly\s+)?disclos|undisclosed|not\s+publicly\s+reported)/i;
+  const parseUSD = (s) => {
+    if (!s || NEG.test(s)) return null;
+    const m = String(s).match(/\$\s?([\d,]+(?:\.\d+)?)\s*(billion|bn|million|mn|m|k|thousand)?/i);
+    if (!m) return null;
+    let val = parseFloat(m[1].replace(/,/g, ''));
+    const u = (m[2] || '').toLowerCase();
+    if (/^b/.test(u)) val *= 1e9;
+    else if (/^m/.test(u)) val *= 1e6;
+    else if (/^k|thous/.test(u)) val *= 1e3;
+    return val > 5e9 ? null : val;
+  };
+
+  const financial = [], ransom = [];
+  for (const ind of industries) {
+    for (const e of ind.example_incidents || []) {
+      const fu = parseUSD(e.financial_impact);
+      if (fu) financial.push({ victim: e.victim, industry: ind.industry, usd: fu, raw: e.financial_impact });
+      const ru = parseUSD(e.ransom_demanded_or_paid);
+      if (ru) ransom.push({ victim: e.victim, industry: ind.industry, usd: ru, raw: e.ransom_demanded_or_paid });
+    }
+  }
+  financial.sort((a, b) => b.usd - a.usd);
+  ransom.sort((a, b) => b.usd - a.usd);
+  // One row per organisation (same victim researched under two industries
+  // otherwise appears twice); keep the largest figure.
+  const dedupe = (arr) => {
+    const seen = new Set();
+    return arr.filter((x) => {
+      const k = x.victim.split(' (')[0].trim().toLowerCase();
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
+    });
+  };
+
+  const topGroupNames = sortDesc(byGroup).slice(0, 10).map(([g]) => g);
+  const sectorKeys = sortDesc(bySector).map(([s]) => s);
+  const disp = (k) => secName[k] || k;
+
+  return {
+    total,
+    bySector: sortDesc(bySector).map(([sector, n]) => ({ sector: disp(sector), n })),
+    byYear: Object.keys(byYear).sort().map((year) => ({ year, n: byYear[year] })),
+    topGroups: sortDesc(byGroup).slice(0, 15).map(([group, n]) => ({ group, n })),
+    topCountries: sortDesc(byCountry).slice(0, 12).map(([country, n]) => ({ country, n })),
+    groupCount: Object.keys(byGroup).length,
+    countryCount: Object.keys(byCountry).length,
+    heatmap: {
+      groups: topGroupNames,
+      sectors: sectorKeys.map(disp),
+      cells: topGroupNames.map((g) => sectorKeys.map((s) => (gxs[g] && gxs[g][s]) || 0)),
+    },
+    financial: dedupe(financial).slice(0, 15),
+    ransom: dedupe(ransom).slice(0, 15),
+  };
+}
+const insights = buildInsights();
+
 /** The research prose is dense with em dashes. They read as a tic on screen,
  *  so they are converted to ordinary punctuation for display only: the source
  *  text in data/industries.json is never modified. A parenthetical pair
@@ -205,7 +307,7 @@ const payload = {
       })),
     };
   }),
-  hazards, exposures,
+  hazards, exposures, insights,
   global: (synthesis.global_aggregate_losses || []).map((s) => ({
     m: s.metric, v: s.value, s: s.source || '', u: s.source_url || '',
   })),
@@ -399,6 +501,50 @@ a{color:var(--accent)}
   .metric{text-align:left}
   .statrow{flex-wrap:wrap}
 }
+/* ---- insights ---- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line-strong);border-radius:3px;margin-bottom:18px}
+.tile{background:var(--surface);padding:13px 16px}
+.tile b{display:block;font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:23px;font-weight:600;letter-spacing:-.01em}
+.tile span{font-size:11.5px;color:var(--faint)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:14px}
+.chart{background:var(--surface);border:1px solid var(--line-strong);border-radius:3px;padding:14px 16px 16px}
+.chart.wide{grid-column:1/-1}
+.chart h3{font-size:14px;margin-bottom:2px}
+.chart .cap{font-size:11.5px;color:var(--faint);margin-bottom:12px}
+.chart .cap b{color:var(--muted);font-weight:600}
+.bars{display:flex;flex-direction:column;gap:5px}
+.brow{display:grid;grid-template-columns:130px 1fr auto;align-items:center;gap:9px;font-size:12px}
+.brow .bl{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btrack{background:var(--surface-2);border-radius:0 2px 2px 0;height:15px;position:relative;overflow:hidden}
+.bfill{height:100%;border-radius:0 2px 2px 0;background:var(--freq)}
+.bfill.money{background:var(--sev)}
+.brow .bv{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--ink);font-size:11.5px;min-width:38px;text-align:right}
+.brow:hover .bl{color:var(--ink)}
+.brow:hover .btrack{outline:1px solid var(--line-strong)}
+/* heatmap */
+.hm{overflow-x:auto}
+.hmgrid{display:grid;gap:2px;font-size:11px;min-width:640px}
+.hmcell{aspect-ratio:2.4;border-radius:2px;cursor:default}
+.hmcell.lab{background:none;display:flex;align-items:center;color:var(--muted);font-size:10.5px;cursor:default;aspect-ratio:auto}
+.hmcell.lab.col{writing-mode:vertical-rl;transform:rotate(180deg);justify-content:flex-end;padding-bottom:3px;height:96px}
+.hmcell.lab.row{justify-content:flex-end;padding-right:6px;white-space:nowrap}
+.hm0{background:var(--surface-2)}
+.hm1{background:var(--hm1)} .hm2{background:var(--hm2)} .hm3{background:var(--hm3)} .hm4{background:var(--hm4)} .hm5{background:var(--hm5)}
+.hmcell[data-v]:hover{outline:2px solid var(--ink);outline-offset:-1px}
+/* area chart */
+.area svg{display:block;width:100%;height:auto;overflow:visible}
+.area .grid line{stroke:var(--line)} .area .axis{fill:var(--faint);font-size:10px;font-family:ui-monospace,Consolas,monospace}
+.area .fill{fill:var(--freq);opacity:.14} .area .stroke{stroke:var(--freq);stroke-width:2;fill:none}
+.area .dot{fill:var(--freq)} .area .cross{stroke:var(--line-strong);stroke-width:1;stroke-dasharray:3 3}
+/* tooltip */
+#tt{position:fixed;z-index:60;background:var(--accent);color:var(--accent-ink);font-size:11.5px;line-height:1.4;padding:6px 9px;border-radius:4px;pointer-events:none;opacity:0;transition:opacity .1s;max-width:240px;font-family:ui-monospace,Consolas,monospace}
+#tt.on{opacity:1}
+#tt b{font-family:Georgia,serif}
+:root{--freq:#2A5578;--sev:#A2432B;--hm1:#E7EEF4;--hm2:#BBD0E0;--hm3:#7FA6C4;--hm4:#4A7BA1;--hm5:#24557A}
+@media (prefers-color-scheme:dark){:root{--freq:#5E8FB8;--sev:#C9714F;--hm1:#1B2A38;--hm2:#254A66;--hm3:#356B90;--hm4:#5A8DB4;--hm5:#8FBCDD}}
+:root[data-theme="dark"]{--freq:#5E8FB8;--sev:#C9714F;--hm1:#1B2A38;--hm2:#254A66;--hm3:#356B90;--hm4:#5A8DB4;--hm5:#8FBCDD}
+:root[data-theme="light"]{--freq:#2A5578;--sev:#A2432B;--hm1:#E7EEF4;--hm2:#BBD0E0;--hm3:#7FA6C4;--hm4:#4A7BA1;--hm5:#24557A}
+@media (max-width:520px){.brow{grid-template-columns:96px 1fr auto}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -446,11 +592,18 @@ a{color:var(--accent)}
     <div class="grid" id="incs"></div>
   </section>
 
+  <section class="panel" id="p-insights" role="tabpanel">
+    <div class="tiles" id="tiles"></div>
+    <div class="charts" id="charts"></div>
+    <p class="note" id="inote"></p>
+  </section>
+
   <section class="panel" id="p-syn" role="tabpanel">
     <div class="prose" id="syn"></div>
   </section>
 </main>
 
+<div id="tt" role="status" aria-live="polite"></div>
 <div class="scrim" id="scrim"></div>
 <aside id="drawer" aria-hidden="true" role="dialog" aria-label="Detail"><button class="close" id="closeBtn" aria-label="Close">&times;</button><div id="dbody"></div></aside>
 
@@ -472,7 +625,7 @@ $('#metrics').innerHTML = [
 ].map(([b, s]) => '<div class="metric"><b>' + b + '</b><span>' + s + '</span></div>').join('');
 
 /* tabs */
-const TABS = [['matrix','Matrix'],['ind','Industries'],['cat','Categories'],['inc','Incidents'],['syn','Cross-industry']];
+const TABS = [['matrix','Matrix'],['insights','Insights'],['ind','Industries'],['cat','Categories'],['inc','Incidents'],['syn','Cross-industry']];
 $('#nav').innerHTML = TABS.map(([id,t],i) =>
   '<button role="tab" data-t="'+id+'" aria-selected="'+(i===0)+'">'+t+'</button>').join('');
 $('#nav').addEventListener('click', (e) => {
@@ -693,6 +846,129 @@ $('#syn').innerHTML = '<h2 style="font-size:19px;margin-bottom:10px">How ransomw
       '<div class="statrow"><span class="m"><b>' + esc(s.m) + '</b><br>' + esc(s.v) + '</span>'
       + '<span class="s">' + (s.u ? '<a href="' + esc(s.u) + '" target="_blank" rel="noopener">' + esc(s.s) + '</a>' : esc(s.s)) + '</span></div>').join('') : '');
 
+/* ---------- insights ---------- */
+const I = D.insights;
+const tt = $('#tt');
+const fmtN = (n) => n.toLocaleString('en-US');
+const fmtUSD = (v) => v >= 1e9 ? '$' + (v / 1e9).toFixed(v % 1e9 ? 1 : 0) + 'B'
+  : v >= 1e6 ? '$' + Math.round(v / 1e6) + 'M'
+  : v >= 1e3 ? '$' + Math.round(v / 1e3) + 'K' : '$' + v;
+function tipMove(e) {
+  const pad = 14;
+  let x = e.clientX + pad, y = e.clientY + pad;
+  if (x + tt.offsetWidth + 8 > innerWidth) x = e.clientX - tt.offsetWidth - pad;
+  tt.style.left = x + 'px'; tt.style.top = y + 'px';
+}
+function wireTips(root) {
+  root.querySelectorAll('[data-tip]').forEach((el) => {
+    el.addEventListener('mouseenter', () => { tt.innerHTML = el.dataset.tip; tt.classList.add('on'); });
+    el.addEventListener('mousemove', tipMove);
+    el.addEventListener('mouseleave', () => tt.classList.remove('on'));
+  });
+}
+
+/** Horizontal magnitude bars. Single hue: length carries the value. */
+function bars(data, o) {
+  const mx = o.max || Math.max(...data.map(o.value));
+  return '<div class="bars">' + data.map((d) => {
+    const v = o.value(d), pct = Math.max(1.5, (v / mx) * 100);
+    return '<div class="brow" data-tip="<b>' + esc(o.label(d)) + '</b><br>' + esc(o.tip ? o.tip(d) : o.fmt(v)) + '">'
+      + '<span class="bl" title="' + esc(o.label(d)) + '">' + esc(o.label(d)) + '</span>'
+      + '<div class="btrack"><div class="bfill' + (o.money ? ' money' : '') + '" style="width:' + pct + '%"></div></div>'
+      + '<span class="bv">' + o.fmt(v) + '</span></div>';
+  }).join('') + '</div>';
+}
+
+function heatmap(hm) {
+  const secs = hm.sectors, grps = hm.groups, cells = hm.cells;
+  const mx = Math.max(...cells.flat());
+  const bucket = (v) => !v ? 0 : Math.min(5, Math.max(1, Math.ceil(Math.sqrt(v / mx) * 5)));
+  const cols = '150px repeat(' + secs.length + ',1fr)';
+  let h = '<div class="hm"><div class="hmgrid" style="grid-template-columns:' + cols + '">';
+  h += '<div class="hmcell lab"></div>' + secs.map((s) => '<div class="hmcell lab col">' + esc(short(s)) + '</div>').join('');
+  grps.forEach((g, gi) => {
+    h += '<div class="hmcell lab row" title="' + esc(g) + '">' + esc(g) + '</div>';
+    secs.forEach((s, si) => {
+      const v = cells[gi][si];
+      h += '<div class="hmcell hm' + bucket(v) + '"' + (v ? ' data-v="1" data-tip="<b>' + esc(g) + '</b> in ' + esc(short(s)) + '<br>' + fmtN(v) + ' victims"' : '') + '></div>';
+    });
+  });
+  return h + '</div></div>';
+}
+
+/** Area chart for one time series, with crosshair + tooltip. */
+function area(data, id) {
+  const W = 580, H = 180, pl = 6, pr = 6, pt = 12, pb = 24;
+  const n = data.length, mx = Math.max(...data.map((d) => d.n));
+  const X = (i) => pl + (i / (n - 1)) * (W - pl - pr);
+  const Y = (v) => pt + (1 - v / mx) * (H - pt - pb);
+  const pts = data.map((d, i) => [X(i), Y(d.n)]);
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const fill = line + ' L' + X(n - 1).toFixed(1) + ' ' + (H - pb) + ' L' + X(0).toFixed(1) + ' ' + (H - pb) + ' Z';
+  const gridY = [0, 0.5, 1].map((t) => { const y = pt + t * (H - pt - pb); return '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y + '" y2="' + y + '"/>'; }).join('');
+  const labs = data.map((d, i) => (i % 2 === 0 || i === n - 1) ? '<text class="axis" x="' + X(i) + '" y="' + (H - 8) + '" text-anchor="middle">' + d.year + '</text>' : '').join('');
+  const dots = pts.map((p) => '<circle class="dot" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="2.5"/>').join('');
+  const hits = data.map((d, i) => '<rect x="' + (X(i) - (W / n / 2)) + '" y="0" width="' + (W / n) + '" height="' + H + '" fill="transparent" data-x="' + X(i).toFixed(1) + '" data-tip="<b>' + d.year + '</b><br>' + fmtN(d.n) + ' victims"></rect>').join('');
+  return '<div class="area"><svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" id="' + id + '">'
+    + '<g class="grid">' + gridY + '</g><path class="fill" d="' + fill + '"/><path class="stroke" d="' + line + '"/>' + dots
+    + '<line class="cross" id="' + id + 'c" x1="0" x2="0" y1="' + pt + '" y2="' + (H - pb) + '" style="opacity:0"/>'
+    + '<g class="axis">' + labs + '</g>' + hits + '</svg></div>';
+}
+
+function card(title, cap, body, wide) {
+  return '<div class="chart' + (wide ? ' wide' : '') + '"><h3>' + title + '</h3><div class="cap">' + cap + '</div>' + body + '</div>';
+}
+
+function renderInsights() {
+  const yrs = I.byYear.filter((y) => +y.year >= 2018); // pre-2018 is a negligible long tail
+  const peak = I.byYear.reduce((a, b) => b.n > a.n ? b : a);
+  $('#tiles').innerHTML = [
+    [fmtN(I.total), 'victims scraped'],
+    [fmtN(I.groupCount), 'ransomware groups'],
+    [fmtN(I.countryCount), 'countries hit'],
+    [I.bySector.length, 'sectors'],
+    [peak.year, 'peak year (' + fmtN(peak.n) + ')'],
+    [fmtUSD(I.financial[0].usd), 'costliest incident'],
+  ].map(([b, s]) => '<div class="tile"><b>' + b + '</b><span>' + s + '</span></div>').join('');
+
+  const charts = [];
+  charts.push(card('Victims by sector', 'Leak-site postings per industry, all years. <b>Frequency, not severity.</b>',
+    bars(I.bySector, { label: (d) => d.sector, value: (d) => d.n, fmt: fmtN }), true));
+
+  charts.push(card('Victims by year', 'Leak-site postings 2018 to date. 2026 is partial.',
+    area(yrs, 'yr'), true));
+
+  charts.push(card('Most active groups', 'Top 15 by victim count across all sectors.',
+    bars(I.topGroups, { label: (d) => d.group, value: (d) => d.n, fmt: fmtN })));
+
+  charts.push(card('Most-targeted countries', 'Top 12 by victim count.',
+    bars(I.topCountries, { label: (d) => d.country, value: (d) => d.n, fmt: fmtN })));
+
+  charts.push(card('Who hits whom', 'Top 10 groups &times; sector. Darker = more victims. The specialists show as bright rows in one or two columns.',
+    heatmap(I.heatmap), true));
+
+  charts.push(card('Costliest incidents', 'Reported total impact, researched incidents. <b>Mixed basis</b> (company cost, recovery, fines) &mdash; read each source.',
+    bars(I.financial, { label: (d) => d.victim.split(' (')[0], value: (d) => d.usd, fmt: fmtUSD, money: true, tip: (d) => d.industry + '<br>' + d.raw.slice(0, 120) })));
+
+  charts.push(card('Largest ransoms', 'Demanded or paid, where publicly reported.',
+    bars(I.ransom, { label: (d) => d.victim.split(' (')[0], value: (d) => d.usd, fmt: fmtUSD, money: true, tip: (d) => d.industry + '<br>' + d.raw.slice(0, 120) })));
+
+  $('#charts').innerHTML = charts.join('');
+  wireTips($('#charts'));
+
+  // area crosshair
+  const svg = $('#yr'), cross = $('#yrc');
+  if (svg) svg.querySelectorAll('rect[data-x]').forEach((r) => {
+    r.addEventListener('mouseenter', () => { cross.setAttribute('x1', r.dataset.x); cross.setAttribute('x2', r.dataset.x); cross.style.opacity = '1'; });
+    r.addEventListener('mouseleave', () => { cross.style.opacity = '0'; });
+  });
+
+  $('#inote').innerHTML = 'Sector, year, group and country charts come from the full <b>' + fmtN(I.total)
+    + '</b>-victim leak-site scrape and measure <b>frequency</b>. The two money charts come from the '
+    + '<b>107 researched incidents</b> and measure <b>severity</b> &mdash; blanks in that layer are undisclosed figures, not zeros, '
+    + 'so these are the disclosed subset. Frequency is blue, money is red throughout.';
+}
+
 /* ---------- wiring ---------- */
 function delegate(sel, attr, fn) {
   const el = $(sel);
@@ -712,7 +988,7 @@ $('#qi').addEventListener('input', (e) => renderInds(e.target.value));
 $('#qc').addEventListener('input', (e) => renderCats(e.target.value));
 $('#qn').addEventListener('input', (e) => renderIncs(e.target.value));
 
-buildMatrix(); renderInds(); renderCats(); renderIncs();
+buildMatrix(); renderInds(); renderCats(); renderIncs(); renderInsights();
 </script>
 </body>
 </html>`;
