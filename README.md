@@ -33,8 +33,11 @@ scripts/
   build_explorer.js          regenerate explorer.html with data inlined (incl. Insights tab)
   export_mongo.js            shape the dataset into the 6 MongoDB collections
   load_mongo.py              upsert the collections into Atlas + build indexes
+  server.js                  Node: serve explorer.html + live insights from Atlas
   embed_graph.py             add a local-embedding vector index to Neo4j (for GraphRAG)
-  ask.py                     natural-language querying: semantic / relational / analytical
+  rag_core.py                the GraphRAG engine (routing + retrieval + synthesis)
+  api.py                     FastAPI: POST /api/ask + live insights (the production API)
+  ask.py                     CLI front end to the same engine
 ```
 
 ## Two layers of data
@@ -335,34 +338,58 @@ fast, analytics flat, and the archive normalized — the three jobs a single sto
 
 ## Natural-language querying (GraphRAG)
 
-Asking "anything" is really three problems, so `ask.py` routes between three lanes:
+Every question is answered by an LLM, but grounded in retrieved evidence — never the model's
+memory. What gets retrieved depends on the question, so a router (`rag_core.py`) picks one of
+three lanes:
 
-| Lane | Example | How |
+| Lane | Example | Retrieval source |
 |---|---|---|
-| **Semantic** | *"why is healthcare targeted so heavily?"* | Embed the question, vector-search the graph, pull 1-hop context. **This is GraphRAG.** |
-| **Relational** | *"what's exposed in healthcare but not manufacturing?"* | A graph **traversal**. Vectors can't do this; Cypher can. |
-| **Analytical** | *"top 5 groups in manufacturing"* | An **aggregation** over the bulk layer. Not RAG. |
+| **Semantic** | *"why is healthcare targeted so heavily?"* | **Neo4j** vector search + 1-hop traversal. This is the GraphRAG lane. |
+| **Relational** | *"what's exposed in healthcare but not manufacturing?"* | **Neo4j** graph traversal. Vectors can't do this; Cypher can. |
+| **Analytical** | *"how many incidents disclose the ransom amount?"* | **MongoDB** — the materialized `insights` doc + a targeted aggregation. Numbers come from the DB, verbatim. |
 
 The vector index lives in **Neo4j** (native, 5.11+), so semantic retrieval can vector-search
-**then traverse** — the thing Atlas vector search alone can't do. Embeddings are computed by a
-**local model** (`all-MiniLM-L6-v2`, ~1,300 short texts, seconds on CPU, **no API, no cost**).
-Your OpenAI/Anthropic key is used only, and only if you opt in with `--answer`, to phrase a
-final prose answer from the retrieved evidence.
+**then traverse** — the thing Atlas vector search alone can't do. Embeddings are a **local model**
+(`all-MiniLM-L6-v2`, ~1,300 short texts, seconds on CPU, **no API**). The OpenAI/Anthropic call
+is only the final synthesis, and answers cite the `[n]` snippets they used.
+
+### The production API (`api.py`)
+
+A FastAPI service — the productionized interface. One long-running process holds the Neo4j
+driver, Mongo client and embedding model, and answers over HTTP:
 
 ```bash
-pip install neo4j sentence-transformers
+pip install -r requirements.txt
 export NEO4J_URI='bolt://localhost:7687' NEO4J_USER='neo4j' NEO4J_PASSWORD='...'
+export MONGODB_URI='mongodb+srv://...'          # enables the analytical lane
+export OPENAI_API_KEY='sk-...'                   # or ANTHROPIC_API_KEY
 
-python scripts/embed_graph.py          # once: embeds nodes + builds the vector index
-python scripts/ask.py "why is healthcare targeted so heavily?"
-python scripts/ask.py "top 5 groups in manufacturing"
-python scripts/ask.py "what's exposed in healthcare but not manufacturing?"
-python scripts/ask.py "why is healthcare unique?" --answer   # + optional LLM synthesis
+python scripts/embed_graph.py                    # once: builds the Neo4j vector index
+uvicorn scripts.api:app --host 0.0.0.0 --port 8080
 ```
 
-By default the tool **shows you the evidence** (matched nodes + their graph links). `--answer`
-adds a synthesized paragraph — the only step that touches an API. Routing is keyword-heuristic,
-and the semantic lane is the fallback, so a question never hard-fails.
+```bash
+curl -s localhost:8080/api/ask -H 'content-type: application/json' \
+     -d '{"question":"why is healthcare targeted so heavily?"}' | jq
+# -> { "lane": "semantic", "answer": "...[1][3]", "evidence": [ {type,score,text,linked}, ... ] }
+```
+
+Endpoints: `POST /api/ask`, `GET /api/insights` (live, incl. coverage), `/api/industries`,
+`/api/synthesis`, `/api/health`, and `/` serves the explorer. Backends are **independently
+optional**: with only Mongo the analytical lane still works; the graph lanes return a clear
+503 until Neo4j is wired. So a missing backend degrades, never crashes.
+
+### CLI (`ask.py`)
+
+Same engine, terminal front end, for quick testing:
+
+```bash
+python scripts/ask.py "how many incidents disclose the ransom amount?"
+python scripts/ask.py "what's exposed in healthcare but not manufacturing?"
+python scripts/ask.py "why is healthcare unique?" --answer   # + LLM synthesis
+```
+
+Without `--answer` (or an API key) it prints the retrieved evidence only — no API call.
 
 ---
 
