@@ -218,6 +218,27 @@ function buildInsights() {
   const sectorKeys = sortDesc(bySector).map(([s]) => s);
   const disp = (k) => secName[k] || k;
 
+  // Disclosure coverage: of the researched incidents, how many actually report
+  // each kind of impact? A blank is a reporting gap, not a zero.
+  const allInc = industries.flatMap((i) => i.example_incidents || []);
+  const T = allInc.length;
+  const has = (t) => !!t && t.trim().length > 0 && !NEG.test(t);
+  const paid = (t) => has(t) && /\bpaid\b|did pay|reportedly paid|payment of/i.test(t);
+  const demanded = (t) => has(t) && /\bdemand|ransom of|sought|asked for\b/i.test(t);
+  const cov = (field, pred) => { const d = allInc.filter(pred).length; return { field, disclosed: d, undisclosed: T - d, pct: Math.round((d / T) * 100) }; };
+  const coverage = {
+    total: T,
+    fields: [
+      cov('Financial impact stated', (i) => has(i.financial_impact)),
+      cov('Financial amount ($)', (i) => parseUSD(i.financial_impact) != null),
+      cov('Ransom amount ($)', (i) => parseUSD(i.ransom_demanded_or_paid) != null),
+      cov('Ransom demanded', (i) => demanded(i.ransom_demanded_or_paid)),
+      cov('Ransom paid', (i) => paid(i.ransom_demanded_or_paid) || paid(i.financial_impact)),
+      cov('Downtime / recovery', (i) => has(i.downtime_and_recovery)),
+      cov('Data impact', (i) => has(i.data_impact)),
+    ],
+  };
+
   return {
     total,
     bySector: sortDesc(bySector).map(([sector, n]) => ({ sector: disp(sector), n })),
@@ -231,6 +252,7 @@ function buildInsights() {
       sectors: sectorKeys.map(disp),
       cells: topGroupNames.map((g) => sectorKeys.map((s) => (gxs[g] && gxs[g][s]) || 0)),
     },
+    coverage,
     financial: dedupe(financial).slice(0, 15),
     ransom: dedupe(ransom).slice(0, 15),
   };
@@ -521,6 +543,16 @@ a{color:var(--accent)}
 .brow .bv{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--ink);font-size:11.5px;min-width:38px;text-align:right}
 .brow:hover .bl{color:var(--ink)}
 .brow:hover .btrack{outline:1px solid var(--line-strong)}
+/* coverage bars */
+.cov{display:flex;flex-direction:column;gap:6px}
+.covrow{display:grid;grid-template-columns:180px 1fr auto;align-items:center;gap:10px;font-size:12.5px}
+.covl{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.covtrack{height:16px;border-radius:2px;background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 4px,transparent 4px,transparent 8px);border:1px solid var(--line);position:relative;overflow:hidden}
+.covfill{height:100%;background:var(--exposure);border-radius:0}
+.covrow .covv{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:11.5px;color:var(--ink);min-width:34px;text-align:right}
+.covrow:hover .covl{color:var(--ink)}
+.covrow:hover .covtrack{outline:1px solid var(--line-strong)}
+@media (max-width:520px){.covrow{grid-template-columns:120px 1fr auto}}
 /* heatmap */
 .hm{overflow-x:auto}
 .hmgrid{display:grid;gap:2px;font-size:11px;min-width:640px}
@@ -948,6 +980,19 @@ function renderInsights() {
 
   charts.push(card('Who hits whom', 'Top 10 groups &times; sector. Darker = more victims. The specialists show as bright rows in one or two columns.',
     heatmap(I.heatmap), true));
+
+  if (I.coverage) {
+    const cv = I.coverage;
+    const covBody = '<div class="cov">' + cv.fields.map((f) => {
+      const dw = (f.disclosed / cv.total) * 100;
+      return '<div class="covrow" data-tip="<b>' + esc(f.field) + '</b><br>' + f.disclosed + ' of ' + cv.total + ' disclosed (' + f.pct + '%)<br>' + f.undisclosed + ' not publicly reported">'
+        + '<span class="covl">' + esc(f.field) + '</span>'
+        + '<div class="covtrack"><div class="covfill" style="width:' + dw + '%"></div></div>'
+        + '<span class="covv">' + f.pct + '%</span></div>';
+    }).join('') + '</div>';
+    charts.push(card('Disclosure coverage', 'Of the <b>' + cv.total + ' researched incidents</b>, how many actually report each figure. Filled = disclosed, rest = not publicly reported. These are reporting gaps, <b>not zeros</b>.',
+      covBody, true));
+  }
 
   charts.push(card('Costliest incidents', 'Reported total impact, researched incidents. <b>Mixed basis</b> (company cost, recovery, fines) &mdash; read each source.',
     bars(I.financial, { label: (d) => d.victim.split(' (')[0], value: (d) => d.usd, fmt: fmtUSD, money: true, tip: (d) => d.industry + '<br>' + d.raw.slice(0, 120) })));

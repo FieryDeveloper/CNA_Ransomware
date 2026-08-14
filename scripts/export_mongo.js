@@ -284,17 +284,55 @@ function insightsDoc() {
   const ran = incidents.filter((i) => i.ransom.usd).map((i) => ({ victim: i.victim, industry: i.industry, usd: i.ransom.usd, text: i.ransom.text })).sort((a, b) => b.usd - a.usd);
   const topGroups = sortDesc(byGroup).slice(0, 10).map(([g]) => g);
   const sectorKeys = sortDesc(bySector).map(([s]) => s);
+
+  // --- disclosure coverage: of the researched incidents, how many actually
+  // report each kind of impact? A blank is a real reporting gap, not a zero,
+  // so this quantifies how complete the severity layer is.
+  const T = incidents.length;
+  const disclosedText = (t) => !!t && t.trim().length > 0 && !NEG.test(t);
+  const paid = (t) => disclosedText(t) && /\bpaid\b|did pay|reportedly paid|payment of/i.test(t);
+  const demanded = (t) => disclosedText(t) && /\bdemand|ransom of|sought|asked for\b/i.test(t);
+  const one = (label, pred) => {
+    const d = incidents.filter(pred).length;
+    return { field: label, disclosed: d, undisclosed: T - d, pct: Math.round((d / T) * 100) };
+  };
+  const coverage = {
+    total: T,
+    fields: [
+      one('Financial impact stated', (i) => disclosedText(i.financial.text)),
+      one('Financial amount ($)', (i) => i.financial.usd != null),
+      one('Ransom amount ($)', (i) => i.ransom.usd != null),
+      one('Ransom demanded', (i) => demanded(i.ransom.text)),
+      one('Ransom paid', (i) => paid(i.ransom.text) || paid(i.financial.text)),
+      one('Downtime / recovery', (i) => disclosedText(i.downtime_and_recovery)),
+      one('Data impact', (i) => disclosedText(i.data_impact)),
+    ],
+    // per-industry: how complete is each industry's severity reporting?
+    by_industry: [...new Set(incidents.map((i) => i.industry))].map((ind) => {
+      const rows = incidents.filter((i) => i.industry === ind);
+      const c = (pred) => rows.filter(pred).length;
+      return {
+        industry: ind, incidents: rows.length,
+        financial: c((i) => i.financial.usd != null),
+        ransom: c((i) => i.ransom.usd != null),
+        downtime: c((i) => disclosedText(i.downtime_and_recovery)),
+      };
+    }).sort((a, b) => b.incidents - a.incidents),
+  };
+
   return {
     _id: 'current',
     generated_at: NOW,
     total_victims: victims.length,
     group_count: Object.keys(byGroup).length,
     country_count: Object.keys(byCountry).length,
+    researched_incidents: T,
     by_sector: sortDesc(bySector).map(([k, n]) => ({ sector: secDisplay[k] || k, n })),
     by_year: Object.keys(byYear).sort().map((y) => ({ year: Number(y), n: byYear[y] })),
     top_groups: sortDesc(byGroup).slice(0, 15).map(([group, n]) => ({ group, n })),
     top_countries: sortDesc(byCountry).slice(0, 12).map(([country, n]) => ({ country, n })),
     heatmap: { groups: topGroups, sectors: sectorKeys.map((k) => secDisplay[k] || k), cells: topGroups.map((g) => sectorKeys.map((s) => (gxs[g] && gxs[g][s]) || 0)) },
+    coverage,
     costliest: dedupe(fin).slice(0, 15),
     largest_ransoms: dedupe(ran).slice(0, 15),
   };

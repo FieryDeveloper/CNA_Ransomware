@@ -55,6 +55,7 @@ function mapInsights(d) {
     topGroups: d.top_groups,
     topCountries: d.top_countries,
     heatmap: d.heatmap,
+    coverage: d.coverage,
     financial: money(d.costliest),
     ransom: money(d.largest_ransoms),
     generated_at: d.generated_at,
