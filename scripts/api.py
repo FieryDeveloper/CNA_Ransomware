@@ -31,7 +31,11 @@ Example:
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
+
+# Work whether launched as `python scripts/api.py` or `uvicorn scripts.api:app`.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
