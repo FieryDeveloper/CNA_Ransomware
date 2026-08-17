@@ -1,6 +1,7 @@
 # Data pipeline
 pymongo>=4.6
 dnspython>=2.4            # required for mongodb+srv:// Atlas URIs
+python-dotenv>=1.0        # auto-loads .env for api.py / ask.py
 
 # GraphRAG
 neo4j>=5.15              # native vector index needs Neo4j server 5.11+

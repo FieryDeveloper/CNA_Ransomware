@@ -37,6 +37,8 @@ from pathlib import Path
 # Work whether launched as `python scripts/api.py` or `uvicorn scripts.api:app`.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,10 +48,20 @@ from rag_core import RagEngine, DB_NAME
 
 HTML = Path(__file__).resolve().parent.parent / "explorer.html"
 
-app = FastAPI(title="CNA Ransomware GraphRAG API", version="1.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
 engine = RagEngine()
+
+
+@asynccontextmanager
+async def lifespan(app):
+    try:
+        engine.connect()  # wire Neo4j + Mongo once at boot
+    except Exception as e:  # keep serving static + a clear health error
+        print(f"[startup] backend not fully wired: {e}")
+    yield
+
+
+app = FastAPI(title="CNA Ransomware GraphRAG API", version="1.0.0", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 
 def _map_insights(d):
@@ -64,14 +76,6 @@ def _map_insights(d):
         "coverage": d.get("coverage"), "financial": money(d.get("costliest")),
         "ransom": money(d.get("largest_ransoms")), "generated_at": d.get("generated_at"),
     }
-
-
-@app.on_event("startup")
-def _startup():
-    try:
-        engine.connect()
-    except Exception as e:  # keep serving static + a clear health error
-        print(f"[startup] backend not fully wired: {e}")
 
 
 @app.get("/", response_class=HTMLResponse)

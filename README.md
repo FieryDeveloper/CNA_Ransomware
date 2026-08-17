@@ -360,13 +360,16 @@ driver, Mongo client and embedding model, and answers over HTTP:
 
 ```bash
 pip install -r requirements.txt
-export NEO4J_URI='bolt://localhost:7687' NEO4J_USER='neo4j' NEO4J_PASSWORD='...'
-export MONGODB_URI='mongodb+srv://...'          # enables the analytical lane
-export OPENAI_API_KEY='sk-...'                   # or ANTHROPIC_API_KEY
+cp .env.example .env      # then fill in NEO4J_*, MONGODB_URI, OPENAI_API_KEY
 
-python scripts/embed_graph.py                    # once: builds the Neo4j vector index
-uvicorn scripts.api:app --host 0.0.0.0 --port 8080
+python scripts/embed_graph.py    # once: builds the Neo4j vector index
+python scripts/api.py            # reads .env; serves on $PORT (default 8090)
+# or: uvicorn scripts.api:app --host 0.0.0.0 --port 8080
 ```
+
+`rag_core.py` auto-loads a repo-root `.env` (gitignored), so the API and CLI run with one
+command instead of exported env vars. Use `bolt://` for a single local Neo4j instance —
+`neo4j://` attempts cluster routing and fails.
 
 ```bash
 curl -s localhost:8080/api/ask -H 'content-type: application/json' \

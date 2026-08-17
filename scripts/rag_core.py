@@ -29,6 +29,15 @@ from __future__ import annotations
 
 import os
 import re
+from pathlib import Path
+
+# Load a repo-root .env if present, so api.py / ask.py run with one command
+# instead of exported env vars each time. Optional — skipped if not installed.
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+except ImportError:
+    pass
 
 INDEX = "rag_vec"
 EMB_MODEL = "all-MiniLM-L6-v2"
