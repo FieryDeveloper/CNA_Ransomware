@@ -30,6 +30,7 @@ import time
 from datetime import date
 from urllib.parse import quote
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ingest import extract, ingest_record  # reuse the classifier + append logic
@@ -48,24 +49,43 @@ def _opt(args, name, default=None):
     return default
 
 
-def _get(url: str) -> bytes:
+def _get(url: str, retries: int = 4) -> bytes:
+    """GET with retries — EDGAR returns sporadic 500s and the odd rate-limit."""
     import gzip
-    r = urlopen(Request(url, headers=HEADERS), timeout=60)
-    data = r.read()
-    if r.headers.get("Content-Encoding") == "gzip":
-        data = gzip.decompress(data)
-    return data
+    for attempt in range(retries):
+        try:
+            r = urlopen(Request(url, headers=HEADERS), timeout=60)
+            data = r.read()
+            if r.headers.get("Content-Encoding") == "gzip":
+                data = gzip.decompress(data)
+            return data
+        except HTTPError as e:
+            if e.code in (429, 500, 502, 503) and attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            raise
+        except (URLError, TimeoutError):
+            if attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            raise
+    raise RuntimeError("unreachable")
 
 
 def search(query: str, since: str, until: str, want: int) -> tuple[list[dict], int]:
-    """EDGAR full-text search for 8-K filings. Pages until it has `want` hits or
-    the results are exhausted. Returns (hits, total_available). EDGAR caps the
-    `from` offset at 10,000."""
+    """EDGAR full-text search for 8-K filings. Pages (100/page) until it has
+    `want` hits or the results are exhausted. Tolerant of a page that keeps
+    failing — it stops and returns what it has rather than crashing. EDGAR caps
+    the `from` offset at 10,000."""
     hits, frm, total = [], 0, 0
     while True:
         url = (f"{EFTS}?q={quote(query)}&forms=8-K"
                f"&startdt={since}&enddt={until}&from={frm}")
-        payload = json.loads(_get(url))
+        try:
+            payload = json.loads(_get(url))
+        except Exception as e:
+            print(f"  (stopped paging at from={frm}: {e}; keeping {len(hits)} so far)")
+            break
         batch = payload.get("hits", {}).get("hits", [])
         total = payload.get("hits", {}).get("total", {}).get("value", 0)
         hits.extend(batch)
