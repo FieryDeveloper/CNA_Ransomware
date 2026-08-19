@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ransomware Knowledge Assistant</title>
+<style>
+:root{
+  --ground:#F4F3F0; --surface:#FCFBF9; --surface-2:#EFEEEA;
+  --ink:#191C1F; --muted:#5A6268; --faint:#8B9298;
+  --line:#DEDCD6; --line-strong:#BFBCB4;
+  --accent:#2B3238; --accent-ink:#FCFBF9;
+  --sem:#2A5578; --rel:#2A6A63; --ana:#A2432B;
+  --sem-soft:#DDE4EC; --rel-soft:#DCEAE7; --ana-soft:#EFE1DB;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#101315; --surface:#171A1D; --surface-2:#1E2226;
+  --ink:#E4E5E2; --muted:#9AA1A7; --faint:#6C737A;
+  --line:#282D32; --line-strong:#3C434A;
+  --accent:#E4E5E2; --accent-ink:#171A1D;
+  --sem:#7BA5CA; --rel:#6BB8AC; --ana:#C9714F;
+  --sem-soft:#161F29; --rel-soft:#162926; --ana-soft:#2A1B15;
+}}
+:root[data-theme="dark"]{
+  --ground:#101315; --surface:#171A1D; --surface-2:#1E2226;
+  --ink:#E4E5E2; --muted:#9AA1A7; --faint:#6C737A;
+  --line:#282D32; --line-strong:#3C434A;
+  --accent:#E4E5E2; --accent-ink:#171A1D;
+  --sem:#7BA5CA; --rel:#6BB8AC; --ana:#C9714F;
+  --sem-soft:#161F29; --rel-soft:#162926; --ana-soft:#2A1B15;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:var(--ground); color:var(--ink);
+  font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased; display:flex; flex-direction:column; height:100vh;
+}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style",serif;font-weight:600;margin:0}
+.mono{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+header{border-bottom:1px solid var(--line-strong);background:var(--surface);flex:0 0 auto}
+.hwrap{max-width:1400px;margin:0 auto;padding:12px 22px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+h1{font-size:17px;letter-spacing:-.005em}
+.hwrap .sub{color:var(--muted);font-size:12.5px}
+.hwrap a{margin-left:auto;color:var(--sem);font-size:12.5px;text-decoration:none}
+.hwrap a:hover{text-decoration:underline}
+
+main{flex:1 1 auto;min-height:0;max-width:1400px;width:100%;margin:0 auto;padding:0 22px 0;
+     display:grid;grid-template-columns:1fr 400px;gap:0}
+.col{min-height:0;display:flex;flex-direction:column}
+.chat{border-right:1px solid var(--line)}
+.stream{flex:1 1 auto;overflow-y:auto;padding:22px 24px 8px}
+.sources{overflow-y:auto;padding:18px 20px}
+
+/* messages */
+.msg{margin-bottom:20px;max-width:760px}
+.msg.user{margin-left:auto}
+.msg.user .bubble{background:var(--accent);color:var(--accent-ink);padding:10px 15px;border-radius:12px 12px 3px 12px;display:inline-block;font-size:14.5px}
+.msg.bot .who{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.lane{font-size:10.5px;font-family:ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:3px;border:1px solid}
+.lane.semantic{color:var(--sem);border-color:var(--sem);background:var(--sem-soft)}
+.lane.relational{color:var(--rel);border-color:var(--rel);background:var(--rel-soft)}
+.lane.analytical{color:var(--ana);border-color:var(--ana);background:var(--ana-soft)}
+.answer{font-size:14.5px;line-height:1.65;color:var(--ink)}
+.answer p{margin:0 0 10px}
+.answer strong{font-weight:600}
+.answer ol,.answer ul{margin:6px 0 10px;padding-left:22px}
+.answer li{margin-bottom:5px}
+.cite{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;color:var(--sem);cursor:pointer;
+      border:1px solid var(--line-strong);border-radius:3px;padding:0 3px;margin:0 1px;vertical-align:super;line-height:1;user-select:none}
+.cite:hover{background:var(--sem);color:var(--surface);border-color:var(--sem)}
+
+/* thinking dots */
+.dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--faint);margin-right:4px;animation:bl 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* input */
+.inputbar{flex:0 0 auto;border-top:1px solid var(--line);background:var(--surface);padding:12px 16px}
+.inputrow{display:flex;gap:9px;max-width:900px;margin:0 auto}
+textarea{flex:1;resize:none;font:inherit;font-size:14.5px;padding:10px 13px;border:1px solid var(--line-strong);
+         border-radius:8px;background:var(--ground);color:var(--ink);max-height:120px;line-height:1.4}
+textarea:focus{outline:2px solid var(--sem);outline-offset:0;border-color:var(--sem)}
+.send{flex:0 0 auto;font:inherit;font-size:14px;font-weight:600;padding:0 18px;border:0;border-radius:8px;
+      background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.send:hover{opacity:.9}.send:disabled{opacity:.4;cursor:default}
+
+/* sources panel */
+.sources h2{font-size:12px;font-family:ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);margin-bottom:12px;font-weight:400}
+.scard{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:11px 13px;margin-bottom:10px;scroll-margin-top:12px}
+.scard.flash{animation:fl 1.1s ease}
+@keyframes fl{0%,100%{border-color:var(--line)}30%{border-color:var(--sem);box-shadow:0 0 0 2px var(--sem-soft)}}
+.scard .top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.snum{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--faint)}
+.stype{font-size:10px;font-family:ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:3px;padding:1px 6px}
+.sscore{margin-left:auto;font-family:ui-monospace,Consolas,monospace;font-size:10.5px;color:var(--faint)}
+.stext{font-size:12.5px;line-height:1.5;color:var(--ink)}
+.slinks{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+.slinks a{font-size:10.5px;font-family:ui-monospace,Consolas,monospace;color:var(--sem);text-decoration:none;border:1px solid var(--line-strong);border-radius:3px;padding:1px 6px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slinks a:hover{background:var(--sem-soft)}
+.chips{margin-top:7px;display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:1px 6px}
+.empty{color:var(--faint);font-size:13px;line-height:1.6}
+
+/* welcome / suggestions */
+.welcome{max-width:680px;margin:6vh auto 0;text-align:center}
+.welcome h2{font-size:22px;margin-bottom:8px}
+.welcome p{color:var(--muted);font-size:14px;margin:0 auto 22px;max-width:52ch}
+.suggest{display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto;text-align:left}
+.sg{background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:11px 14px;cursor:pointer;font-size:13.5px;color:var(--ink);display:flex;gap:10px;align-items:center}
+.sg:hover{border-color:var(--sem)}
+.sg .tag{font-size:9.5px;font-family:ui-monospace,Consolas,monospace;text-transform:uppercase;letter-spacing:.04em;padding:2px 6px;border-radius:3px;flex:0 0 auto}
+.sg .tag.semantic{color:var(--sem);background:var(--sem-soft)} .sg .tag.relational{color:var(--rel);background:var(--rel-soft)} .sg .tag.analytical{color:var(--ana);background:var(--ana-soft)}
+
+.err{color:var(--ana);font-size:13px;background:var(--ana-soft);border:1px solid var(--ana);border-radius:6px;padding:8px 12px}
+
+@media (max-width:900px){
+  main{grid-template-columns:1fr}
+  .chat{border-right:0}
+  .sources{border-top:1px solid var(--line-strong);max-height:38vh}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <h1>Ransomware Knowledge Assistant</h1>
+    <span class="sub">GraphRAG over 14 industries &middot; 27,108 incidents &middot; a knowledge graph + Atlas</span>
+    <a href="./explorer.html">Open the explorer &rarr;</a>
+  </div>
+</header>
+<main>
+  <div class="col chat">
+    <div class="stream" id="stream">
+      <div class="welcome" id="welcome">
+        <h2>Ask about ransomware risk</h2>
+        <p>Questions are answered by an LLM, grounded in a knowledge graph and analytics store. The sources it used appear on the right.</p>
+        <div class="suggest" id="suggest">
+          <div class="sg" data-q="Why is healthcare targeted so heavily by ransomware?"><span class="tag semantic">semantic</span>Why is healthcare targeted so heavily?</div>
+          <div class="sg" data-q="What is exposed in healthcare but not manufacturing?"><span class="tag relational">relational</span>What&rsquo;s exposed in healthcare but not manufacturing?</div>
+          <div class="sg" data-q="How many incidents disclose the ransom amount, and what does that imply?"><span class="tag analytical">analytical</span>How many incidents disclose the ransom amount?</div>
+          <div class="sg" data-q="Which ransomware groups hit both healthcare and finance?"><span class="tag relational">relational</span>Which groups hit both healthcare and finance?</div>
+        </div>
+      </div>
+    </div>
+    <div class="inputbar">
+      <div class="inputrow">
+        <textarea id="q" rows="1" placeholder="Ask a question about ransomware risk&hellip;" aria-label="Question"></textarea>
+        <button class="send" id="send">Ask</button>
+      </div>
+    </div>
+  </div>
+  <aside class="col sources" id="sources">
+    <h2>Sources</h2>
+    <div id="srcbody"><p class="empty">The knowledge-graph evidence behind each answer will appear here &mdash; source text, similarity scores, graph links, and citations you can click.</p></div>
+  </aside>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s==null?'':s).replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const stream = $('#stream'), srcbody = $('#srcbody'), q = $('#q'), send = $('#send');
+const evById = {};           // message id -> evidence[]
+let seq = 0, busy = false;
+
+function scrollDown(){ stream.scrollTop = stream.scrollHeight; }
+
+/** Turn "[1]" refs into clickable chips bound to a message's sources. */
+function renderAnswer(text, mid){
+  let html = esc(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[(\d+)\]/g, (m,n)=>`<span class="cite" data-mid="${mid}" data-n="${n}">[${n}]</span>`);
+  // simple paragraph + list handling
+  const lines = html.split('\n').filter(l=>l.trim()!=='');
+  let out = '', inList = false;
+  for (const ln of lines){
+    if (/^\s*\d+\.\s/.test(ln) || /^\s*[-*]\s/.test(ln)){
+      if(!inList){ out+='<ul>'; inList=true; }
+      out += '<li>'+ln.replace(/^\s*(\d+\.|[-*])\s/,'')+'</li>';
+    } else { if(inList){out+='</ul>';inList=false;} out+='<p>'+ln+'</p>'; }
+  }
+  if(inList) out+='</ul>';
+  return out;
+}
+
+const laneName = {semantic:'graph &middot; semantic', relational:'graph &middot; traversal', analytical:'mongodb &middot; analytics'};
+
+function addUser(text){
+  $('#welcome')?.remove();
+  const d = document.createElement('div'); d.className='msg user';
+  d.innerHTML = '<div class="bubble">'+esc(text)+'</div>';
+  stream.appendChild(d); scrollDown();
+}
+function addThinking(){
+  const d = document.createElement('div'); d.className='msg bot'; d.id='thinking';
+  d.innerHTML = '<div class="who"><span class="lane semantic">&hellip;</span></div><div class="answer dots"><span></span><span></span><span></span></div>';
+  stream.appendChild(d); scrollDown();
+}
+function addBot(res){
+  $('#thinking')?.remove();
+  const mid = ++seq; evById[mid] = res.evidence || [];
+  const d = document.createElement('div'); d.className='msg bot';
+  const lane = res.lane || 'semantic';
+  const ans = res.answer ? renderAnswer(res.answer, mid)
+            : '<p class="empty">Retrieved '+(res.evidence||[]).length+' sources (add an OpenAI key for a written answer).</p>';
+  d.innerHTML = '<div class="who"><span class="lane '+lane+'">'+(laneName[lane]||lane)+'</span></div><div class="answer">'+ans+'</div>';
+  stream.appendChild(d); scrollDown();
+  renderSources(mid);
+}
+function addError(msg){
+  $('#thinking')?.remove();
+  const d = document.createElement('div'); d.className='msg bot';
+  d.innerHTML = '<div class="err">'+esc(msg)+'</div>';
+  stream.appendChild(d); scrollDown();
+}
+
+function host(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch{ return u; } }
+
+function renderSources(mid){
+  const ev = evById[mid] || [];
+  if(!ev.length){ srcbody.innerHTML = '<p class="empty">No sources for this answer.</p>'; return; }
+  srcbody.innerHTML = ev.map((e,i)=>{
+    const n = i+1;
+    const links = (e.urls||[]).length ? '<div class="slinks">'+e.urls.map(u=>'<a href="'+esc(u)+'" target="_blank" rel="noopener" title="'+esc(u)+'">'+esc(host(u))+'</a>').join('')+'</div>' : '';
+    const chips = (e.linked||[]).length ? '<div class="chips">'+e.linked.slice(0,6).map(c=>'<span class="chip">'+esc(c)+'</span>').join('')+'</div>' : '';
+    const score = ('score' in e) ? '<span class="sscore">'+e.score+'</span>' : '';
+    return '<div class="scard" id="src-'+mid+'-'+n+'"><div class="top"><span class="snum">['+n+']</span><span class="stype">'+esc(e.type||'')+'</span>'+score+'</div>'
+      + '<div class="stext">'+esc(e.text||'')+'</div>'+links+chips+'</div>';
+  }).join('');
+}
+
+// clicking a [n] citation shows that message's sources and flashes the card
+stream.addEventListener('click',(e)=>{
+  const c = e.target.closest('.cite'); if(!c) return;
+  const mid=c.dataset.mid, n=c.dataset.n;
+  renderSources(mid);
+  const card = $('#src-'+mid+'-'+n);
+  if(card){ card.scrollIntoView({behavior:'smooth',block:'nearest'}); card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash'); }
+});
+
+async function ask(text){
+  if(busy || !text.trim()) return;
+  busy=true; send.disabled=true; q.value=''; q.style.height='auto';
+  addUser(text); addThinking();
+  try{
+    const r = await fetch('api/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:text,k:6})});
+    if(!r.ok){ const j=await r.json().catch(()=>({})); addError(j.error||('Request failed ('+r.status+')')); }
+    else addBot(await r.json());
+  }catch(err){ addError('Could not reach the API. Is the server running? ('+err+')'); }
+  busy=false; send.disabled=false; q.focus();
+}
+
+send.addEventListener('click',()=>ask(q.value));
+q.addEventListener('keydown',(e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ask(q.value);} });
+q.addEventListener('input',()=>{ q.style.height='auto'; q.style.height=Math.min(q.scrollHeight,120)+'px'; });
+document.querySelectorAll('.sg').forEach(el=>el.addEventListener('click',()=>ask(el.dataset.q)));
+q.focus();
+</script>
+</body>
+</html>

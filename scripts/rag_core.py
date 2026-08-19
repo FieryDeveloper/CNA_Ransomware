@@ -131,14 +131,23 @@ class RagEngine:
     def _semantic_context(self, q: str, k: int = 6):
         qv = self.model.encode([q], normalize_embeddings=True)[0].tolist()
         with self.driver.session() as s:
+            # vector hit -> 1-hop neighbours (graph context) + any cited source
+            # URLs. Sources attach to Incident nodes directly, or to an Incident
+            # one hop away (so a matched hazard/exposure can still surface links).
             rows = s.run(
                 f"CALL db.index.vector.queryNodes('{INDEX}', $k, $qv) YIELD node, score "
-                "OPTIONAL MATCH (node)-[r]-(nb) "
-                "WITH node, score, collect(DISTINCT coalesce(nb.name, nb.victim, nb.id))[0..6] AS ctx "
-                "RETURN labels(node) AS labels, node.rag_text AS text, score, ctx "
+                "OPTIONAL MATCH (node)-[]-(nb) "
+                "OPTIONAL MATCH (node)-[:CITED_BY]->(s1:Source) "
+                "OPTIONAL MATCH (node)-[]-(:Incident)-[:CITED_BY]->(s2:Source) "
+                "WITH node, score, "
+                "     collect(DISTINCT coalesce(nb.name, nb.victim, nb.id))[0..6] AS ctx, "
+                "     (collect(DISTINCT s1.id) + collect(DISTINCT s2.id))[0..4] AS urls "
+                "RETURN labels(node) AS labels, node.rag_text AS text, score, ctx, urls "
                 "ORDER BY score DESC", k=k, qv=qv).data()
         ev = [{"type": "/".join([l for l in r["labels"] if l != "Doc"]) or "Doc",
-               "score": round(r["score"], 3), "text": r["text"], "linked": [c for c in r["ctx"] if c]}
+               "score": round(r["score"], 3), "text": r["text"],
+               "linked": [c for c in r["ctx"] if c],
+               "urls": [u for u in r["urls"] if u]}
               for r in rows]
         return ev, [r["text"] for r in rows]
 
@@ -192,9 +201,22 @@ class RagEngine:
                 {"$sort": {"n": -1}}, {"$limit": 10},
             ]))
             facts[f"top_groups_in_{tags[0]}"] = [{"group": r["_id"], "n": r["n"]} for r in rows if r["_id"]]
+
+        # Readable evidence for the sources panel (a few relevant facts), while
+        # the LLM still gets the full JSON as its grounding context.
+        ev = [{"type": "MongoDB", "text": f"{facts['total_victims']:,} leak-site victims across "
+               f"{facts['group_count']} groups and {facts['country_count']} countries; "
+               f"{facts['researched_incidents']} researched incidents."}]
+        if facts.get("coverage"):
+            for f in facts["coverage"]["fields"]:
+                ev.append({"type": "coverage", "text": f"{f['field']}: {f['disclosed']} of "
+                           f"{facts['coverage']['total']} disclosed ({f['pct']}%)"})
+        tk = next((v for k, v in facts.items() if k.startswith("top_groups_in_")), None)
+        if tk:
+            ev.append({"type": "aggregation", "text": "Top groups: "
+                       + ", ".join(f"{g['group']} ({g['n']})" for g in tk[:8])})
         import json
-        return [{"type": "MongoDB insights", "text": "materialized aggregates + targeted query"}], \
-            [json.dumps(facts, default=str)]
+        return ev, [json.dumps(facts, default=str)]
 
     # --- synthesis ---------------------------------------------------------
     def _synthesize(self, question: str, contexts, lane: str):

@@ -46,7 +46,9 @@ from pydantic import BaseModel
 
 from rag_core import RagEngine, DB_NAME
 
-HTML = Path(__file__).resolve().parent.parent / "explorer.html"
+ROOT = Path(__file__).resolve().parent.parent
+HTML = ROOT / "explorer.html"
+CHAT = ROOT / "chat.html"
 
 engine = RagEngine()
 
@@ -80,6 +82,16 @@ def _map_insights(d):
 
 @app.get("/", response_class=HTMLResponse)
 def index():
+    return HTML.read_text(encoding="utf-8")
+
+
+@app.get("/chat", response_class=HTMLResponse)
+def chat():
+    return CHAT.read_text(encoding="utf-8")
+
+
+@app.get("/explorer.html", response_class=HTMLResponse)
+def explorer():
     return HTML.read_text(encoding="utf-8")
 
 
