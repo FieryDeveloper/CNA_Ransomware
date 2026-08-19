@@ -60,8 +60,9 @@ INCIDENT_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
     "properties": {
-        "is_ransomware_incident": {"type": "boolean",
-            "description": "true only if the text describes a real ransomware or cyber-extortion incident against a specific organisation"},
+        "incident_type": {"type": "string",
+            "enum": ["ransomware", "data-extortion", "other-cyber", "not-a-specific-incident"],
+            "description": "ransomware = encryption/ransom; data-extortion = threat actor stole data and extorted/threatened to leak (no encryption needed); other-cyber = adversarial breach without extortion; not-a-specific-incident = outage, accidental exposure, or not about one org"},
         "industry": {"type": "string", "enum": INDUSTRIES + ["UNKNOWN"]},
         "victim": {"type": "string"},
         "group": {"type": "string", "description": "ransomware group/gang, or 'not publicly disclosed'"},
@@ -74,17 +75,21 @@ INCIDENT_SCHEMA = {
         "summary": {"type": "string", "description": "2-3 sentence factual summary"},
         "sources": {"type": "array", "items": {"type": "string"}},
     },
-    "required": ["is_ransomware_incident", "industry", "victim", "group", "date", "country",
+    "required": ["incident_type", "industry", "victim", "group", "date", "country",
                  "financial_impact", "ransom_demanded_or_paid", "downtime_and_recovery",
                  "data_impact", "summary", "sources"],
 }
 
-SYSTEM = ("You extract structured ransomware-incident records for a cyber-risk dataset. "
-          "Use ONLY facts present in the text. For any figure not stated, write exactly "
-          "'not publicly disclosed' — never estimate. Classify the victim's industry into "
-          "the provided list (choose the closest; use UNKNOWN only if truly none fit). "
-          "If the text is not about a specific ransomware/cyber-extortion incident, set "
-          "is_ransomware_incident=false.")
+# Incident types we keep in the dataset (threat-actor-driven extortion).
+ACCEPT_TYPES = {"ransomware", "data-extortion"}
+
+SYSTEM = ("You extract structured cyber-extortion incident records for a ransomware-risk "
+          "dataset. Use ONLY facts present in the text. For any figure not stated, write "
+          "exactly 'not publicly disclosed' — never estimate. Classify the victim's industry "
+          "into the provided list (closest match; UNKNOWN only if none fit). Set incident_type "
+          "precisely: 'ransomware' or 'data-extortion' for threat-actor extortion (keep these), "
+          "'other-cyber' for an adversarial breach with no extortion, 'not-a-specific-incident' "
+          "for outages/accidental exposure or text not about one organisation.")
 
 
 def strip_html(html: str) -> str:
@@ -143,6 +148,7 @@ def to_incident(rec: dict) -> dict:
     return {
         "victim": rec["victim"], "group": rec.get("group") or None,
         "date": rec.get("date") or None, "country": rec.get("country") or None,
+        "incident_type": rec.get("incident_type"), "ingest_source": "sec/news",
         "summary": rec.get("summary"),
         "financial_impact": rec.get("financial_impact"),
         "ransom_demanded_or_paid": rec.get("ransom_demanded_or_paid"),
@@ -152,42 +158,49 @@ def to_incident(rec: dict) -> dict:
     }
 
 
+def ingest_record(rec: dict, dry: bool = False) -> str:
+    """Validate + append one extracted record to industries.json. Returns a
+    status: 'added' | 'dry' | 'skip:<reason>'. Reusable by batch fetchers."""
+    if rec.get("incident_type") not in ACCEPT_TYPES:
+        return f"skip:{rec.get('incident_type', 'unclassified')}"
+    if rec.get("industry") in (None, "", "UNKNOWN"):
+        return "skip:industry-unknown"
+    if not (rec.get("victim") or "").strip():
+        return "skip:no-victim"
+
+    industries = json.loads(DATA.read_text(encoding="utf-8"))
+    target = next((i for i in industries if i["industry"] == rec["industry"]), None)
+    if target is None:
+        return f"skip:no-such-industry:{rec['industry']}"
+
+    existing = {(e.get("victim") or "").strip().lower() for e in target.get("example_incidents", [])}
+    if rec["victim"].strip().lower() in existing:
+        return "skip:duplicate"
+    if dry:
+        return "dry"
+
+    target.setdefault("example_incidents", []).append(to_incident(rec))
+    DATA.write_text(json.dumps(industries, indent=2, ensure_ascii=False), encoding="utf-8")
+    return "added"
+
+
 def main() -> int:
     args = sys.argv[1:]
     dry = "--dry-run" in args
     text, url = get_text(args)
     rec = extract(text, url)
-
     print(json.dumps(rec, indent=2, ensure_ascii=False))
-    if not rec.get("is_ransomware_incident"):
-        print("\nNot a specific ransomware incident — nothing to add.")
-        return 0
-    if rec["industry"] == "UNKNOWN":
-        print("\nIndustry could not be classified into our list — skipping (edit manually if needed).")
-        return 0
 
-    industries = json.loads(DATA.read_text(encoding="utf-8"))
-    target = next((i for i in industries if i["industry"] == rec["industry"]), None)
-    if target is None:
-        print(f"\nNo such industry in dataset: {rec['industry']}")
-        return 1
-
-    existing = {(e.get("victim") or "").strip().lower() for e in target.get("example_incidents", [])}
-    if rec["victim"].strip().lower() in existing:
-        print(f"\n'{rec['victim']}' already in {rec['industry']} — skipping duplicate.")
-        return 0
-
-    if dry:
-        print(f"\n[dry-run] would add '{rec['victim']}' to {rec['industry']} "
-              f"({len(target.get('example_incidents', []))} -> {len(target.get('example_incidents', []))+1}).")
-        return 0
-
-    target.setdefault("example_incidents", []).append(to_incident(rec))
-    DATA.write_text(json.dumps(industries, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"\nAdded '{rec['victim']}' to {rec['industry']}.")
-    print("Rebuild to propagate:\n"
-          "  node scripts/export_mongo.js && python scripts/load_mongo.py\n"
-          "  node scripts/export_graph.js   # then reload load.cypher + python scripts/embed_graph.py")
+    status = ingest_record(rec, dry)
+    if status == "added":
+        print(f"\nAdded '{rec['victim']}' to {rec['industry']}.")
+        print("Rebuild to propagate:\n"
+              "  node scripts/export_mongo.js && python scripts/load_mongo.py\n"
+              "  node scripts/export_graph.js   # then reload load.cypher + python scripts/embed_graph.py")
+    elif status == "dry":
+        print(f"\n[dry-run] would add '{rec['victim']}' to {rec['industry']}.")
+    else:
+        print(f"\nSkipped ({status}).")
     return 0
 
 

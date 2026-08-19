@@ -36,6 +36,7 @@ scripts/
   server.js                  Node: serve explorer.html + live insights from Atlas
   embed_graph.py             add per-type local-embedding vector indexes to Neo4j
   ingest.py                  classify raw incident text into the schema (LLM) -> industries.json
+  fetch_sec.py               pull SEC 8-K cyber filings, classify + enrich attacker from ransomware.live
   rag_core.py                the GraphRAG engine (routing + retrieval + synthesis)
   api.py                     FastAPI: POST /api/ask + live insights (the production API)
   ask.py                     CLI front end to the same engine
@@ -309,6 +310,18 @@ incident — so it won't invent records.
 
 ransomware.live gives the *who/when/sector*; SEC + AG lists + news give the *impact*
 (the fields the coverage chart shows are sparse). Feed any of them to `ingest.py`.
+
+**SEC 8-K fetcher.** `fetch_sec.py` automates the highest-value source: it queries
+EDGAR full-text search for 8-K **Item 1.05** filings (mandatory material-cyber
+disclosures since Dec 2023), classifies each via `ingest.py`, and — since filings
+rarely name the attacker — **enriches the group by matching the victim against
+ransomware.live**. Keeps ransomware + data-extortion; skips accidental breaches.
+
+```bash
+export SEC_USER_AGENT="Your Name your@email.com"     # SEC requires a real UA
+python scripts/fetch_sec.py --since 2024-01-01 --limit 20 --dry-run
+python scripts/fetch_sec.py --since 2024-01-01 --limit 20     # then rebuild
+```
 
 ---
 
