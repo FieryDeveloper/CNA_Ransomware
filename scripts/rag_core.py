@@ -176,22 +176,47 @@ class RagEngine:
         return "semantic"
 
     # --- retrieval ---------------------------------------------------------
+    # How many hits to pull from each per-type index. Weighted so incidents and
+    # industries (which carry impact + sources) are always represented, not
+    # crowded out by the far more numerous subcategories.
+    MULTI_INDEX = [("vec_incident", 3), ("vec_industry", 2), ("vec_hazard", 2),
+                   ("vec_exposure", 2), ("vec_subcategory", 3)]
+
+    def _vector_query(self, session, index, n, qv):
+        # vector hit -> 1-hop neighbours (graph context) + any cited source URLs
+        # (on the node, or on an Incident one hop away).
+        return session.run(
+            "CALL db.index.vector.queryNodes($idx, $n, $qv) YIELD node, score "
+            "OPTIONAL MATCH (node)-[]-(nb) "
+            "OPTIONAL MATCH (node)-[:CITED_BY]->(s1:Source) "
+            "OPTIONAL MATCH (node)-[]-(:Incident)-[:CITED_BY]->(s2:Source) "
+            "WITH node, score, "
+            "     collect(DISTINCT coalesce(nb.name, nb.victim, nb.id))[0..6] AS ctx, "
+            "     (collect(DISTINCT s1.id) + collect(DISTINCT s2.id))[0..4] AS urls "
+            "RETURN labels(node) AS labels, node.rag_text AS text, score, ctx, urls",
+            idx=index, n=n, qv=qv).data()
+
     def _semantic_context(self, q: str, k: int = 6):
+        """Multi-index retrieval: query one vector index per node type and merge,
+        so context always spans incidents, industries and taxonomy. Falls back to
+        the combined index if the per-type ones aren't built yet."""
         qv = self.model.encode([q], normalize_embeddings=True)[0].tolist()
+        rows, seen = [], set()
         with self.driver.session() as s:
-            # vector hit -> 1-hop neighbours (graph context) + any cited source
-            # URLs. Sources attach to Incident nodes directly, or to an Incident
-            # one hop away (so a matched hazard/exposure can still surface links).
-            rows = s.run(
-                f"CALL db.index.vector.queryNodes('{INDEX}', $k, $qv) YIELD node, score "
-                "OPTIONAL MATCH (node)-[]-(nb) "
-                "OPTIONAL MATCH (node)-[:CITED_BY]->(s1:Source) "
-                "OPTIONAL MATCH (node)-[]-(:Incident)-[:CITED_BY]->(s2:Source) "
-                "WITH node, score, "
-                "     collect(DISTINCT coalesce(nb.name, nb.victim, nb.id))[0..6] AS ctx, "
-                "     (collect(DISTINCT s1.id) + collect(DISTINCT s2.id))[0..4] AS urls "
-                "RETURN labels(node) AS labels, node.rag_text AS text, score, ctx, urls "
-                "ORDER BY score DESC", k=k, qv=qv).data()
+            for idx, n in self.MULTI_INDEX:
+                try:
+                    hits = self._vector_query(s, idx, n, qv)
+                except Exception:
+                    hits = []  # per-type index missing -> handled by fallback below
+                for r in hits:
+                    key = (r["text"] or "")[:100]
+                    if key and key not in seen:
+                        seen.add(key)
+                        rows.append(r)
+            if not rows:  # per-type indexes absent: use the combined one
+                rows = self._vector_query(s, INDEX, max(k, 8), qv)
+        rows.sort(key=lambda r: -r["score"])
+        rows = rows[: max(k, 8)]
         ev = [{"type": "/".join([l for l in r["labels"] if l != "Doc"]) or "Doc",
                "score": round(r["score"], 3), "text": r["text"],
                "linked": [c for c in r["ctx"] if c],

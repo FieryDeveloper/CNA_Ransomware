@@ -92,12 +92,23 @@ def main() -> int:
             print(f"  {label:12} {len(rows):>4} embedded")
             total += len(rows)
 
+        # Combined index (search everything) ...
         session.run(
             f"CREATE VECTOR INDEX {INDEX} IF NOT EXISTS FOR (n:Doc) ON (n.embedding) "
             "OPTIONS {indexConfig: {`vector.dimensions`: $dim, `vector.similarity_function`: 'cosine'}}",
             dim=DIM,
         )
-        print(f"\nvector index '{INDEX}' ready over {total} nodes (:Doc label).")
+        # ... plus one index PER node type, so retrieval can pull guaranteed
+        # context from each (an incident AND an industry AND taxonomy), instead
+        # of whichever type happens to dominate the top-k of a single index.
+        for label in NODE_TEXT:
+            session.run(
+                f"CREATE VECTOR INDEX vec_{label.lower()} IF NOT EXISTS FOR (n:{label}) ON (n.embedding) "
+                "OPTIONS {indexConfig: {`vector.dimensions`: $dim, `vector.similarity_function`: 'cosine'}}",
+                dim=DIM,
+            )
+        print(f"\nindexes ready: '{INDEX}' (all {total} nodes) + per-type "
+              + ", ".join(f"vec_{l.lower()}" for l in NODE_TEXT))
 
     driver.close()
     return 0
