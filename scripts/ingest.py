@@ -173,9 +173,12 @@ def ingest_record(rec: dict, dry: bool = False) -> str:
     if target is None:
         return f"skip:no-such-industry:{rec['industry']}"
 
-    existing = {(e.get("victim") or "").strip().lower() for e in target.get("example_incidents", [])}
-    if rec["victim"].strip().lower() in existing:
-        return "skip:duplicate"
+    # Global dedup: one organisation = one incident, even if a later filing
+    # (amendment, 10-Q) gets classified into a different industry.
+    vic = rec["victim"].strip().lower()
+    for ind in industries:
+        if vic in {(e.get("victim") or "").strip().lower() for e in ind.get("example_incidents", [])}:
+            return "skip:duplicate"
     if dry:
         return "dry"
 

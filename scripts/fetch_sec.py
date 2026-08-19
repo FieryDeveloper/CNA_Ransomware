@@ -57,21 +57,23 @@ def _get(url: str) -> bytes:
     return data
 
 
-def search(query: str, since: str, until: str, page_size: int = 100) -> list[dict]:
-    """EDGAR full-text search for 8-K filings matching the query in a date range."""
-    hits, frm = [], 0
+def search(query: str, since: str, until: str, want: int) -> tuple[list[dict], int]:
+    """EDGAR full-text search for 8-K filings. Pages until it has `want` hits or
+    the results are exhausted. Returns (hits, total_available). EDGAR caps the
+    `from` offset at 10,000."""
+    hits, frm, total = [], 0, 0
     while True:
         url = (f"{EFTS}?q={quote(query)}&forms=8-K"
                f"&startdt={since}&enddt={until}&from={frm}")
         payload = json.loads(_get(url))
         batch = payload.get("hits", {}).get("hits", [])
-        hits.extend(batch)
         total = payload.get("hits", {}).get("total", {}).get("value", 0)
+        hits.extend(batch)
         frm += len(batch)
-        if frm >= total or not batch or frm >= 300:
+        if not batch or frm >= total or len(hits) >= want or frm >= 10000:
             break
         time.sleep(0.3)  # be polite to SEC
-    return hits
+    return hits[:want], total
 
 
 def doc_url(hit: dict) -> str | None:
@@ -147,13 +149,15 @@ def main() -> int:
     limit = int(_opt(args, "--limit", "10"))
 
     print(f"searching EDGAR: q={query!r} forms=8-K {since}..{until}")
-    hits = search(query, since, until)
+    hits, total = search(query, since, until, want=limit)
     gidx = load_group_index()
-    print(f"found {len(hits)} filings; classifying up to {limit} "
-          f"(attacker index: {len(gidx)} ransomware.live victims)\n")
+    print(f"{total} filings match; classifying {len(hits)} "
+          f"(raise with --limit; broaden with --query ransomware). "
+          f"attacker index: {len(gidx)} ransomware.live victims\n")
 
     counts = {}
     processed = 0
+    seen = set()  # in-batch dedup: same victim across multiple filings (8-K + amendments)
     for hit in hits:
         if processed >= limit:
             break
@@ -168,7 +172,13 @@ def main() -> int:
             text = strip_html(_get(url).decode("utf-8", "replace"))[:12000]
             rec = extract(text, url)
             enriched = enrich_attacker(rec, gidx)
-            status = ingest_record(rec, dry)
+            vkey = _norm(rec.get("victim", ""))
+            if vkey and vkey in seen:
+                status = "skip:duplicate-in-batch"
+            else:
+                status = ingest_record(rec, dry)
+                if status in ("added", "dry"):
+                    seen.add(vkey)
         except Exception as e:
             status = f"error:{str(e)[:60]}"
         counts[status.split(":")[0]] = counts.get(status.split(":")[0], 0) + 1
