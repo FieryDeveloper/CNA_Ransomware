@@ -34,7 +34,8 @@ scripts/
   export_mongo.js            shape the dataset into the 6 MongoDB collections
   load_mongo.py              upsert the collections into Atlas + build indexes
   server.js                  Node: serve explorer.html + live insights from Atlas
-  embed_graph.py             add a local-embedding vector index to Neo4j (for GraphRAG)
+  embed_graph.py             add per-type local-embedding vector indexes to Neo4j
+  ingest.py                  classify raw incident text into the schema (LLM) -> industries.json
   rag_core.py                the GraphRAG engine (routing + retrieval + synthesis)
   api.py                     FastAPI: POST /api/ask + live insights (the production API)
   ask.py                     CLI front end to the same engine
@@ -273,6 +274,41 @@ node, the universality is visible structurally instead of being buried in 14 nea
 rows. Subcategories stay per-category, since that is where industry-specific detail lives.
 
 `build_dataset.js` handles two real complications from how this was produced: the research run was interrupted by usage limits and resumed, so results span **multiple runs** (it takes the union), and agents named the same sector inconsistently (it canonicalises names and keeps the **richest** duplicate).
+
+---
+
+## Expanding the dataset (ingest)
+
+New incidents can be classified into the schema from raw text (an SEC 8-K, a news
+article, a breach notice). `ingest.py` uses an LLM with a strict JSON schema to
+extract our incident fields and classify the victim into one of the 14 industries,
+then appends to `data/industries.json` — the single source of truth the whole
+pipeline derives from. Dollar parsing and dedup happen on rebuild, so there is one
+parser and the derived stores never drift.
+
+```bash
+python scripts/ingest.py --file article.txt --dry-run   # preview the classified record
+python scripts/ingest.py --url https://www.sec.gov/...   # fetch + strip + classify
+cat notice.txt | python scripts/ingest.py                # stdin
+# then rebuild: node export_mongo.js && python load_mongo.py ; node export_graph.js ; embed_graph.py
+```
+
+The model is told to write "not publicly disclosed" rather than estimate a missing
+figure, and to set `is_ransomware_incident=false` for text that isn't a specific
+incident — so it won't invent records.
+
+### Where to get more data
+
+| Source | Access | Best for |
+|---|---|---|
+| **SEC EDGAR full-text search** (`efts.sec.gov`) | API | Financial impact — 8-K Item 1.05 material-cyber filings (since Dec 2023). |
+| **Maine AG breach notifications** | structured list | Clean victim/date/records-affected registry. |
+| **California AG breach list**, **HHS OCR portal** | HTML table / CSV | Breach victim + people affected (HHS = healthcare ≥500). |
+| **ransomware.live** | API (already used) | Victim/group/sector/country/date — the frequency spine. |
+| **The Record, BleepingComputer, DataBreaches.net** | HTML/RSS | Ransom paid + downtime narrative (needs LLM extraction). |
+
+ransomware.live gives the *who/when/sector*; SEC + AG lists + news give the *impact*
+(the fields the coverage chart shows are sparse). Feed any of them to `ingest.py`.
 
 ---
 
