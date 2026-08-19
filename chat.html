@@ -10,24 +10,24 @@
   --ink:#191C1F; --muted:#5A6268; --faint:#8B9298;
   --line:#DEDCD6; --line-strong:#BFBCB4;
   --accent:#2B3238; --accent-ink:#FCFBF9;
-  --sem:#2A5578; --rel:#2A6A63; --ana:#A2432B;
-  --sem-soft:#DDE4EC; --rel-soft:#DCEAE7; --ana-soft:#EFE1DB;
+  --sem:#2A5578; --rel:#2A6A63; --ana:#A2432B; --ent:#6B4E9E;
+  --sem-soft:#DDE4EC; --rel-soft:#DCEAE7; --ana-soft:#EFE1DB; --ent-soft:#E6DFF0;
 }
 @media (prefers-color-scheme:dark){:root{
   --ground:#101315; --surface:#171A1D; --surface-2:#1E2226;
   --ink:#E4E5E2; --muted:#9AA1A7; --faint:#6C737A;
   --line:#282D32; --line-strong:#3C434A;
   --accent:#E4E5E2; --accent-ink:#171A1D;
-  --sem:#7BA5CA; --rel:#6BB8AC; --ana:#C9714F;
-  --sem-soft:#161F29; --rel-soft:#162926; --ana-soft:#2A1B15;
+  --sem:#7BA5CA; --rel:#6BB8AC; --ana:#C9714F; --ent:#A78BD6;
+  --sem-soft:#161F29; --rel-soft:#162926; --ana-soft:#2A1B15; --ent-soft:#1F1830;
 }}
 :root[data-theme="dark"]{
   --ground:#101315; --surface:#171A1D; --surface-2:#1E2226;
   --ink:#E4E5E2; --muted:#9AA1A7; --faint:#6C737A;
   --line:#282D32; --line-strong:#3C434A;
   --accent:#E4E5E2; --accent-ink:#171A1D;
-  --sem:#7BA5CA; --rel:#6BB8AC; --ana:#C9714F;
-  --sem-soft:#161F29; --rel-soft:#162926; --ana-soft:#2A1B15;
+  --sem:#7BA5CA; --rel:#6BB8AC; --ana:#C9714F; --ent:#A78BD6;
+  --sem-soft:#161F29; --rel-soft:#162926; --ana-soft:#2A1B15; --ent-soft:#1F1830;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -62,6 +62,7 @@ main{flex:1 1 auto;min-height:0;max-width:1400px;width:100%;margin:0 auto;paddin
 .lane.semantic{color:var(--sem);border-color:var(--sem);background:var(--sem-soft)}
 .lane.relational{color:var(--rel);border-color:var(--rel);background:var(--rel-soft)}
 .lane.analytical{color:var(--ana);border-color:var(--ana);background:var(--ana-soft)}
+.lane.entity{color:var(--ent);border-color:var(--ent);background:var(--ent-soft)}
 .answer{font-size:14.5px;line-height:1.65;color:var(--ink)}
 .answer p{margin:0 0 10px}
 .answer strong{font-weight:600}
@@ -185,7 +186,7 @@ function renderAnswer(text, mid){
   return out;
 }
 
-const laneName = {semantic:'graph &middot; semantic', relational:'graph &middot; traversal', analytical:'mongodb &middot; analytics'};
+const laneName = {semantic:'graph &middot; semantic', relational:'graph &middot; traversal', analytical:'mongodb &middot; analytics', entity:'entity lookup'};
 
 function addUser(text){
   $('#welcome')?.remove();

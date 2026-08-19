@@ -71,6 +71,17 @@ def _hint(q, table):
     return [v for k, v in table.items() if k in ql]
 
 
+# Second names / spellings that map to a group's token in the data.
+GROUP_ALIASES = {
+    "blackcat": "alphv", "black cat": "alphv", "alphv/blackcat": "alphv", "noberus": "alphv",
+    "lockbit 3.0": "lockbit3", "lockbit3.0": "lockbit3", "lockbit 2.0": "lockbit2",
+    "lockbit3": "lockbit3", "lockbit2": "lockbit2",
+}
+# Group names that are also ordinary words — only treat as a group with intent.
+COMMON_WORD_GROUPS = {"play", "money", "hunters", "cactus", "trigona"}
+ENTITY_INTENT = re.compile(r"\b(attack|incident|victim|hit|target|breach|group|gang|ransom|campaign|about|by|from)\b", re.I)
+
+
 class RagEngine:
     """Holds the connections/model so a long-running server initializes once."""
 
@@ -78,6 +89,7 @@ class RagEngine:
         self.driver = None
         self.mongo = None
         self._model = None
+        self._groups = None  # cached set of known group tokens
 
     # --- lifecycle ---------------------------------------------------------
     def connect(self):
@@ -119,8 +131,44 @@ class RagEngine:
         if self.driver:
             self.driver.close()
 
+    # --- entity detection --------------------------------------------------
+    def _known_groups(self):
+        """Group name tokens as they appear in the data (from the bulk victim
+        layer). Cached; used to recognise when a question names a group."""
+        if self._groups is None:
+            g = set()
+            if self.mongo is not None:
+                g = {str(x).lower() for x in self.mongo["victims"].distinct("group") if x}
+            elif self.driver is not None:
+                with self.driver.session() as s:
+                    g = {r["g"].lower() for r in s.run("MATCH (n:Group) RETURN n.id AS g").data() if r["g"]}
+            self._groups = g
+        return self._groups
+
+    def detect_group(self, q: str):
+        """Return the canonical group token a question names, or None. Aliases
+        map common second names (BlackCat -> ALPHV). Common-word group names
+        ('play') only trigger with attack/group context, to avoid false hits."""
+        ql = q.lower()
+        for alias, canon in GROUP_ALIASES.items():
+            if re.search(r"(?<![a-z0-9])" + re.escape(alias) + r"(?![a-z0-9])", ql):
+                return canon
+        hits = []
+        for g in self._known_groups():
+            if len(g) < 3:
+                continue
+            if re.search(r"(?<![a-z0-9])" + re.escape(g) + r"(?![a-z0-9])", ql):
+                if g in COMMON_WORD_GROUPS and not ENTITY_INTENT.search(ql):
+                    continue
+                hits.append(g)
+        return max(hits, key=len) if hits else None
+
     # --- routing -----------------------------------------------------------
     def classify(self, q: str) -> str:
+        # a named group takes priority: pull that entity's attacks by keyword,
+        # not by vector similarity (which misses "all attacks by X").
+        if (self.mongo is not None or self.driver is not None) and self.detect_group(q):
+            return "entity"
         if RELATIONAL.search(q):
             return "relational"
         if ANALYTICAL.search(q):
@@ -218,6 +266,60 @@ class RagEngine:
         import json
         return ev, [json.dumps(facts, default=str)]
 
+    def _entity_context(self, q: str, group: str):
+        """Everything about one named group: its full leak-site footprint (bulk
+        victims by sector/year + sample) plus the researched incidents with
+        impact and sources. Keyword lookup, not vector similarity."""
+        import json
+        if self.mongo is None:
+            return self._semantic_context(q)
+        # prefix match so a family name catches its versions (lockbit -> lockbit,
+        # lockbit2, lockbit3). Exact-token groups (alphv) are unaffected.
+        vq = {"group": {"$regex": f"^{re.escape(group)}", "$options": "i"}}
+        total = self.mongo["victims"].count_documents(vq)
+        by_sector = list(self.mongo["victims"].aggregate([
+            {"$match": vq}, {"$group": {"_id": "$sector", "n": {"$sum": 1}}},
+            {"$sort": {"n": -1}}, {"$limit": 8}]))
+        by_year = list(self.mongo["victims"].aggregate([
+            {"$match": vq}, {"$group": {"_id": "$year", "n": {"$sum": 1}}},
+            {"$sort": {"_id": 1}}]))
+        countries = list(self.mongo["victims"].aggregate([
+            {"$match": vq}, {"$group": {"_id": "$country", "n": {"$sum": 1}}},
+            {"$sort": {"n": -1}}, {"$limit": 6}]))
+        sample = list(self.mongo["victims"].find(vq, {"victim": 1, "sector": 1, "country": 1, "attackdate": 1})
+                      .sort("attackdate", -1).limit(15))
+        # researched incidents match on the free-text group field (contains)
+        incs = list(self.mongo["incidents"].find({"group": {"$regex": re.escape(group), "$options": "i"}}))
+
+        facts = {
+            "group": group,
+            "total_leaksite_victims": total,
+            "by_sector": [{"sector": r["_id"], "n": r["n"]} for r in by_sector],
+            "by_year": [{"year": r["_id"], "n": r["n"]} for r in by_year if r["_id"]],
+            "top_countries": [{"country": r["_id"], "n": r["n"]} for r in countries if r["_id"]],
+            "recent_victims": [s["victim"] for s in sample],
+            "researched_incidents": [{
+                "victim": i["victim"], "industry": i["industry"],
+                "financial": i["financial"]["text"], "ransom": i["ransom"]["text"],
+                "downtime": i["downtime_and_recovery"], "summary": i.get("summary"),
+                "sources": i.get("sources", []),
+            } for i in incs],
+        }
+
+        ev = [{"type": "footprint", "text":
+               f"{group.upper()}: {total:,} leak-site victims. Top sectors: "
+               + ", ".join(f"{r['_id']} ({r['n']})" for r in by_sector[:5])
+               + (". Countries: " + ", ".join(f"{r['_id']} ({r['n']})" for r in countries[:4]) if countries else "")}]
+        for i in incs[:8]:
+            ev.append({"type": "Incident",
+                       "text": f"{i['victim']} ({i['industry']}): "
+                               + (i.get("summary") or i["financial"]["text"] or "")[:200],
+                       "urls": [u for u in i.get("sources", []) if isinstance(u, str)][:3]})
+        if sample:
+            ev.append({"type": "recent victims",
+                       "text": "Recent leak-site victims: " + ", ".join(s["victim"] for s in sample[:12])})
+        return ev, [json.dumps(facts, default=str)]
+
     # --- synthesis ---------------------------------------------------------
     def _synthesize(self, question: str, contexts, lane: str):
         joined = "\n\n".join(f"[{i+1}] {c}" for i, c in enumerate(contexts))
@@ -243,7 +345,9 @@ class RagEngine:
     # --- public ------------------------------------------------------------
     def answer(self, question: str, synthesize: bool = True, k: int = 6) -> dict:
         lane = self.classify(question)
-        if lane == "analytical":
+        if lane == "entity":
+            evidence, contexts = self._entity_context(question, self.detect_group(question))
+        elif lane == "analytical":
             evidence, contexts = self._analytical_context(question)
         elif self.driver is None:
             # graph lanes need Neo4j; fall back to Mongo facts if available
