@@ -165,7 +165,9 @@ def ingest_record(rec: dict, dry: bool = False) -> str:
         return f"skip:{rec.get('incident_type', 'unclassified')}"
     if rec.get("industry") in (None, "", "UNKNOWN"):
         return "skip:industry-unknown"
-    if not (rec.get("victim") or "").strip():
+    vic_raw = (rec.get("victim") or "").strip()
+    # reject placeholders — a record with no real victim name is useless
+    if not vic_raw or re.match(r"(?i)^(not (publicly )?disclosed|unknown|undisclosed|n/?a|redacted|the company|confidential)$", vic_raw):
         return "skip:no-victim"
 
     industries = json.loads(DATA.read_text(encoding="utf-8"))

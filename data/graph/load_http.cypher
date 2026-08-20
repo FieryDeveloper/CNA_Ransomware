@@ -1,16 +1,4 @@
-// Ransomware Industry Knowledge Graph, Neo4j import over HTTP.
-//
-// Use this version when 'file:///' fails with:
-//   Neo.ClientError.Statement.ExternalResourceFailed
-//
-// That error means the CSVs are not in the import folder THIS instance reads.
-// Rather than hunt for the folder, serve them over localhost instead:
-//
-//   cd data/graph
-//   python -m http.server 877
-//
-// Leave that running, then paste this whole file into Neo4j Browser.
-// Stop the server (Ctrl+C) when the load finishes.
+// HTTP variant — serve this dir: python -m http.server 877, then run in Browser or via driver.
 
 CREATE CONSTRAINT industry_id IF NOT EXISTS FOR (n:Industry) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT hazard_id IF NOT EXISTS FOR (n:Hazard) REQUIRE n.id IS UNIQUE;

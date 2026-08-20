@@ -228,6 +228,40 @@
           "https://cybernews.com/security/anubis-ransomware-gang-claims-disneyland-paris/",
           "https://dailysecurityreview.com/security-spotlight/anubis-ransomware-gang-claims-64gb-disneyland-paris-leak-in-alleged-construction-data-breach/"
         ]
+      },
+      {
+        "victim": "Inspired Entertainment, Inc.",
+        "group": "not publicly disclosed",
+        "date": "2023-11-08",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On November 8, 2023, Inspired Entertainment, Inc. detected a ransomware attack that disrupted its corporate IT systems. The company initiated response protocols and engaged cybersecurity experts, later discovering that personal data had been exfiltrated on November 15, 2023.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The affected IT systems have now been substantially restored to full operational capabilities.",
+        "data_impact": "Company data, including personal data, was exfiltrated.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1615063/000149315223042355/form8-k.htm",
+          "United States Securities and Exchange Commission"
+        ]
+      },
+      {
+        "victim": "Yum! Brands, Inc.",
+        "group": "not publicly disclosed",
+        "date": "2023-01-18",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On January 18, 2023, Yum! Brands, Inc. announced a ransomware attack that impacted certain information technology systems. The company initiated response protocols and engaged cybersecurity professionals, while confirming that less than 300 restaurants in the UK were temporarily closed but are now operational.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "Less than 300 restaurants in the United Kingdom were closed for one day; all stores are now operational and systems are expected to be largely restored in the coming days.",
+        "data_impact": "Data was taken from the Company's network; no evidence that customer databases were stolen.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1041061/000110465923004769/tm233852d1_8k.htm",
+          "not publicly disclosed"
+        ]
       }
     ],
     "exposure_categories": [
@@ -1863,6 +1897,23 @@
         "sources": [
           "https://www.ransomware.live/activity/Energy"
         ]
+      },
+      {
+        "victim": "Newpark Resources, Inc.",
+        "group": "not publicly disclosed",
+        "date": "2024-10-29",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On October 29, 2024, Newpark Resources, Inc. detected a ransomware incident where an unauthorized third party accessed its internal information systems. The company activated its cybersecurity response plan and is investigating the incident with external advisors.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The incident caused disruptions and limitation of access to certain information systems, but manufacturing and field operations continued utilizing established downtime procedures.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/71829/000007182924000111/nr-20241029.htm",
+          "SEC Form 8-K"
+        ]
       }
     ],
     "aggregate_stats": [
@@ -2170,6 +2221,91 @@
           "https://www.computing.co.uk/news/2026/security/deutsche-bank-probes-supplier-cyber-incident-after-ransomware-gang-claims-breach",
           "https://compliancehub.wiki/deutsche-bank-unsafe-ransomware-third-party-breach-dora-2026/",
           "https://techchannel.news/unsafe-ransomware-group-claims-deutsche-bank-breach/"
+        ]
+      },
+      {
+        "victim": "SEI Investments Company",
+        "group": "not publicly disclosed",
+        "date": "not publicly disclosed",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "SEI Investments Company reported a ransomware attack on a third-party vendor. The company has issued a forward-looking statement regarding the potential impacts of this incident.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/350894/000035089423000088/seic-20231026.htm",
+          "seic-20231026"
+        ]
+      },
+      {
+        "victim": "River Financial Corporation",
+        "group": "not publicly disclosed",
+        "date": "2026-06-19",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On June 16, 2026, an unauthorized threat actor gained access to River Financial Corporation's network and deployed ransomware. The company identified the incident on June 19, 2026, and is currently investigating the scope and impact of the breach with the help of a third-party forensic firm.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "Certain operations have been impacted, but River is working with external cybersecurity professionals to fully restore these operations.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1641601/000119312526282946/ck0001641601-20260619.htm",
+          "SEC Form 8-K"
+        ]
+      },
+      {
+        "victim": "Navient Corporation",
+        "group": "not publicly disclosed",
+        "date": "2026-06-08",
+        "country": "United States",
+        "incident_type": "data-extortion",
+        "ingest_source": "sec/news",
+        "summary": "On June 8, 2026, Navient Corporation was informed of a ransomware attack affecting a third-party law firm that provides services to the company. The attack resulted in unauthorized access to sensitive borrower information maintained by the law firm. The company has initiated an investigation and is notifying affected individuals and regulators as required.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "borrower information including customer names, date of birth, addresses, and Social Security numbers",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1593538/000114036126027441/ef20077249_8k.htm",
+          "United States Securities and Exchange Commission"
+        ]
+      },
+      {
+        "victim": "Prudential Financial, Inc.",
+        "group": "alphv",
+        "date": "2024-02-05",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On February 5, 2024, Prudential Financial, Inc. detected unauthorized access to its systems by a threat actor starting February 4, 2024. The investigation revealed that the threat actor accessed and exfiltrated limited client information and Company data, but no evidence of malware or ransomware was found, and the incident has not materially impacted operations.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "limited data including some client information and personally identifiable information, Company administrative and user data, and a small percentage of Company user accounts associated with employees and contractors",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1137774/000119312524040749/d766318d8ka.htm",
+          "United States Securities and Exchange Commission"
+        ]
+      },
+      {
+        "victim": "Globe Life Inc.",
+        "group": "not publicly disclosed",
+        "date": "2024-10-17",
+        "country": "United States",
+        "incident_type": "data-extortion",
+        "ingest_source": "sec/news",
+        "summary": "Globe Life Inc. received communications from an unknown threat actor attempting to extort money in exchange for not disclosing certain customer information. The company activated its incident response plan and is cooperating with federal law enforcement while investigating the claims made by the threat actor.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not applicable",
+        "data_impact": "Approximately 5,000 individuals affected; includes names, email addresses, phone numbers, postal addresses, Social Security numbers, health-related data, and other policy information.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/320335/000032033524000056/gl-20241017.htm",
+          "United States Securities and Exchange Commission"
         ]
       }
     ],
@@ -2604,6 +2740,142 @@
           "https://insight.scmagazineuk.com/synnovis-2024-attack-contributing-factor-in-patient-death",
           "https://www.infosecurity-magazine.com/news/synnovis-breach-notification-2024/"
         ]
+      },
+      {
+        "victim": "Enzo Biochem, Inc.",
+        "group": "not publicly disclosed",
+        "date": "2023-04-06",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On April 6, 2023, Enzo Biochem, Inc. experienced a ransomware attack that impacted its IT systems. The Company implemented containment measures and launched an investigation, discovering that certain data was extracted from its systems as part of the incident.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company activated its disaster recovery plan, allowing it to continue operations while restoring systems. Back-up procedures caused operational challenges and delays in processing laboratory specimens.",
+        "data_impact": "Certain data was extracted from the Company’s information technology systems; specific records or data types not publicly disclosed.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/316253/000121390023029594/ea176929-8k_enzo.htm",
+          "United States Securities and Exchange Commission Form 8-K"
+        ]
+      },
+      {
+        "victim": "Omnicell, Inc.",
+        "group": "not publicly disclosed",
+        "date": "not publicly disclosed",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Omnicell, Inc. experienced a ransomware incident that led to significant operational challenges. The company has been focused on addressing the impact of this incident while continuing to provide medication management solutions.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/926326/000092632623000027/exhibit991q2-23.htm",
+          "EX-99.1 Document Exhibit 99.1"
+        ]
+      },
+      {
+        "victim": "Akumin Inc.",
+        "group": "bianlian",
+        "date": "2023-11-02",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Akumin Inc. announced on November 2, 2023, that it has made significant progress in restoring its business activities and systems following a ransomware incident disclosed on October 16, 2023. Most of its cancer centers are now operational, allowing patient appointments to be scheduled, although some services and locations are still not fully restored.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The majority of systems have been restored, with most cancer centers treating patients and operations online, though some services remain unavailable and certain locations are temporarily closed.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1776197/000177619723000028/aku-20231102.htm",
+          "https://akumin.com/service-updates/"
+        ]
+      },
+      {
+        "victim": "DaVita Inc.",
+        "group": "interlock",
+        "date": "2025-04-12",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On April 12, 2025, DaVita Inc. experienced a ransomware incident that encrypted certain elements of their network. The company activated response protocols, isolated impacted systems, and is working with cybersecurity professionals to assess and remediate the situation while continuing to provide patient care.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/927066/000119312525079593/d948299d8k.htm",
+          "SEC Form 8-K"
+        ]
+      },
+      {
+        "victim": "TELA Bio, Inc.",
+        "group": "not publicly disclosed",
+        "date": "not publicly disclosed",
+        "country": "USA",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "TELA Bio, Inc. experienced a ransomware attack that impacted procedures at some of their largest accounts, contributing to a shortfall in revenue growth. The company reported a revenue of $16.1 million for the second quarter of 2024, reflecting an 11% increase from the previous year, despite the disruptions caused by the cyberattack.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1561921/000110465924088353/tm2421368d1_ex99-1.htm",
+          "EX-99.1"
+        ]
+      },
+      {
+        "victim": "Stryker",
+        "group": "handala",
+        "date": "03/23/2026",
+        "country": "not publicly disclosed",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Stryker experienced a network disruption but found no evidence of ransomware or malware. The incident was contained, and there was no indication of malicious activity directed towards customers or partners. The company is prioritizing the restoration of systems that support customer operations and manufacturing capabilities.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/310764/000119312526118634/d94012dex992.htm",
+          "not publicly disclosed"
+        ]
+      },
+      {
+        "victim": "Allied Healthcare Products, Inc.",
+        "group": "not publicly disclosed",
+        "date": "not publicly disclosed",
+        "country": "USA",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Allied Healthcare Products, Inc. experienced a ransomware attack during the COVID-19 pandemic, which contributed to operational inefficiencies and cash strain. The company is now implementing strategic transformation initiatives under new leadership to improve operational effectiveness and drive growth.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/874710/000110465923033243/tm239758d1_ex99-2.htm",
+          "EX-99.2 3 tm239758d1_ex99-2.htm"
+        ]
+      },
+      {
+        "victim": "Change Healthcare Solutions LLC",
+        "group": "not publicly disclosed",
+        "date": "not publicly disclosed",
+        "country": "Canada",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Change Healthcare Solutions LLC experienced a ransomware cyberattack that disrupted patient billing and collections, impacting the broader healthcare industry. This incident contributed to a decrease in revenue for Greenbrook TMS Inc. in Q1 2024, despite their efforts to restructure and expand treatment offerings.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1735948/000110465924061255/tm2414236d1_ex99-1.htm",
+          "EX-99.1 2 tm2414236d1_ex99-1.htm"
+        ]
       }
     ],
     "aggregate_stats": [
@@ -2987,6 +3259,176 @@
           "https://techcrunch.com/2025/03/11/tata-technologies-data-leaked-by-ransomware-gang/",
           "https://securityaffairs.com/174953/data-breach/ransomware-group-hunters-international-claims-to-have-hacked-tata-technologies.html"
         ]
+      },
+      {
+        "victim": "QuickLogic Corporation",
+        "group": "not publicly disclosed",
+        "date": "January 20, 2023",
+        "country": "not publicly disclosed",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On January 20, 2023, QuickLogic Corporation detected a ransomware infection affecting a limited number of IT systems. The Company promptly began an assessment, notified law enforcement, and engaged cybersecurity professionals to investigate the incident.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company has continued its business operations during this incident and successfully restored all of its critical operational data.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/882508/000143774923006511/ex_488676.htm",
+          "EX-99.1"
+        ]
+      },
+      {
+        "victim": "NCR Corporation",
+        "group": "not publicly disclosed",
+        "date": "2023-04-17",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On April 17, 2023, NCR Corporation announced that a single data center outage affecting some functionality for its commerce customers was caused by a cyber ransomware incident. The company is assessing the impact of the incident on its operations and financial results.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/70866/000119312523103016/d472247d8k.htm",
+          "https://www.sec.gov"
+        ]
+      },
+      {
+        "victim": "DISH Network Corporation",
+        "group": "not publicly disclosed",
+        "date": "February 23, 2023",
+        "country": "United States",
+        "incident_type": "data-extortion",
+        "ingest_source": "sec/news",
+        "summary": "On February 23, 2023, DISH Network Corporation announced a network outage due to a cyber-security incident. Following the incident, it was determined that certain data was extracted from the Corporation's IT systems, potentially including personal information, prompting an ongoing investigation.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Corporation's internal communications, customer call centers, and internet sites have been affected, but DISH, Sling, and their wireless and data networks remain operational. The Corporation is actively engaged in restoring the affected systems and is making steady progress.",
+        "data_impact": "It is possible that the extracted data includes personal information.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1001082/000155837023002254/dish-20230223x8k.htm",
+          "not publicly disclosed"
+        ]
+      },
+      {
+        "victim": "NCR Voyix Corporation",
+        "group": "not publicly disclosed",
+        "date": "April 2023",
+        "country": "not publicly disclosed",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "NCR Voyix Corporation experienced a ransomware incident in April 2023, which impacted its business operations. The company has since been working on efforts to prevent or mitigate such incidents in the future.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/70866/000007086624000023/exhibit992-q12024callsli.htm",
+          "EX-99.2 3 exhibit992-q12024callsli.htm"
+        ]
+      },
+      {
+        "victim": "AFG Companies, Inc.",
+        "group": "not publicly disclosed",
+        "date": "not publicly disclosed",
+        "country": "USA",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "AFG Companies, Inc. is facing a lawsuit from Brand Engagement Network Inc. (BEN) for allegedly concealing a ransomware attack on their network prior to an agreement signed in August 2023. The lawsuit claims that this concealment hindered BEN's ability to deliver AI solutions to automotive dealerships, causing significant delays and damaging trust in the partnership.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1838163/000149315225002670/ex99-1.htm",
+          "EX-99.1"
+        ]
+      },
+      {
+        "victim": "Rackspace Technology",
+        "group": "not publicly disclosed",
+        "date": "late 2022",
+        "country": "not publicly disclosed",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Rackspace Technology experienced a ransomware attack at the end of 2022, which was highly publicized and resulted in a loss of approximately $30 million in high-margin revenue. The company has since implemented a strategy to transform its business and mitigate the impact of the attack.",
+        "financial_impact": "~$30M",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1810019/000181001924000029/rxtlenderpresentationcle.htm",
+          "EX-99.3 7 rxtlenderpresentationcle.htm"
+        ]
+      },
+      {
+        "victim": "Ingram Micro Holding Corporation",
+        "group": "not publicly disclosed",
+        "date": "July 5, 2025",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Ingram Micro identified ransomware on certain internal systems and took steps to secure the environment, including taking systems offline. The Company is investigating the incident with cybersecurity experts and has notified law enforcement.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company is working diligently to restore the affected systems to process and ship orders.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1897762/000162828025034372/pressrelease-cybersecurity.htm",
+          "EX-99.1 2 pressrelease-cybersecurity.htm"
+        ]
+      },
+      {
+        "victim": "Data I/O Corporation",
+        "group": "not publicly disclosed",
+        "date": "August 16, 2025",
+        "country": "USA",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Data I/O Corporation reported a ransomware incident that was identified on August 16, 2025. The attack was not targeted and originated from a vulnerability in a third-party firewall service. The company has restored all systems and believes there was no revenue loss due to the incident.",
+        "financial_impact": "$180,000",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "All systems operational with no impact to customers or orders; incident contained and remediated.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/351998/000165495425010613/daio_ex990.htm",
+          "daio_ex990.htm"
+        ]
+      },
+      {
+        "victim": "Trio-Tech International",
+        "group": "not publicly disclosed",
+        "date": "2026-03-11",
+        "country": "Singapore",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On March 11, 2026, Trio-Tech International's subsidiary in Singapore experienced a ransomware incident that resulted in the encryption of certain files. The incident escalated on March 18, leading to the unauthorized disclosure of company data, prompting the company to activate response protocols and notify law enforcement.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The subsidiary took its network offline and is in the process of restoring affected systems.",
+        "data_impact": "The scope of the data potentially affected has not yet been fully determined.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/732026/000143774926009193/trt20260320_8k.htm",
+          "trt20260320_8k.htm"
+        ]
+      },
+      {
+        "victim": "Brand Engagement Network Inc.",
+        "group": "not publicly disclosed",
+        "date": "2025-01-16",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Brand Engagement Network Inc. reported a ransomware attack on its network shortly before the termination of an Exclusive Reseller Agreement with AFG Companies, Inc. The company has filed a lawsuit against AFG alleging fraudulent misrepresentation and breach of contract related to the attack.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1838163/000149315225002670/form8-k.htm",
+          "not publicly disclosed"
+        ]
       }
     ],
     "aggregate_stats": [
@@ -3322,6 +3764,210 @@
           "https://www.securityweek.com/nissan-data-breach-affects-100000-individuals/",
           "https://www.cpomagazine.com/cyber-security/nissan-oceania-data-breach-impacts-100000-individuals-in-australia-and-new-zealand/",
           "https://securityaffairs.com/156283/cyber-crime/akira-ransomware-breached-nissan-australia.html"
+        ]
+      },
+      {
+        "victim": "MKS Instruments, Inc.",
+        "group": "not publicly disclosed",
+        "date": "February 3, 2023",
+        "country": "USA",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "MKS Instruments, Inc. experienced a ransomware incident identified on February 3, 2023, which disrupted their operations. The company reported that they have restored global operations and are on track to recover revenue by the end of the second quarter of 2023.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "Global operations restored following ransomware incident",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1049502/000095017023017248/mksi-ex99_1.htm",
+          "EX-99 2 mksi-ex99_1.htm"
+        ]
+      },
+      {
+        "victim": "Gates Industrial Corporation plc",
+        "group": "not publicly disclosed",
+        "date": "2023-02-11",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On February 11, 2023, Gates Industrial Corporation plc reported being the target of a ransomware attack. The company activated its incident response plans and engaged cybersecurity experts to assess and remediate the situation, which temporarily disrupted production and shipping operations.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The attack resulted in the temporary inability of most facilities to produce and ship products. Production and shipping have been restored at some facilities, with full restoration expected in the coming days.",
+        "data_impact": "It is possible that personally identifiable information (PII) was accessed, but the extent is not yet determined.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1718512/000171851223000016/gtes-20230211.htm",
+          "SEC Form 8-K"
+        ]
+      },
+      {
+        "victim": "Tecogen Inc.",
+        "group": "not publicly disclosed",
+        "date": "2023-04-28",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Tecogen Inc. experienced a ransomware attack on April 28, 2023, which was identified as a spear phishing attack targeting the company's VPN. The company took immediate action to limit access, investigate the threat, and restore affected files, successfully returning to full operational status by May 1, 2023.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company's network was fully operational on May 1, 2023, after restoring files from the previous evening's back-up.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1537435/000153743523000036/tgen-20230503.htm",
+          "FORM 8-K CURRENT REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934"
+        ]
+      },
+      {
+        "victim": "Ultralife Corporation",
+        "group": "avoslocker",
+        "date": "2023-01-25",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Ultralife Corporation experienced an unauthorized entry into its IT systems, leading to a partial disruption of operations at its Newark and Virginia Beach locations. The company engaged external incident response professionals and did not pay any ransom, as they restored their systems and resumed production.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not applicable",
+        "downtime_and_recovery": "approximately two weeks of production and shipping downtime; systems have been restored and production resumed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/875657/000143774923005169/ulbi20230301_8k.htm",
+          "ulbi20230301_8k.htm"
+        ]
+      },
+      {
+        "victim": "Hillman Solutions Corp.",
+        "group": "not publicly disclosed",
+        "date": "May 2023",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Hillman Solutions Corp. experienced a ransomware attack in May 2023, which resulted in direct and indirect costs associated with the incident. The company is also expecting insurance receivables related to this cybersecurity incident.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1822492/000182249224000059/hillmanpr-termnoterepricin.htm",
+          "EX-99.1 Document Ex. 99.1 Hillman Successfully Reprices Senior Term Loan Lowering Interest Expense"
+        ]
+      },
+      {
+        "victim": "PGT Innovations, Inc.",
+        "group": "royal",
+        "date": "not publicly disclosed",
+        "country": "USA",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "PGT Innovations, Inc. reported that their fourth quarter financial results were impacted by a ransomware incident, which affected their ability to expand gross margin. The incident, along with Hurricane Ian, resulted in a revenue impact of approximately $15 million.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1354327/000095017023003596/pgti-ex99_1.htm",
+          "EX-99 3 pgti-ex99_1.htm"
+        ]
+      },
+      {
+        "victim": "HanesBrands Inc.",
+        "group": "not publicly disclosed",
+        "date": "May 31, 2022",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "HanesBrands Inc. announced that it experienced a ransomware attack on May 31, 2022. The incident raised concerns regarding the adequacy and security of their information technology systems.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1359841/000119312523031373/d438262dex991.htm",
+          "EX-99.1"
+        ]
+      },
+      {
+        "victim": "Sensata Technologies Holding plc",
+        "group": "not publicly disclosed",
+        "date": "2025-04-06",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On April 6, 2025, Sensata Technologies experienced a ransomware incident that encrypted devices in its network. The company activated response protocols, took its network offline, and is investigating the incident with third-party cybersecurity professionals.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The incident has temporarily impacted operations, including shipping, receiving, and manufacturing production. The timeline for full restoration is not yet known.",
+        "data_impact": "Files were taken from the Company’s environment; specific records or individuals affected are not disclosed.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1477294/000147729425000047/st-20250406.htm",
+          "Form 8-K filed with the SEC"
+        ]
+      },
+      {
+        "victim": "The Coca-Cola Company",
+        "group": "everest",
+        "date": "2026-07-16",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On July 16, 2026, The Coca-Cola Company announced that its subsidiary fairlife, LLC experienced unauthorized access to its systems due to a ransomware event. The company activated its incident response protocols and is investigating the impact, with production operations in the U.S. temporarily suspended.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "Production operations at fairlife in the United States are temporarily suspended; investigation and restoration efforts are ongoing.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/21344/000162828026048466/ko-20260716.htm",
+          "not publicly disclosed"
+        ]
+      },
+      {
+        "victim": "Mueller Water Products, Inc.",
+        "group": "not publicly disclosed",
+        "date": "2023-10-28",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Mueller Water Products, Inc. experienced a cybersecurity incident involving unauthorized access and deployment of ransomware, which disrupted access to business applications and limited the ability to take orders and ship products. The company has contained the incident and is in the process of restoring operations and verifying data.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company has largely restored the impacted applications and systems and continues to execute business continuity and restoration plans for the remaining impacted applications and systems.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1350593/000135059323000054/mwa-20231129.htm",
+          "SEC Form 8-K"
+        ]
+      },
+      {
+        "victim": "Johnson Controls International plc",
+        "group": "not publicly disclosed",
+        "date": "2023-09-23",
+        "country": "Ireland",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Johnson Controls International plc experienced a ransomware incident that disrupted portions of its internal IT infrastructure and applications. The incident was detected on September 23, 2023, and the company has since implemented its incident management and response plan, engaging cybersecurity experts to assist in the investigation and remediation efforts.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The company has largely restored the impacted applications and systems and continues to execute business continuity and restoration plans for the remaining impacted applications and systems.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/833444/000083344423000038/jci-20231113.htm",
+          "United States Securities and Exchange Commission"
+        ]
+      },
+      {
+        "victim": "Hillman Group",
+        "group": "not publicly disclosed",
+        "date": "May 2023",
+        "country": "not publicly disclosed",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Hillman Group experienced a ransomware attack in May 2023, which has had direct and indirect costs associated with the incident. The company has mentioned the receipt of expected insurance receivables related to this cybersecurity incident.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "not publicly disclosed",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1822492/000182249224000085/hillmanq12024earningscal.htm",
+          "EX-99.2 hillmanq12024earningscal.htm"
         ]
       }
     ],
@@ -4449,6 +5095,23 @@
         "sources": [
           "https://cyberq.tw/2026/06/30/nethome-group-is-caught-in-a-double/"
         ]
+      },
+      {
+        "victim": "Citi Trends, Inc.",
+        "group": "Hive",
+        "date": "2023-01-14",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "Citi Trends, Inc. experienced a disruption of its back office and distribution center IT systems due to Hive ransomware on January 14, 2023. The FBI provided tools to help restore affected systems, and the company's stores and financial systems remained operational throughout the incident.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company activated its incident response and business continuity plan to support the restoration of affected systems. Critical operating systems were restored, and the flow of merchandise to stores began to normalize during the third week of February 2023.",
+        "data_impact": "Sensitive customer data is not retained on its systems.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/1318484/000110465923024793/tm237638d1_8k.htm",
+          "https://www.sec.gov/Archives/edgar/data/1318484/000131848423000004/ct-20230223.htm"
+        ]
       }
     ],
     "exposure_categories": [
@@ -4803,6 +5466,23 @@
           "https://www.dexpose.io/shinyhunters-breach-american-tower-corporation/",
           "https://www.technadu.com/american-tower-data-breach-215000-accounts-exposed-in-shinyhunters-attack/629952/",
           "https://haveibeenpwned.com/Breach/AmericanTower"
+        ]
+      },
+      {
+        "victim": "Lumen Technologies, Inc.",
+        "group": "not publicly disclosed",
+        "date": "2023-03-27",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On March 27, 2023, Lumen Technologies announced two cybersecurity incidents. A ransomware attack affected a limited number of the Company’s servers, degrading operations for some enterprise customers. Additionally, a separate intrusion involved unauthorized access to internal IT systems, including data extraction.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "The Company implemented business continuity plans to restore functionality to its customers’ operational and business systems.",
+        "data_impact": "A limited amount of data was extracted, but the specific number of records or individuals affected is not publicly disclosed.",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/18926/000119312523079847/d467138d8k.htm",
+          "United States Securities and Exchange Commission"
         ]
       }
     ],
@@ -5162,6 +5842,23 @@
           "https://theloadstar.com/jas-worldwide-suffers-cyber-attack/",
           "https://thecyberexpress.com/cyberattack-on-jas-worldwide/",
           "https://dysruptionhub.com/ransomware-attack-disrupts-global-operations-of-jas-worldwide/"
+        ]
+      },
+      {
+        "victim": "RTX Corporation",
+        "group": "not publicly disclosed",
+        "date": "2025-09-19",
+        "country": "United States",
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news",
+        "summary": "On September 19, 2025, RTX Corporation reported a ransomware incident affecting its Multi-User System Environment (MUSE) passenger processing software. The company activated its incident response plan and is investigating the incident with the help of cybersecurity experts while communicating with affected airlines and airports.",
+        "financial_impact": "not publicly disclosed",
+        "ransom_demanded_or_paid": "not publicly disclosed",
+        "downtime_and_recovery": "Customers have shifted to back-up or manual processes and have experienced certain flight delays and cancellations.",
+        "data_impact": "not publicly disclosed",
+        "sources": [
+          "https://www.sec.gov/Archives/edgar/data/101829/000010182925000036/rtx-20250919.htm",
+          "United States Securities and Exchange Commission"
         ]
       }
     ],

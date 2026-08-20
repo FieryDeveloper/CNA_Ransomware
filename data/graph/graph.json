@@ -5,7 +5,7 @@
    "label": "Industry",
    "sector_tag": "Hospitality and Tourism",
    "overview": "The Accommodation, Food Services, Arts and Entertainment industry (ransomware.live sector tag \"Hospitality and Tourism\") is a high-frequency, high-visibility ransomware target: 771 victims have been tracked on ransomware.live's leak-site monitoring platform since roughly 2018, spanning hotels, casinos, restaurants, theme parks, cruise lines, museums, theaters, and travel/tour operators across 65+ countries (with the US, GB, FR, ES, CA, AU, DE and IT most represented). The sector is attacked by a broad spread of ransomware groups -- LockBit (in its 2/3/5 variants), Qilin, Akira, Play, Medusa, IncRansom, RansomHub, DragonForce and Clop are the most prolific -- and has produced some of the highest-profile ransomware incidents in history (MGM Resorts, Caesars Entertainment) due to the combination of large, valuable guest/loyalty databases, PCI-regulated payment systems, IT/OT-blended physical operations (casino floors, digital key/lock systems, POS), heavy third-party/franchise dependency, and a business model highly sensitive to even brief guest-facing downtime -- all of which make organizations in this sector both frequent targets and comparatively willing payers.",
-   "incident_count": 8,
+   "incident_count": 10,
    "distinct": "771 tracked victims across 65+ countries spanning hotels, casinos, restaurants, theme parks, cruise lines and museums. Distinctively franchised and multi-site, with inconsistent security maturity across properties and heavy seasonal revenue concentration. Casino and gaming operations add regulator-supervised systems and cage/loyalty data. Guest-facing outages are immediately public and directly convert to booking loss and brand damage.",
    "extortion_leverage": "Guest-facing service disruption timed to peak periods, combined with exposure of guest PII, payment card data and loyalty records.",
    "downtime_tolerance": "Low to moderate. Days in the ordinary course, but effectively hours during peak season or a major event, when a single weekend outage can absorb a quarter's margin."
@@ -45,7 +45,7 @@
    "label": "Industry",
    "sector_tag": "Energy",
    "overview": "The Energy and Utilities sector (ransomware.live tag \"Energy,\" ~826 indexed victim records at time of research) spans oil & gas exploration/production, pipelines and midstream transport, refining, oilfield services, electric power generation/transmission/distribution, gas distribution, and water/wastewater utilities. It is a top-tier ransomware target because it blends two high-leverage traits: (1) it is critical national infrastructure where downtime has cascading physical, economic, and public-safety consequences, giving attackers extraordinary extortion leverage; and (2) it runs a large, aging, and often flat-networked mix of IT and operational technology (OT/ICS/SCADA). Even when malware only hits corporate IT, operators frequently shut down OT preemptively out of caution (as Colonial Pipeline and Conpet did), so IT-only intrusions still cause operational and physical-world disruption (fuel shortages, offline payment at fuel retail, halted shipment planning). Financially the sector is among the most expensive to recover: Sophos put mean recovery cost for energy/oil-gas/utilities at ~$3.12M (2024), IBM put average energy-sector breach cost at $4.83M, and the sector reports the h",
-   "incident_count": 6,
+   "incident_count": 7,
    "distinct": "Roughly 826 indexed victims across oil and gas, pipelines, refining, power generation and transmission, and water/wastewater. Blends critical-national-infrastructure status — where downtime carries cascading physical, economic and public-safety consequence — with large, aged, geographically dispersed OT estates. Uniquely, the precautionary IT/OT shutdown is itself the loss event: operators halt physical operations defensively when IT is compromised, as Colonial Pipeline showed, so business interruption occurs even where OT is never touched. Heaviest regulatory overlay including CIRCIA and sector-specific mandates.",
    "extortion_leverage": "Threat to physical operational continuity and public-safety consequence, giving attackers extraordinary leverage disproportionate to the data actually held.",
    "downtime_tolerance": "Extremely low. Minutes to hours for grid, pipeline and water operations, where interruption is a public-safety and regulatory event, not merely a commercial one."
@@ -55,7 +55,7 @@
    "label": "Industry",
    "sector_tag": "Financial Services",
    "overview": "Finance and insurance is one of the most consistently targeted industries in the ransomware threat landscape, combining three features attackers prize: high-value, tightly regulated data (PII, account/payment details, claims and underwriting data); low tolerance for downtime given real-time payment, trading, and claims obligations; and deep interdependency through vendors, fintech partners, and market infrastructure that lets a single compromise cascade well beyond one victim. Recent ransomware.live data (100 most-recent sector-tagged victims, spanning roughly April-July 2026) shows the sector being hit across the full spectrum of institution types - community banks and credit unions, insurers and brokers, wealth/asset managers, fintech and payments firms, and even a central bank - by a wide range of groups (Qilin, Everest, DragonForce, Akira, Everest, LockBit successors, Lapsus$, and newer entrants like Unsafe and Krybit), with double-extortion (encrypt-and-exfiltrate) now the dominant pattern. Notable historical and recent incidents illustrate two especially distinctive hazards for this industry versus others: (1) systemic/market-contagion risk, where ransomware against a market-",
-   "incident_count": 8,
+   "incident_count": 13,
    "distinct": "Combines the highest-value regulated data with real-time payment, trading and claims obligations and dense interconnection through fintech partners and market infrastructure that permits contagion beyond the direct victim. Generally the most mature sector in controls, capital and recovery capability, which lowers payment likelihood while raising regulatory and systemic-risk scrutiny under GLBA and, for EU-touching entities, DORA.",
    "extortion_leverage": "Exposure of customer PII/PFI, account and counterparty data, plus regulatory and market-confidence consequence. Availability leverage is real for payments and trading but blunted by mature redundancy.",
    "downtime_tolerance": "Very low for transaction processing and settlement (minutes to hours); moderate for back-office and underwriting functions."
@@ -65,7 +65,7 @@
    "label": "Industry",
    "sector_tag": "Healthcare",
    "overview": "Healthcare and Social Assistance is one of the most heavily targeted sectors in the ransomware ecosystem, driven by a combination of low tolerance for downtime (patient safety), high-value PHI, fragmented and legacy IT/OT environments, and a long tail of small, under-resourced providers (clinics, home health agencies, billing firms) alongside a handful of giant, deeply interconnected health systems and claims processors. Ransomware.live's \"Healthcare\" sector tag currently lists 2,443 posted victims spanning 2015-2026 (dataset pulled 2026-07-19/20), with the pace of incidents accelerating sharply since 2020 (34 in 2020 vs. 627 in 2025 and 387 already in the first ~6.5 months of 2026). The threat-actor landscape is fragmented across 206 distinct named groups in the dataset, with Qilin (178), LockBit3 (143), Inc Ransom (128), BianLian (92), RansomHub (81), Clop (72), ALPHV/BlackCat (68), Everest (63) and Medusa (63) the most prolific against this sector. Geographically the US dominates (1,092 recorded victims), followed by the UK (58), Australia (58), Canada (57), India (56), Germany (55), France (47) and Brazil (45), reflecting both the concentration of large private health systems i",
-   "incident_count": 7,
+   "incident_count": 15,
    "distinct": "2,443 posted victims with sharply accelerating pace. The only sector where both extortion levers are simultaneously severe: PHI carries the most punitive and mechanically triggered regulatory regime (HIPAA breach notification, OCR investigation, near-automatic class-action follow-on), while downtime is a patient-safety event producing ambulance diversion and delayed treatment. Fragmented estates, unpatchable connected medical devices, and a long tail of small under-resourced providers sit alongside a few giant claims processors whose compromise cascades industry-wide.",
    "extortion_leverage": "Dual: patient-safety-driven urgency to restore clinical operations, plus PHI publication carrying regulatory penalty and litigation exposure.",
    "downtime_tolerance": "Lowest of any sector. Hours for clinical and emergency systems, where outage translates directly into patient harm rather than financial loss alone."
@@ -75,7 +75,7 @@
    "label": "Industry",
    "sector_tag": "Technology",
    "overview": "The Information Technology sector (software vendors, IT-services/MSPs, SaaS/cloud hosts, distributors, semiconductor/EDA and telecom-adjacent firms) is one of the two most-targeted industries in ransomware, consistently ranking behind only manufacturing. Its defining risk feature is systemic/aggregation exposure: IT companies sit upstream of thousands of downstream customers, so a single intrusion into an MSP platform (Kaseya), a managed file-transfer product (MOVEit/Progress), a SaaS provider (CDK Global), or a distributor (Ingram Micro) cascades into mass downstream outages and data loss far larger than the direct victim. Beyond encryption-based extortion, the sector is disproportionately exposed to data-theft/leak extortion and intellectual-property theft (source code, chip designs, product blueprints). Common initial-access paths are the sector's own internet-facing edge (VPNs, RMM tools, MFT appliances), leaked/infostealer credentials, and exploitation of vulnerabilities in products the companies themselves ship. Regulatory exposure is intensifying (SEC cyber-disclosure rules, GDPR, breach-notification statutes, and large class-action liability). Sector-level economics per Sop",
-   "incident_count": 7,
+   "incident_count": 17,
    "distinct": "One of the two most-targeted industries, behind only manufacturing. Its defining feature is systemic aggregation exposure: software vendors, MSPs, SaaS hosts and distributors sit upstream of thousands of customers, so a single intrusion cascades into mass downstream outage and data loss — Kaseya, MOVEit, CDK Global and Ingram Micro each proved this at scale. For a cyber portfolio this is the sector most capable of generating a single correlated accumulation event across an entire book, and privileged remote-management access makes IT firms both victim and weapon.",
    "extortion_leverage": "Downstream customer impact and reputational destruction of the platform, plus source code, IP and customer data theft. Contractual liability to thousands of customers often dwarfs the insured's own restoration cost.",
    "downtime_tolerance": "Very low. Minutes to hours for SaaS and hosting under contractual SLAs, with customer attrition and contractual penalties beginning almost immediately."
@@ -85,7 +85,7 @@
    "label": "Industry",
    "sector_tag": "Manufacturing",
    "overview": "Manufacturing has been the single most-targeted sector by ransomware operators for five consecutive years through 2025, driven by a combination of high operational-downtime sensitivity (which pressures victims toward paying quickly), widespread reliance on legacy OT/ICS equipment with long refresh cycles, deep tiered supply-chain interdependency that multiplies contingent business-interruption exposure, and valuable intellectual property/trade-secret data. The ransomware.live \"Manufacturing\" sector tag alone contains 4,434 recorded victim postings, with year-over-year posting volume roughly quadrupling from 2021 (295) to 2025 (1,204), and the sector accounting for an estimated one in four ransomware attacks globally by 2025 per industry trackers. Attack economics are shifting: per Sophos's 2025 manufacturing-specific report, successful encryption rates have fallen sharply (74% to 40% YoY) as defenses improve, but attackers are compensating by shifting toward pure data theft and extortion, and average ransom demands against manufacturers have risen even as median demands/payments across all sectors trend down. High-profile incidents — from Norsk Hydro's ~$70M LockerGoga attack (2019",
-   "incident_count": 8,
+   "incident_count": 20,
    "distinct": "The most-targeted sector for five consecutive years through 2025, with 4,434 leak-site postings. Combines legacy OT/ICS estates on decade-plus refresh cycles with deep tiered supply-chain interdependency and valuable trade-secret data. A weak IT/OT boundary means an IT-side encryption event routinely halts physical production, and a single Tier-2 supplier outage idles multiple OEMs, producing contingent business interruption invisible on the direct victim's own policy.",
    "extortion_leverage": "Production downtime. Ransom is priced against per-hour output loss and contractual delivery penalties, secondarily against theft of designs, process IP and trade secrets.",
    "downtime_tolerance": "Very low. Hours to a few days; continuous-process and just-in-time operations tolerate least, and idle-line cost accrues immediately regardless of data outcome."
@@ -115,7 +115,7 @@
    "label": "Industry",
    "sector_tag": "Consumer Services",
    "overview": "Retail Trade and Consumer Services (ransomware.live's \"Consumer Services\" sector tag) is one of the highest-volume ransomware targeting categories, spanning everything from single-location dealerships, gyms, and jewelry shops up to multinational department-store chains, casino/hospitality operators, and the shared SaaS platforms (CRM, dealer-management systems) that underpin the industry. A live pull of the ransomware.live sector feed (~120 victim postings across roughly a 2-month window in mid-2026) shows the sector is dominated by high-volume, opportunistic ransomware-as-a-service groups (Qilin, TheGentlemen, SafePay, DragonForce, Akira, Nova, Settra) hitting mostly small/mid-size retailers, HVAC/home-services firms, funeral homes, and franchise operations, alongside a smaller number of large, named-brand victims. Layered on top of this baseline is a distinct and increasingly dominant pattern: pure data-extortion campaigns against enterprise SaaS/CRM platforms (the ShinyHunters Salesforce-vishing campaign hit Ralph Lauren, JCPenney/Catalyst Brands, and Madison Square Garden Sports Corp. in 2025-2026) that steal customer and employee data without ever deploying encryption. The sec",
-   "incident_count": 9,
+   "incident_count": 10,
    "distinct": "One of the highest-volume targeting categories, spanning single-location dealerships and gyms up to multinational chains, and dominated by high-volume opportunistic RaaS affiliates rather than targeted operators. Distinguished by extreme seasonal revenue concentration and by shared-platform concentration: dealer-management and CRM systems used across thousands of franchises mean one platform compromise produces simultaneous outages across an entire franchise network, as CDK Global demonstrated. PCI-DSS obligations and payment-card liability attach to nearly every incident.",
    "extortion_leverage": "POS and store-network outage timed to peak trading periods, plus customer payment-card and loyalty data exposure with PCI and consumer-notification consequence.",
    "downtime_tolerance": "Low. Hours to days, collapsing to near-zero during peak seasonal trading when a short outage consumes a disproportionate share of annual margin."
@@ -125,7 +125,7 @@
    "label": "Industry",
    "sector_tag": "Telecommunication",
    "overview": "The telecommunications sector - internet service providers, mobile network operators, fixed-line/cable carriers, tower/infrastructure companies, and satellite/media-adjacent telecom firms - has become an increasingly frequent ransomware and data-extortion target. Ransomware.live's own sector tracker lists 357 telecom-sector victims (tag \"Telecommunication\") with a pronounced acceleration in 2025-2026 (124 posted in 2025 alone, the sector's most active year on record, plus 62 more in the first ~7 months of 2026), corroborated by Cyble/Cybersecurity Dive research showing telecom ransomware attack volume grew roughly fourfold from 24 in 2022 to 90 in 2025. The threat-actor landscape is dominated by prolific double-extortion RaaS groups (Qilin, Akira, LockBit variants, Play, Clop) alongside a newer wave of pure data-extortion/leak-only crews with no encryption capability (Arkana Security, ShinyHunters, DragonForce) that specifically target telecom's dense stores of subscriber PII, SIM/USIM credentials, and call-detail metadata. What distinguishes telecom from most other industries in this taxonomy is the sector's dual exposure: (1) a large, regulated subscriber-PII attack surface compa",
-   "incident_count": 8,
+   "incident_count": 9,
    "distinct": "357 tracked victims with pronounced acceleration — 124 in 2025, the sector's most active year on record, plus 62 more in the first seven months of 2026. Carriers are single points of failure for downstream connectivity, so an outage propagates into every dependent business and household. Uniquely combines mass subscriber PII, core network and signaling systems functioning as OT-equivalents, and lawful-intercept and critical-infrastructure systems whose compromise carries national-security consequence beyond commercial loss.",
    "extortion_leverage": "Service availability affecting large downstream populations, plus mass subscriber PII and call-detail records with regulatory and surveillance sensitivity.",
    "downtime_tolerance": "Very low. Minutes to hours for core network and signaling; regulatory service-obligation and SLA penalties begin accruing almost immediately."
@@ -135,7 +135,7 @@
    "label": "Industry",
    "sector_tag": "Transportation/Logistics",
    "overview": "Transportation and Warehousing (ransomware.live sector tag \"Transportation/Logistics\") is a high-frequency, high-consequence ransomware target because it sits at the intersection of critical infrastructure, thin operating margins, and deeply interconnected IT/OT systems. The sector has seen some of history's costliest cyber incidents (Maersk/NotPetya, ~$300M) as well as cases where a ransomware attack directly caused a long-established company's insolvency (KNP Logistics, ~730 jobs lost). Live ransomware.live tracking shows a very high and steadily growing victim count across trucking, freight forwarding, maritime/port operators, warehousing, and fleet-technology vendors, spanning dozens of active ransomware groups and dozens of countries. Industry reporting for 2025 shows both attack frequency (+34% YoY) and average ransom demands (+685% YoY, to $2.19M) rising sharply, with third-party/supply-chain exposure (shared ELD, TMS, and port-terminal software) acting as a key amplifier — a single vendor compromise can cascade operational disruption across many otherwise-unrelated carriers simultaneously.",
-   "incident_count": 8,
+   "incident_count": 9,
    "distinct": "Sits at the intersection of critical infrastructure, thin operating margins and tightly coupled IT/OT. Produced both the costliest cyber incident on record (Maersk/NotPetya, roughly $300 million) and a documented insolvency directly caused by ransomware (KNP Logistics, roughly 730 jobs lost) — the clearest evidence that thin margins convert a survivable outage into a terminal one. Dispatch, freight and warehouse management systems have no manual fallback at modern volume.",
    "extortion_leverage": "Halted freight movement and dispatch, with cascading contractual penalties and downstream customer disruption across the shipping chain.",
    "downtime_tolerance": "Very low. Hours. Perishable and time-definite freight has effectively no tolerance, and margin structure leaves little buffer to absorb extended interruption."
@@ -7949,6 +7949,32 @@
    "source_count": 4
   },
   {
+   "id": "Accommodation, Food Services, Arts and Entertainment::Inspired Entertainment, Inc.",
+   "label": "Incident",
+   "victim": "Inspired Entertainment, Inc.",
+   "date": "2023-11-08",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The affected IT systems have now been substantially restored to full operational capabilities.",
+   "data_impact": "Company data, including personal data, was exfiltrated.",
+   "summary": "On November 8, 2023, Inspired Entertainment, Inc. detected a ransomware attack that disrupted its corporate IT systems. The company initiated response protocols and engaged cybersecurity experts, later discovering that personal data had been exfiltrated on November 15, 2023.",
+   "source_count": 2
+  },
+  {
+   "id": "Accommodation, Food Services, Arts and Entertainment::Yum! Brands, Inc.",
+   "label": "Incident",
+   "victim": "Yum! Brands, Inc.",
+   "date": "2023-01-18",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "Less than 300 restaurants in the United Kingdom were closed for one day; all stores are now operational and systems are expected to be largely restored in the coming days.",
+   "data_impact": "Data was taken from the Company's network; no evidence that customer databases were stolen.",
+   "summary": "On January 18, 2023, Yum! Brands, Inc. announced a ransomware attack that impacted certain information technology systems. The company initiated response protocols and engaged cybersecurity professionals, while confirming that less than 300 restaurants in the UK were temporarily closed but are now operational.",
+   "source_count": 2
+  },
+  {
    "id": "Agriculture, Forestry, Fishing and Food Production::JBS S.A. / JBS USA",
    "label": "Incident",
    "victim": "JBS S.A. / JBS USA",
@@ -8313,6 +8339,19 @@
    "source_count": 1
   },
   {
+   "id": "Energy and Utilities::Newpark Resources, Inc.",
+   "label": "Incident",
+   "victim": "Newpark Resources, Inc.",
+   "date": "2024-10-29",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The incident caused disruptions and limitation of access to certain information systems, but manufacturing and field operations continued utilizing established downtime procedures.",
+   "data_impact": "not publicly disclosed",
+   "summary": "On October 29, 2024, Newpark Resources, Inc. detected a ransomware incident where an unauthorized third party accessed its internal information systems. The company activated its cybersecurity response plan and is investigating the incident with external advisors.",
+   "source_count": 2
+  },
+  {
    "id": "Finance and Insurance::CNA Financial Corporation",
    "label": "Incident",
    "victim": "CNA Financial Corporation",
@@ -8417,6 +8456,71 @@
    "source_count": 4
   },
   {
+   "id": "Finance and Insurance::SEI Investments Company",
+   "label": "Incident",
+   "victim": "SEI Investments Company",
+   "date": "not publicly disclosed",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "SEI Investments Company reported a ransomware attack on a third-party vendor. The company has issued a forward-looking statement regarding the potential impacts of this incident.",
+   "source_count": 2
+  },
+  {
+   "id": "Finance and Insurance::River Financial Corporation",
+   "label": "Incident",
+   "victim": "River Financial Corporation",
+   "date": "2026-06-19",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "Certain operations have been impacted, but River is working with external cybersecurity professionals to fully restore these operations.",
+   "data_impact": "not publicly disclosed",
+   "summary": "On June 16, 2026, an unauthorized threat actor gained access to River Financial Corporation's network and deployed ransomware. The company identified the incident on June 19, 2026, and is currently investigating the scope and impact of the breach with the help of a third-party forensic firm.",
+   "source_count": 2
+  },
+  {
+   "id": "Finance and Insurance::Navient Corporation",
+   "label": "Incident",
+   "victim": "Navient Corporation",
+   "date": "2026-06-08",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "borrower information including customer names, date of birth, addresses, and Social Security numbers",
+   "summary": "On June 8, 2026, Navient Corporation was informed of a ransomware attack affecting a third-party law firm that provides services to the company. The attack resulted in unauthorized access to sensitive borrower information maintained by the law firm. The company has initiated an investigation and is notifying affected individuals and regulators as required.",
+   "source_count": 2
+  },
+  {
+   "id": "Finance and Insurance::Prudential Financial, Inc.",
+   "label": "Incident",
+   "victim": "Prudential Financial, Inc.",
+   "date": "2024-02-05",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "limited data including some client information and personally identifiable information, Company administrative and user data, and a small percentage of Company user accounts associated with employees and contractors",
+   "summary": "On February 5, 2024, Prudential Financial, Inc. detected unauthorized access to its systems by a threat actor starting February 4, 2024. The investigation revealed that the threat actor accessed and exfiltrated limited client information and Company data, but no evidence of malware or ransomware was found, and the incident has not materially impacted operations.",
+   "source_count": 2
+  },
+  {
+   "id": "Finance and Insurance::Globe Life Inc.",
+   "label": "Incident",
+   "victim": "Globe Life Inc.",
+   "date": "2024-10-17",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not applicable",
+   "data_impact": "Approximately 5,000 individuals affected; includes names, email addresses, phone numbers, postal addresses, Social Security numbers, health-related data, and other policy information.",
+   "summary": "Globe Life Inc. received communications from an unknown threat actor attempting to extort money in exchange for not disclosing certain customer information. The company activated its incident response plan and is cooperating with federal law enforcement while investigating the claims made by the threat actor.",
+   "source_count": 2
+  },
+  {
    "id": "Healthcare and Social Assistance::Change Healthcare (subsidiary of UnitedHealth Group/Optum)",
    "label": "Incident",
    "victim": "Change Healthcare (subsidiary of UnitedHealth Group/Optum)",
@@ -8508,6 +8612,110 @@
    "source_count": 5
   },
   {
+   "id": "Healthcare and Social Assistance::Enzo Biochem, Inc.",
+   "label": "Incident",
+   "victim": "Enzo Biochem, Inc.",
+   "date": "2023-04-06",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company activated its disaster recovery plan, allowing it to continue operations while restoring systems. Back-up procedures caused operational challenges and delays in processing laboratory specimens.",
+   "data_impact": "Certain data was extracted from the Company’s information technology systems; specific records or data types not publicly disclosed.",
+   "summary": "On April 6, 2023, Enzo Biochem, Inc. experienced a ransomware attack that impacted its IT systems. The Company implemented containment measures and launched an investigation, discovering that certain data was extracted from its systems as part of the incident.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::Omnicell, Inc.",
+   "label": "Incident",
+   "victim": "Omnicell, Inc.",
+   "date": "not publicly disclosed",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Omnicell, Inc. experienced a ransomware incident that led to significant operational challenges. The company has been focused on addressing the impact of this incident while continuing to provide medication management solutions.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::Akumin Inc.",
+   "label": "Incident",
+   "victim": "Akumin Inc.",
+   "date": "2023-11-02",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The majority of systems have been restored, with most cancer centers treating patients and operations online, though some services remain unavailable and certain locations are temporarily closed.",
+   "data_impact": "not publicly disclosed",
+   "summary": "Akumin Inc. announced on November 2, 2023, that it has made significant progress in restoring its business activities and systems following a ransomware incident disclosed on October 16, 2023. Most of its cancer centers are now operational, allowing patient appointments to be scheduled, although some services and locations are still not fully restored.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::DaVita Inc.",
+   "label": "Incident",
+   "victim": "DaVita Inc.",
+   "date": "2025-04-12",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "On April 12, 2025, DaVita Inc. experienced a ransomware incident that encrypted certain elements of their network. The company activated response protocols, isolated impacted systems, and is working with cybersecurity professionals to assess and remediate the situation while continuing to provide patient care.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::TELA Bio, Inc.",
+   "label": "Incident",
+   "victim": "TELA Bio, Inc.",
+   "date": "not publicly disclosed",
+   "country": "USA",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "TELA Bio, Inc. experienced a ransomware attack that impacted procedures at some of their largest accounts, contributing to a shortfall in revenue growth. The company reported a revenue of $16.1 million for the second quarter of 2024, reflecting an 11% increase from the previous year, despite the disruptions caused by the cyberattack.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::Stryker",
+   "label": "Incident",
+   "victim": "Stryker",
+   "date": "03/23/2026",
+   "country": "not publicly disclosed",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Stryker experienced a network disruption but found no evidence of ransomware or malware. The incident was contained, and there was no indication of malicious activity directed towards customers or partners. The company is prioritizing the restoration of systems that support customer operations and manufacturing capabilities.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::Allied Healthcare Products, Inc.",
+   "label": "Incident",
+   "victim": "Allied Healthcare Products, Inc.",
+   "date": "not publicly disclosed",
+   "country": "USA",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Allied Healthcare Products, Inc. experienced a ransomware attack during the COVID-19 pandemic, which contributed to operational inefficiencies and cash strain. The company is now implementing strategic transformation initiatives under new leadership to improve operational effectiveness and drive growth.",
+   "source_count": 2
+  },
+  {
+   "id": "Healthcare and Social Assistance::Change Healthcare Solutions LLC",
+   "label": "Incident",
+   "victim": "Change Healthcare Solutions LLC",
+   "date": "not publicly disclosed",
+   "country": "Canada",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Change Healthcare Solutions LLC experienced a ransomware cyberattack that disrupted patient billing and collections, impacting the broader healthcare industry. This incident contributed to a decrease in revenue for Greenbrook TMS Inc. in Q1 2024, despite their efforts to restructure and expand treatment offerings.",
+   "source_count": 2
+  },
+  {
    "id": "Information Technology::Kaseya (VSA platform)",
    "label": "Incident",
    "victim": "Kaseya (VSA platform)",
@@ -8597,6 +8805,136 @@
    "data_impact": "Claimed theft of 1.4TB (~730,000 files) including current/former employee personal details, purchase orders and confidential customer contracts (India and U.S. customers).",
    "summary": "Hunters International claimed a January 2025 ransomware attack on Tata Technologies (engineering/IT-services arm of the Tata group), later leaking 1.4TB of stolen data; Tata Motors disclosed a ransomware incident to Indian stock exchanges.",
    "source_count": 3
+  },
+  {
+   "id": "Information Technology::QuickLogic Corporation",
+   "label": "Incident",
+   "victim": "QuickLogic Corporation",
+   "date": "January 20, 2023",
+   "country": "not publicly disclosed",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company has continued its business operations during this incident and successfully restored all of its critical operational data.",
+   "data_impact": "not publicly disclosed",
+   "summary": "On January 20, 2023, QuickLogic Corporation detected a ransomware infection affecting a limited number of IT systems. The Company promptly began an assessment, notified law enforcement, and engaged cybersecurity professionals to investigate the incident.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::NCR Corporation",
+   "label": "Incident",
+   "victim": "NCR Corporation",
+   "date": "2023-04-17",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "On April 17, 2023, NCR Corporation announced that a single data center outage affecting some functionality for its commerce customers was caused by a cyber ransomware incident. The company is assessing the impact of the incident on its operations and financial results.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::DISH Network Corporation",
+   "label": "Incident",
+   "victim": "DISH Network Corporation",
+   "date": "February 23, 2023",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Corporation's internal communications, customer call centers, and internet sites have been affected, but DISH, Sling, and their wireless and data networks remain operational. The Corporation is actively engaged in restoring the affected systems and is making steady progress.",
+   "data_impact": "It is possible that the extracted data includes personal information.",
+   "summary": "On February 23, 2023, DISH Network Corporation announced a network outage due to a cyber-security incident. Following the incident, it was determined that certain data was extracted from the Corporation's IT systems, potentially including personal information, prompting an ongoing investigation.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::NCR Voyix Corporation",
+   "label": "Incident",
+   "victim": "NCR Voyix Corporation",
+   "date": "April 2023",
+   "country": "not publicly disclosed",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "NCR Voyix Corporation experienced a ransomware incident in April 2023, which impacted its business operations. The company has since been working on efforts to prevent or mitigate such incidents in the future.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::AFG Companies, Inc.",
+   "label": "Incident",
+   "victim": "AFG Companies, Inc.",
+   "date": "not publicly disclosed",
+   "country": "USA",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "AFG Companies, Inc. is facing a lawsuit from Brand Engagement Network Inc. (BEN) for allegedly concealing a ransomware attack on their network prior to an agreement signed in August 2023. The lawsuit claims that this concealment hindered BEN's ability to deliver AI solutions to automotive dealerships, causing significant delays and damaging trust in the partnership.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::Rackspace Technology",
+   "label": "Incident",
+   "victim": "Rackspace Technology",
+   "date": "late 2022",
+   "country": "not publicly disclosed",
+   "financial_impact": "~$30M",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Rackspace Technology experienced a ransomware attack at the end of 2022, which was highly publicized and resulted in a loss of approximately $30 million in high-margin revenue. The company has since implemented a strategy to transform its business and mitigate the impact of the attack.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::Ingram Micro Holding Corporation",
+   "label": "Incident",
+   "victim": "Ingram Micro Holding Corporation",
+   "date": "July 5, 2025",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company is working diligently to restore the affected systems to process and ship orders.",
+   "data_impact": "not publicly disclosed",
+   "summary": "Ingram Micro identified ransomware on certain internal systems and took steps to secure the environment, including taking systems offline. The Company is investigating the incident with cybersecurity experts and has notified law enforcement.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::Data I/O Corporation",
+   "label": "Incident",
+   "victim": "Data I/O Corporation",
+   "date": "August 16, 2025",
+   "country": "USA",
+   "financial_impact": "$180,000",
+   "ransom": "not publicly disclosed",
+   "downtime": "All systems operational with no impact to customers or orders; incident contained and remediated.",
+   "data_impact": "not publicly disclosed",
+   "summary": "Data I/O Corporation reported a ransomware incident that was identified on August 16, 2025. The attack was not targeted and originated from a vulnerability in a third-party firewall service. The company has restored all systems and believes there was no revenue loss due to the incident.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::Trio-Tech International",
+   "label": "Incident",
+   "victim": "Trio-Tech International",
+   "date": "2026-03-11",
+   "country": "Singapore",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The subsidiary took its network offline and is in the process of restoring affected systems.",
+   "data_impact": "The scope of the data potentially affected has not yet been fully determined.",
+   "summary": "On March 11, 2026, Trio-Tech International's subsidiary in Singapore experienced a ransomware incident that resulted in the encryption of certain files. The incident escalated on March 18, leading to the unauthorized disclosure of company data, prompting the company to activate response protocols and notify law enforcement.",
+   "source_count": 2
+  },
+  {
+   "id": "Information Technology::Brand Engagement Network Inc.",
+   "label": "Incident",
+   "victim": "Brand Engagement Network Inc.",
+   "date": "2025-01-16",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Brand Engagement Network Inc. reported a ransomware attack on its network shortly before the termination of an Exclusive Reseller Agreement with AFG Companies, Inc. The company has filed a lawsuit against AFG alleging fraudulent misrepresentation and breach of contract related to the attack.",
+   "source_count": 2
   },
   {
    "id": "Manufacturing::Norsk Hydro",
@@ -8701,6 +9039,162 @@
    "data_impact": "Approximately 100 GB of documents stolen, affecting an estimated 100,000 individuals; exposed data included around 4,000 Medicare card numbers, 7,500 driver's license numbers, 220 passport numbers, and 1,300 tax file numbers, alongside employee personal information, NDAs, and partner/client details.",
    "summary": "Nissan detected an intrusion into its Australian division's network in December 2023; the Akira ransomware gang claimed responsibility and, after negotiations reportedly failed, threatened to leak stolen business and personal data. Nissan confirmed in 2024 that the breach affected roughly 100,000 individuals across Australia and New Zealand, including customers, dealers, and current/former employees.",
    "source_count": 4
+  },
+  {
+   "id": "Manufacturing::MKS Instruments, Inc.",
+   "label": "Incident",
+   "victim": "MKS Instruments, Inc.",
+   "date": "February 3, 2023",
+   "country": "USA",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "Global operations restored following ransomware incident",
+   "data_impact": "not publicly disclosed",
+   "summary": "MKS Instruments, Inc. experienced a ransomware incident identified on February 3, 2023, which disrupted their operations. The company reported that they have restored global operations and are on track to recover revenue by the end of the second quarter of 2023.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Gates Industrial Corporation plc",
+   "label": "Incident",
+   "victim": "Gates Industrial Corporation plc",
+   "date": "2023-02-11",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The attack resulted in the temporary inability of most facilities to produce and ship products. Production and shipping have been restored at some facilities, with full restoration expected in the coming days.",
+   "data_impact": "It is possible that personally identifiable information (PII) was accessed, but the extent is not yet determined.",
+   "summary": "On February 11, 2023, Gates Industrial Corporation plc reported being the target of a ransomware attack. The company activated its incident response plans and engaged cybersecurity experts to assess and remediate the situation, which temporarily disrupted production and shipping operations.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Tecogen Inc.",
+   "label": "Incident",
+   "victim": "Tecogen Inc.",
+   "date": "2023-04-28",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company's network was fully operational on May 1, 2023, after restoring files from the previous evening's back-up.",
+   "data_impact": "not publicly disclosed",
+   "summary": "Tecogen Inc. experienced a ransomware attack on April 28, 2023, which was identified as a spear phishing attack targeting the company's VPN. The company took immediate action to limit access, investigate the threat, and restore affected files, successfully returning to full operational status by May 1, 2023.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Ultralife Corporation",
+   "label": "Incident",
+   "victim": "Ultralife Corporation",
+   "date": "2023-01-25",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not applicable",
+   "downtime": "approximately two weeks of production and shipping downtime; systems have been restored and production resumed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Ultralife Corporation experienced an unauthorized entry into its IT systems, leading to a partial disruption of operations at its Newark and Virginia Beach locations. The company engaged external incident response professionals and did not pay any ransom, as they restored their systems and resumed production.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Hillman Solutions Corp.",
+   "label": "Incident",
+   "victim": "Hillman Solutions Corp.",
+   "date": "May 2023",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Hillman Solutions Corp. experienced a ransomware attack in May 2023, which resulted in direct and indirect costs associated with the incident. The company is also expecting insurance receivables related to this cybersecurity incident.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::PGT Innovations, Inc.",
+   "label": "Incident",
+   "victim": "PGT Innovations, Inc.",
+   "date": "not publicly disclosed",
+   "country": "USA",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "PGT Innovations, Inc. reported that their fourth quarter financial results were impacted by a ransomware incident, which affected their ability to expand gross margin. The incident, along with Hurricane Ian, resulted in a revenue impact of approximately $15 million.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::HanesBrands Inc.",
+   "label": "Incident",
+   "victim": "HanesBrands Inc.",
+   "date": "May 31, 2022",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "HanesBrands Inc. announced that it experienced a ransomware attack on May 31, 2022. The incident raised concerns regarding the adequacy and security of their information technology systems.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Sensata Technologies Holding plc",
+   "label": "Incident",
+   "victim": "Sensata Technologies Holding plc",
+   "date": "2025-04-06",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The incident has temporarily impacted operations, including shipping, receiving, and manufacturing production. The timeline for full restoration is not yet known.",
+   "data_impact": "Files were taken from the Company’s environment; specific records or individuals affected are not disclosed.",
+   "summary": "On April 6, 2025, Sensata Technologies experienced a ransomware incident that encrypted devices in its network. The company activated response protocols, took its network offline, and is investigating the incident with third-party cybersecurity professionals.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::The Coca-Cola Company",
+   "label": "Incident",
+   "victim": "The Coca-Cola Company",
+   "date": "2026-07-16",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "Production operations at fairlife in the United States are temporarily suspended; investigation and restoration efforts are ongoing.",
+   "data_impact": "not publicly disclosed",
+   "summary": "On July 16, 2026, The Coca-Cola Company announced that its subsidiary fairlife, LLC experienced unauthorized access to its systems due to a ransomware event. The company activated its incident response protocols and is investigating the impact, with production operations in the U.S. temporarily suspended.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Mueller Water Products, Inc.",
+   "label": "Incident",
+   "victim": "Mueller Water Products, Inc.",
+   "date": "2023-10-28",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company has largely restored the impacted applications and systems and continues to execute business continuity and restoration plans for the remaining impacted applications and systems.",
+   "data_impact": "not publicly disclosed",
+   "summary": "Mueller Water Products, Inc. experienced a cybersecurity incident involving unauthorized access and deployment of ransomware, which disrupted access to business applications and limited the ability to take orders and ship products. The company has contained the incident and is in the process of restoring operations and verifying data.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Johnson Controls International plc",
+   "label": "Incident",
+   "victim": "Johnson Controls International plc",
+   "date": "2023-09-23",
+   "country": "Ireland",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The company has largely restored the impacted applications and systems and continues to execute business continuity and restoration plans for the remaining impacted applications and systems.",
+   "data_impact": "not publicly disclosed",
+   "summary": "Johnson Controls International plc experienced a ransomware incident that disrupted portions of its internal IT infrastructure and applications. The incident was detected on September 23, 2023, and the company has since implemented its incident management and response plan, engaging cybersecurity experts to assist in the investigation and remediation efforts.",
+   "source_count": 2
+  },
+  {
+   "id": "Manufacturing::Hillman Group",
+   "label": "Incident",
+   "victim": "Hillman Group",
+   "date": "May 2023",
+   "country": "not publicly disclosed",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "not publicly disclosed",
+   "data_impact": "not publicly disclosed",
+   "summary": "Hillman Group experienced a ransomware attack in May 2023, which has had direct and indirect costs associated with the incident. The company has mentioned the receipt of expected insurance receivables related to this cybersecurity incident.",
+   "source_count": 2
   },
   {
    "id": "Professional, Scientific, Technical Services, Real Estate and Wholesale Trade::Cognizant Technology Solutions",
@@ -9028,6 +9522,19 @@
    "source_count": 1
   },
   {
+   "id": "Retail Trade and Consumer Services::Citi Trends, Inc.",
+   "label": "Incident",
+   "victim": "Citi Trends, Inc.",
+   "date": "2023-01-14",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company activated its incident response and business continuity plan to support the restoration of affected systems. Critical operating systems were restored, and the flow of merchandise to stores began to normalize during the third week of February 2023.",
+   "data_impact": "Sensitive customer data is not retained on its systems.",
+   "summary": "Citi Trends, Inc. experienced a disruption of its back office and distribution center IT systems due to Hive ransomware on January 14, 2023. The FBI provided tools to help restore affected systems, and the company's stores and financial systems remained operational throughout the incident.",
+   "source_count": 2
+  },
+  {
    "id": "Telecommunications::Telecom Argentina S.A.",
    "label": "Incident",
    "victim": "Telecom Argentina S.A.",
@@ -9130,6 +9637,19 @@
    "data_impact": "Attackers claimed over 5.2 million records including customer and landowner PII, records referencing other companies' infrastructure (T-Mobile, Verizon, US DHS), tower asset records with GPS coordinates, and plaintext physical access/gate codes for cell tower compounds; 216,601 accounts were added to Have I Been Pwned on June 26, 2026.",
    "summary": "One of the world's largest cell-tower/telecom infrastructure REITs was breached in a 'pay-or-leak' extortion campaign by ShinyHunters. After American Tower did not pay by the group's June 15, 2026 deadline, the attackers published the stolen files - notable for exposing physical-security data (tower gate/access codes) rather than just customer records, illustrating the physical-infrastructure risk unique to telecom tower operators.",
    "source_count": 3
+  },
+  {
+   "id": "Telecommunications::Lumen Technologies, Inc.",
+   "label": "Incident",
+   "victim": "Lumen Technologies, Inc.",
+   "date": "2023-03-27",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "The Company implemented business continuity plans to restore functionality to its customers’ operational and business systems.",
+   "data_impact": "A limited amount of data was extracted, but the specific number of records or individuals affected is not publicly disclosed.",
+   "summary": "On March 27, 2023, Lumen Technologies announced two cybersecurity incidents. A ransomware attack affected a limited number of the Company’s servers, degrading operations for some enterprise customers. Additionally, a separate intrusion involved unauthorized access to internal IT systems, including data extraction.",
+   "source_count": 2
   },
   {
    "id": "Transportation and Warehousing::A.P. Moller-Maersk",
@@ -9236,6 +9756,19 @@
    "source_count": 4
   },
   {
+   "id": "Transportation and Warehousing::RTX Corporation",
+   "label": "Incident",
+   "victim": "RTX Corporation",
+   "date": "2025-09-19",
+   "country": "United States",
+   "financial_impact": "not publicly disclosed",
+   "ransom": "not publicly disclosed",
+   "downtime": "Customers have shifted to back-up or manual processes and have experienced certain flight delays and cancellations.",
+   "data_impact": "not publicly disclosed",
+   "summary": "On September 19, 2025, RTX Corporation reported a ransomware incident affecting its Multi-User System Environment (MUSE) passenger processing software. The company activated its incident response plan and is investigating the incident with the help of cybersecurity experts while communicating with affected airlines and airports.",
+   "source_count": 2
+  },
+  {
    "id": "MGM Resorts International",
    "label": "Company"
   },
@@ -9265,6 +9798,14 @@
   },
   {
    "id": "Disneyland Paris",
+   "label": "Company"
+  },
+  {
+   "id": "Inspired Entertainment, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Yum! Brands, Inc.",
    "label": "Company"
   },
   {
@@ -9380,6 +9921,10 @@
    "label": "Company"
   },
   {
+   "id": "Newpark Resources, Inc.",
+   "label": "Company"
+  },
+  {
    "id": "CNA Financial Corporation",
    "label": "Company"
   },
@@ -9412,6 +9957,26 @@
    "label": "Company"
   },
   {
+   "id": "SEI Investments Company",
+   "label": "Company"
+  },
+  {
+   "id": "River Financial Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "Navient Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "Prudential Financial, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Globe Life Inc.",
+   "label": "Company"
+  },
+  {
    "id": "Change Healthcare (subsidiary of UnitedHealth Group/Optum)",
    "label": "Company"
   },
@@ -9440,6 +10005,38 @@
    "label": "Company"
   },
   {
+   "id": "Enzo Biochem, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Omnicell, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Akumin Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "DaVita Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "TELA Bio, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Stryker",
+   "label": "Company"
+  },
+  {
+   "id": "Allied Healthcare Products, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Change Healthcare Solutions LLC",
+   "label": "Company"
+  },
+  {
    "id": "Kaseya (VSA platform)",
    "label": "Company"
   },
@@ -9465,6 +10062,46 @@
   },
   {
    "id": "Tata Technologies",
+   "label": "Company"
+  },
+  {
+   "id": "QuickLogic Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "NCR Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "DISH Network Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "NCR Voyix Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "AFG Companies, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Rackspace Technology",
+   "label": "Company"
+  },
+  {
+   "id": "Ingram Micro Holding Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "Data I/O Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "Trio-Tech International",
+   "label": "Company"
+  },
+  {
+   "id": "Brand Engagement Network Inc.",
    "label": "Company"
   },
   {
@@ -9497,6 +10134,54 @@
   },
   {
    "id": "Nissan Australia (Nissan Oceania)",
+   "label": "Company"
+  },
+  {
+   "id": "MKS Instruments, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Gates Industrial Corporation plc",
+   "label": "Company"
+  },
+  {
+   "id": "Tecogen Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Ultralife Corporation",
+   "label": "Company"
+  },
+  {
+   "id": "Hillman Solutions Corp.",
+   "label": "Company"
+  },
+  {
+   "id": "PGT Innovations, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "HanesBrands Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Sensata Technologies Holding plc",
+   "label": "Company"
+  },
+  {
+   "id": "The Coca-Cola Company",
+   "label": "Company"
+  },
+  {
+   "id": "Mueller Water Products, Inc.",
+   "label": "Company"
+  },
+  {
+   "id": "Johnson Controls International plc",
+   "label": "Company"
+  },
+  {
+   "id": "Hillman Group",
    "label": "Company"
   },
   {
@@ -9592,6 +10277,10 @@
    "label": "Company"
   },
   {
+   "id": "Citi Trends, Inc.",
+   "label": "Company"
+  },
+  {
    "id": "Telecom Argentina S.A.",
    "label": "Company"
   },
@@ -9624,6 +10313,10 @@
    "label": "Company"
   },
   {
+   "id": "Lumen Technologies, Inc.",
+   "label": "Company"
+  },
+  {
    "id": "A.P. Moller-Maersk",
    "label": "Company"
   },
@@ -9645,6 +10338,10 @@
   },
   {
    "id": "JAS Worldwide",
+   "label": "Company"
+  },
+  {
+   "id": "RTX Corporation",
    "label": "Company"
   },
   {
@@ -9689,6 +10386,10 @@
   },
   {
    "id": "Anubis",
+   "label": "Group"
+  },
+  {
+   "id": "not publicly disclosed",
    "label": "Group"
   },
   {
@@ -9824,6 +10525,10 @@
    "label": "Group"
   },
   {
+   "id": "alphv",
+   "label": "Group"
+  },
+  {
    "id": "BlackCat (initial encryption",
    "label": "Group"
   },
@@ -9849,6 +10554,18 @@
   },
   {
    "id": "later sanctioned by Australia)",
+   "label": "Group"
+  },
+  {
+   "id": "bianlian",
+   "label": "Group"
+  },
+  {
+   "id": "interlock",
+   "label": "Group"
+  },
+  {
+   "id": "handala",
    "label": "Group"
   },
   {
@@ -9901,6 +10618,18 @@
   },
   {
    "id": "Akira",
+   "label": "Group"
+  },
+  {
+   "id": "avoslocker",
+   "label": "Group"
+  },
+  {
+   "id": "royal",
+   "label": "Group"
+  },
+  {
+   "id": "everest",
    "label": "Group"
   },
   {
@@ -9981,6 +10710,10 @@
   },
   {
    "id": "Settra",
+   "label": "Group"
+  },
+  {
+   "id": "Hive",
    "label": "Group"
   },
   {
@@ -10188,10 +10921,6 @@
    "label": "Group"
   },
   {
-   "id": "everest",
-   "label": "Group"
-  },
-  {
    "id": "netrunner",
    "label": "Group"
   },
@@ -10217,10 +10946,6 @@
   },
   {
    "id": "payoutsking",
-   "label": "Group"
-  },
-  {
-   "id": "interlock",
    "label": "Group"
   },
   {
@@ -10297,10 +11022,6 @@
   },
   {
    "id": "sarcoma",
-   "label": "Group"
-  },
-  {
-   "id": "handala",
    "label": "Group"
   },
   {
@@ -10392,10 +11113,6 @@
    "label": "Group"
   },
   {
-   "id": "bianlian",
-   "label": "Group"
-  },
-  {
    "id": "darkvault",
    "label": "Group"
   },
@@ -10409,10 +11126,6 @@
   },
   {
    "id": "donex",
-   "label": "Group"
-  },
-  {
-   "id": "alphv",
    "label": "Group"
   },
   {
@@ -10492,10 +11205,6 @@
    "label": "Group"
   },
   {
-   "id": "royal",
-   "label": "Group"
-  },
-  {
    "id": "malas",
    "label": "Group"
   },
@@ -10513,10 +11222,6 @@
   },
   {
    "id": "daixin",
-   "label": "Group"
-  },
-  {
-   "id": "avoslocker",
    "label": "Group"
   },
   {
@@ -11460,11 +12165,19 @@
    "label": "Country"
   },
   {
+   "id": "not publicly disclosed",
+   "label": "Country"
+  },
+  {
    "id": "Taiwan",
    "label": "Country"
   },
   {
    "id": "India",
+   "label": "Country"
+  },
+  {
+   "id": "Singapore",
    "label": "Country"
   },
   {
@@ -14023,6 +14736,46 @@
   {
    "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Disneyland Paris",
    "target": "Country:France",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Accommodation, Food Services, Arts and Entertainment",
+   "target": "Incident:Accommodation, Food Services, Arts and Entertainment::Inspired Entertainment, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Inspired Entertainment, Inc.",
+   "target": "Company:Inspired Entertainment, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Inspired Entertainment, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Inspired Entertainment, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Accommodation, Food Services, Arts and Entertainment",
+   "target": "Incident:Accommodation, Food Services, Arts and Entertainment::Yum! Brands, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Yum! Brands, Inc.",
+   "target": "Company:Yum! Brands, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Yum! Brands, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Accommodation, Food Services, Arts and Entertainment::Yum! Brands, Inc.",
+   "target": "Country:United States",
    "type": "OCCURRED_IN"
   },
   {
@@ -16837,6 +17590,26 @@
   },
   {
    "source": "Industry:Energy and Utilities",
+   "target": "Incident:Energy and Utilities::Newpark Resources, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Energy and Utilities::Newpark Resources, Inc.",
+   "target": "Company:Newpark Resources, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Energy and Utilities::Newpark Resources, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Energy and Utilities::Newpark Resources, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Energy and Utilities",
    "target": "Statistic:Energy and Utilities::mean cost to recover from a ransomware attack energy oil gas and utilities",
    "type": "MEASURED_BY"
   },
@@ -17458,6 +18231,106 @@
   {
    "source": "Incident:Finance and Insurance::Deutsche Bank (via third-party marketing/incentive platform vendor)",
    "target": "Country:Germany",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Finance and Insurance",
+   "target": "Incident:Finance and Insurance::SEI Investments Company",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::SEI Investments Company",
+   "target": "Company:SEI Investments Company",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::SEI Investments Company",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Finance and Insurance::SEI Investments Company",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Finance and Insurance",
+   "target": "Incident:Finance and Insurance::River Financial Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::River Financial Corporation",
+   "target": "Company:River Financial Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::River Financial Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Finance and Insurance::River Financial Corporation",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Finance and Insurance",
+   "target": "Incident:Finance and Insurance::Navient Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Navient Corporation",
+   "target": "Company:Navient Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Navient Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Navient Corporation",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Finance and Insurance",
+   "target": "Incident:Finance and Insurance::Prudential Financial, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Prudential Financial, Inc.",
+   "target": "Company:Prudential Financial, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Prudential Financial, Inc.",
+   "target": "Group:alphv",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Prudential Financial, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Finance and Insurance",
+   "target": "Incident:Finance and Insurance::Globe Life Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Globe Life Inc.",
+   "target": "Company:Globe Life Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Globe Life Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Finance and Insurance::Globe Life Inc.",
+   "target": "Country:United States",
    "type": "OCCURRED_IN"
   },
   {
@@ -18098,6 +18971,166 @@
   {
    "source": "Incident:Healthcare and Social Assistance::Synnovis (pathology/blood-testing partner for NHS trusts in London)",
    "target": "Country:United Kingdom",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::Enzo Biochem, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Enzo Biochem, Inc.",
+   "target": "Company:Enzo Biochem, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Enzo Biochem, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Enzo Biochem, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::Omnicell, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Omnicell, Inc.",
+   "target": "Company:Omnicell, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Omnicell, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Omnicell, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::Akumin Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Akumin Inc.",
+   "target": "Company:Akumin Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Akumin Inc.",
+   "target": "Group:bianlian",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Akumin Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::DaVita Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::DaVita Inc.",
+   "target": "Company:DaVita Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::DaVita Inc.",
+   "target": "Group:interlock",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::DaVita Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::TELA Bio, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::TELA Bio, Inc.",
+   "target": "Company:TELA Bio, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::TELA Bio, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::TELA Bio, Inc.",
+   "target": "Country:USA",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::Stryker",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Stryker",
+   "target": "Company:Stryker",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Stryker",
+   "target": "Group:handala",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Stryker",
+   "target": "Country:not publicly disclosed",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::Allied Healthcare Products, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Allied Healthcare Products, Inc.",
+   "target": "Company:Allied Healthcare Products, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Allied Healthcare Products, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Allied Healthcare Products, Inc.",
+   "target": "Country:USA",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Healthcare and Social Assistance",
+   "target": "Incident:Healthcare and Social Assistance::Change Healthcare Solutions LLC",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Change Healthcare Solutions LLC",
+   "target": "Company:Change Healthcare Solutions LLC",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Change Healthcare Solutions LLC",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Healthcare and Social Assistance::Change Healthcare Solutions LLC",
+   "target": "Country:Canada",
    "type": "OCCURRED_IN"
   },
   {
@@ -18767,6 +19800,206 @@
   },
   {
    "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::QuickLogic Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::QuickLogic Corporation",
+   "target": "Company:QuickLogic Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::QuickLogic Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::QuickLogic Corporation",
+   "target": "Country:not publicly disclosed",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::NCR Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::NCR Corporation",
+   "target": "Company:NCR Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::NCR Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::NCR Corporation",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::DISH Network Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::DISH Network Corporation",
+   "target": "Company:DISH Network Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::DISH Network Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::DISH Network Corporation",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::NCR Voyix Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::NCR Voyix Corporation",
+   "target": "Company:NCR Voyix Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::NCR Voyix Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::NCR Voyix Corporation",
+   "target": "Country:not publicly disclosed",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::AFG Companies, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::AFG Companies, Inc.",
+   "target": "Company:AFG Companies, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::AFG Companies, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::AFG Companies, Inc.",
+   "target": "Country:USA",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::Rackspace Technology",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::Rackspace Technology",
+   "target": "Company:Rackspace Technology",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::Rackspace Technology",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::Rackspace Technology",
+   "target": "Country:not publicly disclosed",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::Ingram Micro Holding Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::Ingram Micro Holding Corporation",
+   "target": "Company:Ingram Micro Holding Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::Ingram Micro Holding Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::Ingram Micro Holding Corporation",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::Data I/O Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::Data I/O Corporation",
+   "target": "Company:Data I/O Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::Data I/O Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::Data I/O Corporation",
+   "target": "Country:USA",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::Trio-Tech International",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::Trio-Tech International",
+   "target": "Company:Trio-Tech International",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::Trio-Tech International",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::Trio-Tech International",
+   "target": "Country:Singapore",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
+   "target": "Incident:Information Technology::Brand Engagement Network Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Information Technology::Brand Engagement Network Inc.",
+   "target": "Company:Brand Engagement Network Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Information Technology::Brand Engagement Network Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Information Technology::Brand Engagement Network Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Information Technology",
    "target": "Statistic:Information Technology::technology share of ransomware incidents 2nd most targeted sector behind manufacturing at 14",
    "type": "MEASURED_BY"
   },
@@ -19383,6 +20616,246 @@
   {
    "source": "Incident:Manufacturing::Nissan Australia (Nissan Oceania)",
    "target": "Country:Australia",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::MKS Instruments, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::MKS Instruments, Inc.",
+   "target": "Company:MKS Instruments, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::MKS Instruments, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::MKS Instruments, Inc.",
+   "target": "Country:USA",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Gates Industrial Corporation plc",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Gates Industrial Corporation plc",
+   "target": "Company:Gates Industrial Corporation plc",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Gates Industrial Corporation plc",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Gates Industrial Corporation plc",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Tecogen Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Tecogen Inc.",
+   "target": "Company:Tecogen Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Tecogen Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Tecogen Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Ultralife Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Ultralife Corporation",
+   "target": "Company:Ultralife Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Ultralife Corporation",
+   "target": "Group:avoslocker",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Ultralife Corporation",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Hillman Solutions Corp.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Hillman Solutions Corp.",
+   "target": "Company:Hillman Solutions Corp.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Hillman Solutions Corp.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Hillman Solutions Corp.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::PGT Innovations, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::PGT Innovations, Inc.",
+   "target": "Company:PGT Innovations, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::PGT Innovations, Inc.",
+   "target": "Group:royal",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::PGT Innovations, Inc.",
+   "target": "Country:USA",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::HanesBrands Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::HanesBrands Inc.",
+   "target": "Company:HanesBrands Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::HanesBrands Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::HanesBrands Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Sensata Technologies Holding plc",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Sensata Technologies Holding plc",
+   "target": "Company:Sensata Technologies Holding plc",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Sensata Technologies Holding plc",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Sensata Technologies Holding plc",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::The Coca-Cola Company",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::The Coca-Cola Company",
+   "target": "Company:The Coca-Cola Company",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::The Coca-Cola Company",
+   "target": "Group:everest",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::The Coca-Cola Company",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Mueller Water Products, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Mueller Water Products, Inc.",
+   "target": "Company:Mueller Water Products, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Mueller Water Products, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Mueller Water Products, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Johnson Controls International plc",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Johnson Controls International plc",
+   "target": "Company:Johnson Controls International plc",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Johnson Controls International plc",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Johnson Controls International plc",
+   "target": "Country:Ireland",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Manufacturing",
+   "target": "Incident:Manufacturing::Hillman Group",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Manufacturing::Hillman Group",
+   "target": "Company:Hillman Group",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Manufacturing::Hillman Group",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Manufacturing::Hillman Group",
+   "target": "Country:not publicly disclosed",
    "type": "OCCURRED_IN"
   },
   {
@@ -21337,6 +22810,26 @@
   },
   {
    "source": "Industry:Retail Trade and Consumer Services",
+   "target": "Incident:Retail Trade and Consumer Services::Citi Trends, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Retail Trade and Consumer Services::Citi Trends, Inc.",
+   "target": "Company:Citi Trends, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Retail Trade and Consumer Services::Citi Trends, Inc.",
+   "target": "Group:Hive",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Retail Trade and Consumer Services::Citi Trends, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Retail Trade and Consumer Services",
    "target": "Statistic:Retail Trade and Consumer Services::retailers hit by ransomware who paid the ransom 2025",
    "type": "MEASURED_BY"
   },
@@ -21912,6 +23405,26 @@
   },
   {
    "source": "Industry:Telecommunications",
+   "target": "Incident:Telecommunications::Lumen Technologies, Inc.",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Telecommunications::Lumen Technologies, Inc.",
+   "target": "Company:Lumen Technologies, Inc.",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Telecommunications::Lumen Technologies, Inc.",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Telecommunications::Lumen Technologies, Inc.",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Telecommunications",
    "target": "Statistic:Telecommunications::telecom sector ransomware victims listed all time ransomwarelive",
    "type": "MEASURED_BY"
   },
@@ -22432,6 +23945,26 @@
   },
   {
    "source": "Incident:Transportation and Warehousing::JAS Worldwide",
+   "target": "Country:United States",
+   "type": "OCCURRED_IN"
+  },
+  {
+   "source": "Industry:Transportation and Warehousing",
+   "target": "Incident:Transportation and Warehousing::RTX Corporation",
+   "type": "HAD_INCIDENT"
+  },
+  {
+   "source": "Incident:Transportation and Warehousing::RTX Corporation",
+   "target": "Company:RTX Corporation",
+   "type": "HIT"
+  },
+  {
+   "source": "Incident:Transportation and Warehousing::RTX Corporation",
+   "target": "Group:not publicly disclosed",
+   "type": "PERPETRATED_BY"
+  },
+  {
+   "source": "Incident:Transportation and Warehousing::RTX Corporation",
    "target": "Country:United States",
    "type": "OCCURRED_IN"
   },
