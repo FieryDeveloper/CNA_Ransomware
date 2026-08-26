@@ -204,6 +204,8 @@ for (const ind of industries) {
       data_impact: e.data_impact || null,
       summary: e.summary || null,
       sources: (e.sources || []).filter((u) => /^https?:/i.test(u)),
+      incident_type: e.incident_type || "ransomware",   // ransomware | data-extortion
+      ingest_source: e.ingest_source || "research",      // research | sec/news
       updated_at: NOW,
     });
   }
