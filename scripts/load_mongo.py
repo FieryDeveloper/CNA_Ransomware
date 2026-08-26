@@ -49,6 +49,7 @@ INDEXES = {
     ],
     "industries": [([("ransomware_live_sector", 1)], {})],
     "taxonomy": [([("type", 1)], {}), ([("family", 1)], {}), ([("reach", -1)], {})],
+    "groups": [([("ransom_paid_usd", -1)], {})],
 }
 
 # Larger collections load in batches to keep memory and request sizes sane.
@@ -64,7 +65,7 @@ def load_file(name: str) -> list[dict]:
     return docs if isinstance(docs, list) else [docs]
 
 
-COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "synthesis"]
+COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "synthesis", "groups"]
 
 
 def dry_run() -> int:
@@ -103,6 +104,10 @@ def real_run() -> int:
     print(f"connected -> {DB_NAME}\n")
 
     for name in COLLECTIONS:
+        path = MONGO_DIR / f"{name}.json"
+        if not path.exists():
+            print(f"  {name:12} (no file — skipped; optional)")
+            continue
         docs = load_file(name)
         coll = db[name]
         total = 0

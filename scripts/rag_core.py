@@ -316,8 +316,19 @@ class RagEngine:
         # researched incidents match on the free-text group field (contains)
         incs = list(self.mongo["incidents"].find({"group": {"$regex": re.escape(group), "$options": "i"}}))
 
+        # on-chain ransom paid for this group (Ransomwhere), if loaded
+        paid = None
+        try:
+            g = self.mongo["groups"].find_one({"_id": group}) if "groups" in self.mongo.list_collection_names() else None
+            if g:
+                paid = {"ransom_paid_usd": g.get("ransom_paid_usd"), "payments": g.get("payments"),
+                        "span": f"{g.get('first_payment')}..{g.get('last_payment')}", "source": "ransomwhere.re"}
+        except Exception:
+            pass
+
         facts = {
             "group": group,
+            "on_chain_ransom_paid": paid,
             "total_leaksite_victims": total,
             "by_sector": [{"sector": r["_id"], "n": r["n"]} for r in by_sector],
             "by_year": [{"year": r["_id"], "n": r["n"]} for r in by_year if r["_id"]],
@@ -331,10 +342,13 @@ class RagEngine:
             } for i in incs],
         }
 
+        paid_txt = (f" On-chain ransom paid: ${paid['ransom_paid_usd']/1e6:.1f}M "
+                    f"across {paid['payments']} payments (Ransomwhere)." if paid and paid.get("ransom_paid_usd") else "")
         ev = [{"type": "footprint", "text":
                f"{group.upper()}: {total:,} leak-site victims. Top sectors: "
                + ", ".join(f"{r['_id']} ({r['n']})" for r in by_sector[:5])
-               + (". Countries: " + ", ".join(f"{r['_id']} ({r['n']})" for r in countries[:4]) if countries else "")}]
+               + (". Countries: " + ", ".join(f"{r['_id']} ({r['n']})" for r in countries[:4]) if countries else "")
+               + paid_txt}]
         for i in incs[:8]:
             ev.append({"type": "Incident",
                        "text": f"{i['victim']} ({i['industry']}): "

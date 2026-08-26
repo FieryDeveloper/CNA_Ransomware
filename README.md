@@ -37,6 +37,7 @@ scripts/
   embed_graph.py             add per-type local-embedding vector indexes to Neo4j
   ingest.py                  classify raw incident text into the schema (LLM) -> industries.json
   fetch_sec.py               pull SEC 8-K cyber filings, classify + enrich attacker from ransomware.live
+  fetch_ransomwhere.py       on-chain ransom-PAID per group (Ransomwhere) -> groups collection
   rag_core.py                the GraphRAG engine (routing + retrieval + synthesis)
   api.py                     FastAPI: POST /api/ask + live insights (the production API)
   ask.py                     CLI front end to the same engine
@@ -322,6 +323,18 @@ export SEC_USER_AGENT="Your Name your@email.com"     # SEC requires a real UA
 python scripts/fetch_sec.py --since 2024-01-01 --limit 20 --dry-run
 python scripts/fetch_sec.py --since 2024-01-01 --limit 20     # then rebuild
 ```
+
+**Ransom amounts.** SEC filings and most leak sites don't reveal the ransom, so those
+fields stay sparse. The realistic sources:
+
+| Source | Ransom data | Victim-linked? |
+|---|---|---|
+| **Ransomwhere** (`fetch_ransomwhere.py`) | ~$336M PAID on-chain across 106 groups | no — group-level |
+| **ransomware.live bulk** (already pulled) | 137 victim ransom **demands** (Medusa-heavy) | yes |
+| **News** (The Record, BleepingComputer) → `ingest.py` | per-victim paid/demanded | yes, but sparse + manual |
+
+`fetch_ransomwhere.py` populates the `groups` collection (ransom paid per group), which the
+entity lane surfaces — "tell me about ALPHV" then reports its $21.9M on-chain paid.
 
 ---
 
