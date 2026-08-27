@@ -50,6 +50,7 @@ INDEXES = {
     "industries": [([("ransomware_live_sector", 1)], {})],
     "taxonomy": [([("type", 1)], {}), ([("family", 1)], {}), ([("reach", -1)], {})],
     "groups": [([("ransom_paid_usd", -1)], {})],
+    "comparitech": [([("ransom_amount_usd", -1)], {}), ([("strain", 1)], {}), ([("ransom_paid", 1)], {})],
 }
 
 # Larger collections load in batches to keep memory and request sizes sane.
@@ -65,7 +66,7 @@ def load_file(name: str) -> list[dict]:
     return docs if isinstance(docs, list) else [docs]
 
 
-COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "synthesis", "groups"]
+COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "synthesis", "groups", "comparitech"]
 
 
 def dry_run() -> int:

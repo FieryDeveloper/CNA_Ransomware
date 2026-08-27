@@ -14,3 +14,7 @@ uvicorn[standard]>=0.29
 # LLM synthesis (only used by --answer / POST /api/ask; pick one)
 openai>=1.30
 anthropic>=0.25
+
+# Comparitech map extraction (Tableau Public via headless Chrome)
+pychrome>=0.2
+tableauscraper>=0.1.29
