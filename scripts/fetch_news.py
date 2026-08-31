@@ -34,6 +34,20 @@ from urllib.error import HTTPError, URLError
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ingest import extract, ingest_record, strip_html
 
+# Resume cache: URLs already classified, so re-runs continue to fresh articles
+# instead of re-fetching + re-LLM'ing the same ones. Gitignored.
+from pathlib import Path
+SEEN_FILE = Path(__file__).resolve().parent.parent / "data" / ".news_seen.txt"
+
+
+def load_seen() -> set:
+    return set(SEEN_FILE.read_text(encoding="utf-8").split()) if SEEN_FILE.exists() else set()
+
+
+def mark_seen(url: str):
+    with open(SEEN_FILE, "a", encoding="utf-8") as f:
+        f.write(url + "\n")
+
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0 Safari/537.36")
 HEADERS = {"User-Agent": UA, "Accept-Encoding": "gzip, deflate"}
@@ -110,13 +124,17 @@ def main() -> int:
 
     print(f"[{which}] collecting article links across {pages} page(s)...")
     links = collect_links(src, pages)
-    print(f"found {len(links)} articles; classifying up to {limit}\n")
+    seen_urls = load_seen()
+    fresh = [u for u in links if u not in seen_urls]
+    print(f"found {len(links)} articles ({len(links) - len(fresh)} already done); "
+          f"classifying up to {limit} fresh\n")
 
     counts, processed, seen = {}, 0, set()
-    for url in links:
+    for url in fresh:
         if processed >= limit:
             break
         processed += 1
+        mark_seen(url)   # record even skips, so we don't re-fetch next run
         try:
             html = get(url)
             text = title_of(html) + ". " + article_body(html, src["body_re"])

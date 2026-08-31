@@ -17,3 +17,4 @@ sentence_transformers_cache/
 
 # Node deps for the live server (reinstall with `npm install`)
 node_modules/
+data/.news_seen.txt
