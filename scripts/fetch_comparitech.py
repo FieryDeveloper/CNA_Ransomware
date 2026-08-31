@@ -34,10 +34,12 @@ from urllib.request import urlopen
 OUT = Path(__file__).resolve().parent.parent / "data" / "mongo" / "comparitech.json"
 DEBUG_PORT = 9222
 
-# Tableau Public views to pull. Add the worldwide workbook here once its view
-# name is confirmed; the US map is the bulk of the data.
+# Tableau Public views to pull. The US map is US-wide; the sector workbooks are
+# WORLDWIDE within their sector, so they add international incidents.
 VIEWS = [
     ("US", "https://public.tableau.com/views/USRansomwareAttacksMap-3/Dashboard1?:embed=y&:showVizHome=no"),
+    ("Healthcare-WW", "https://public.tableau.com/views/Ransomwareattacksonhealthcareorganizationsfrom2018toFeb2024/Dashboard1?:embed=y&:showVizHome=no"),
+    ("Government-WW", "https://public.tableau.com/views/ofattacksrecordsaffected-governmentagenciesworldwide/Dashboard1?:embed=y&:showVizHome=no"),
 ]
 
 CHROME = next((p for p in [
@@ -139,30 +141,50 @@ def extract(region: str, raw: str) -> list[dict]:
     from tableauscraper import TableauScraper, dashboard
     info, data = parse_chunks(raw)
     wb = dashboard.getWorksheets(TableauScraper(), data, info)
-    # the incident worksheet carries "Company Affected"; several sheets do
-    # (state insets like Alaska/Hawaii), so take the LARGEST — the main map.
-    cands = [w for w in wb.worksheets if any("Company Affected" in c for c in w.data.columns)]
+    # the incident worksheet has a company column; naming differs across
+    # workbooks ("Company Affected" vs "Company Name"), and several sheets carry
+    # it (state insets), so take the LARGEST with any company column.
+    def has_company(cols):
+        return any(("company affected" in c.lower() or "company name" in c.lower()) for c in cols)
+    cands = [w for w in wb.worksheets if has_company(w.data.columns)]
     if not cands:
         return []
-    ws = max(cands, key=lambda w: len(w.data))
-    df = ws.data
-    col = lambda name: (df[f"ATTR({name})-alias"] if f"ATTR({name})-alias" in df
-                        else df[f"{name}-alias"] if f"{name}-alias" in df else [None] * len(df))
+    df = max(cands, key=lambda w: len(w.data)).data
+
+    def find(*names):
+        for n in names:
+            for suf in ("-alias", "-value"):
+                if n + suf in df.columns:
+                    return df[n + suf]
+            for c in df.columns:  # substring fallback
+                if n.lower() in c.lower() and c.endswith("-alias"):
+                    return df[c]
+        return [None] * len(df)
+
+    company_c = find("Company Affected", "Company Name")
+    industry_c = find("Industry", "Organization Type")
+    records_c = find("# Records Affected", "Records Affected")
+    amount_c = find("Ransom Amount", "Ransom Amount ($)")
+    paid_c = find("Ransom Paid", "Ransom Paid?")
+    strain_c = find("Ransomware Strain", "Strain")
+
     recs = []
     for i in range(len(df)):
-        company = clean(col("Company Affected").iloc[i])
+        company = clean(company_c.iloc[i] if hasattr(company_c, "iloc") else company_c[i])
         if not company:
             continue
+        g = lambda s: clean(s.iloc[i]) if hasattr(s, "iloc") else clean(s[i])
+        n_ = lambda s: num(s.iloc[i]) if hasattr(s, "iloc") else num(s[i])
         recs.append({
             "_id": f"comparitech:{region}:{re.sub(r'[^a-z0-9]+', '-', company.lower())[:80]}",
             "company": company,
-            "industry": clean(col("Industry").iloc[i]),
-            "records_affected": num(col("# Records Affected").iloc[i]),
-            "ransom_amount_usd": num(col("Ransom Amount").iloc[i]),
-            "ransom_paid": clean(col("Ransom Paid").iloc[i]),   # Yes / No / None
-            "strain": clean(col("Ransomware Strain").iloc[i]),   # attacker
+            "industry": g(industry_c),
+            "records_affected": n_(records_c),
+            "ransom_amount_usd": n_(amount_c),
+            "ransom_paid": g(paid_c),        # Yes / No / None
+            "strain": g(strain_c),           # attacker
             "region": region,
-            "source": "comparitech.com/ransomware-attack-map",
+            "source": "comparitech.com ransomware trackers",
         })
     return recs
 
@@ -176,7 +198,7 @@ def main() -> int:
 
     proc = ensure_chrome()
     try:
-        all_recs, seen = [], set()
+        by_company = {}   # normalized company -> best record (prefer ransom data)
         for region, url in VIEWS:
             print(f"capturing {region} map ...")
             raw = capture(url)
@@ -185,10 +207,14 @@ def main() -> int:
                 continue
             recs = extract(region, raw)
             for r in recs:
-                if r["_id"] in seen:
-                    continue
-                seen.add(r["_id"]); all_recs.append(r)
+                key = re.sub(r"[^a-z0-9]+", " ", r["company"].lower()).strip()
+                cur = by_company.get(key)
+                # keep the richer record: one with a ransom amount, then paid
+                score = lambda x: (x["ransom_amount_usd"] is not None) * 2 + (x["ransom_paid"] not in (None, "Unknown"))
+                if cur is None or score(r) > score(cur):
+                    by_company[key] = r
             print(f"  {region}: {len(recs)} incidents")
+        all_recs = list(by_company.values())
     finally:
         if proc:
             proc.terminate()
