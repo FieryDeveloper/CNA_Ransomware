@@ -13,6 +13,7 @@ Setup (one time):
   4. Connect -> Drivers -> copy the connection string, and set:
        export MONGODB_URI='mongodb+srv://USER:PASS@cluster0.xxxx.mongodb.net/'
        export MONGODB_DB='cna_ransomware'      # optional, this is the default
+     (or put MONGODB_URI in .env, which this script now reads automatically)
   5. pip install pymongo
   6. node scripts/export_mongo.js      # refresh data/mongo/
      python scripts/load_mongo.py
@@ -30,6 +31,25 @@ import sys
 from pathlib import Path
 
 MONGO_DIR = Path(__file__).resolve().parent.parent / "data" / "mongo"
+
+
+def _load_env():
+    """Read .env the way rag_core.py does, so MONGODB_URI does not have to be
+    exported by hand. Stdlib only: this script must run on a bare install, and
+    python-dotenv is optional elsewhere in the project. Real environment
+    variables always win over .env."""
+    env = Path(__file__).resolve().parent.parent / ".env"
+    if not env.exists():
+        return
+    for line in env.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+_load_env()
 DB_NAME = os.environ.get("MONGODB_DB", "cna_ransomware")
 
 # collection -> index specs. Each spec is (keys, options).
@@ -120,8 +140,8 @@ def dry_run() -> int:
 def real_run() -> int:
     uri = os.environ.get("MONGODB_URI")
     if not uri:
-        raise SystemExit("set MONGODB_URI (see the setup notes at the top of this file), "
-                         "or use --dry-run")
+        raise SystemExit("set MONGODB_URI in .env or the environment (see the setup notes at "
+                         "the top of this file), or use --dry-run")
     try:
         from pymongo import MongoClient, ReplaceOne
     except ImportError:
