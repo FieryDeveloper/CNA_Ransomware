@@ -18,3 +18,9 @@ anthropic>=0.25
 # Comparitech map extraction (Tableau Public via headless Chrome)
 pychrome>=0.2
 tableauscraper>=0.1.29
+
+# Frequency model (fetch_exposure.py, estimate_underreporting.py, build_frequency.py)
+# deliberately needs NOTHING here: it uses only the stdlib (urllib, csv, json, math,
+# re, difflib). SUSB is read as plain CSV rather than XLSX so openpyxl is not needed,
+# and record linkage uses stdlib difflib with token blocking rather than rapidfuzz.
+# Keep it that way — it is the one pipeline that runs on a bare Python install.

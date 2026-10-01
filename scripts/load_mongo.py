@@ -51,6 +51,23 @@ INDEXES = {
     "taxonomy": [([("type", 1)], {}), ([("family", 1)], {}), ([("reach", -1)], {})],
     "groups": [([("ransom_paid_usd", -1)], {})],
     "comparitech": [([("ransom_amount_usd", -1)], {}), ([("strain", 1)], {}), ([("ransom_paid", 1)], {})],
+    # Frequency model (scripts/fetch_exposure.py -> estimate_underreporting.py -> build_frequency.py)
+    "frequency": [
+        ([("kind", 1)], {}),
+        ([("industry_id", 1), ("size_band", 1)], {}),
+        ([("rate.central_per_10k", -1)], {}),
+        ([("exposure_year", 1)], {}),
+    ],
+    "frequency_exposure": [([("kind", 1)], {}), ([("industry_id", 1), ("size_band", 1)], {})],
+    "frequency_calibration": [],
+    # HHS OCR mandatory healthcare breach list (scripts/fetch_hhs_ocr.py)
+    "hhs_ocr": [
+        ([("individuals_affected", -1)], {}),
+        ([("breach_submission_date_iso", -1)], {}),
+        ([("state", 1)], {}),
+        ([("ransomware_indicated", 1)], {}),
+        ([("covered_entity_type", 1)], {}),
+    ],
 }
 
 # Larger collections load in batches to keep memory and request sizes sane.
@@ -60,13 +77,24 @@ BATCH = 2000
 def load_file(name: str) -> list[dict]:
     path = MONGO_DIR / f"{name}.json"
     if not path.exists():
-        raise SystemExit(f"missing {path} — run `node scripts/export_mongo.js` first")
+        hint = ("python scripts/fetch_hhs_ocr.py" if name == "hhs_ocr" else
+                "python scripts/fetch_exposure.py / estimate_underreporting.py / build_frequency.py"
+                if name.startswith("frequency") else "node scripts/export_mongo.js")
+        raise SystemExit(f"missing {path} — run `{hint}` first")
     with open(path, encoding="utf-8") as fh:
         docs = json.load(fh)
     return docs if isinstance(docs, list) else [docs]
 
 
-COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "synthesis", "groups", "comparitech"]
+COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "synthesis",
+               "groups", "comparitech",
+               # Frequency model. Produced by the Python pipeline, not export_mongo.js:
+               #   python scripts/fetch_exposure.py
+               #   python scripts/estimate_underreporting.py
+               #   python scripts/build_frequency.py
+               "frequency_exposure", "frequency_calibration", "frequency",
+               # Healthcare's mandatory breach list (python scripts/fetch_hhs_ocr.py)
+               "hhs_ocr"]
 
 
 def dry_run() -> int:
@@ -76,13 +104,13 @@ def dry_run() -> int:
         try:
             docs = load_file(name)
         except SystemExit as e:
-            print(f"  {name:12} MISSING - {e}")
+            print(f"  {name:22} MISSING - {e}")
             ok = False
             continue
         missing_id = sum(1 for d in docs if not d.get("_id"))
         note = f" ({missing_id} missing _id!)" if missing_id else ""
         idx = len(INDEXES.get(name, []))
-        print(f"  {name:12} {len(docs):>6} docs, {idx} index(es){note}")
+        print(f"  {name:22} {len(docs):>6} docs, {idx} index(es){note}")
         if missing_id:
             ok = False
     print("\nOK - nothing was written." if ok else "\nPROBLEMS found (see above).")
@@ -107,7 +135,7 @@ def real_run() -> int:
     for name in COLLECTIONS:
         path = MONGO_DIR / f"{name}.json"
         if not path.exists():
-            print(f"  {name:12} (no file — skipped; optional)")
+            print(f"  {name:22} (no file — skipped; optional)")
             continue
         docs = load_file(name)
         coll = db[name]
@@ -119,7 +147,7 @@ def real_run() -> int:
             total += (res.upserted_count or 0) + (res.modified_count or 0) + (res.matched_count or 0)
         for keys, opts in INDEXES.get(name, []):
             coll.create_index(keys, **opts)
-        print(f"  {name:12} {len(docs):>6} docs upserted, {len(INDEXES.get(name, []))} index(es)")
+        print(f"  {name:22} {len(docs):>6} docs upserted, {len(INDEXES.get(name, []))} index(es)")
 
     print("\ndone.")
     client.close()
