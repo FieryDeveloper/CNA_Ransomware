@@ -1,0 +1,192 @@
+{
+  "_comment": "Maps the 14 ransomware.live `activity` sector tags to NAICS codes, so victim counts (numerator) can join Census firm counts (denominator). Keyed on ransomware_live_sector because that is the field victim records actually carry. Hand-curated and reviewable; consumed by scripts/fetch_exposure.py.",
+  "naics_vintage": 2017,
+  "denominator_vintage": 2022,
+  "validation_rules": [
+    "No NAICS code may be assigned (net of excludes) to more than one sector.",
+    "Each sector must resolve to a non-zero denominator.",
+    "Do NOT assert the sum of sector firm counts <= the SUSB US total. SUSB counts a firm in every sector it operates in, so the sum of all 20 top-level sectors is 6,461,497 against an unduplicated total of 6,395,635 (1.03% over). Verified 2026-10-01."
+  ],
+  "sectors": [
+    {
+      "ransomware_live_sector": "Healthcare",
+      "industry": "Healthcare and Social Assistance",
+      "industry_id": "healthcare-and-social-assistance",
+      "naics": ["62"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "high",
+      "sensitive_information": true,
+      "regulatory_regimes": ["HIPAA", "HITECH", "state breach notification"],
+      "notes": "Clean 1:1 with NAICS 62. Note 622 (Hospitals) is only 3,136 firms of the 693,801 - the sector is dominated by small practices, which matters for the size dimension."
+    },
+    {
+      "ransomware_live_sector": "Education",
+      "industry": "Educational Services",
+      "industry_id": "educational-services",
+      "naics": ["61"], "naics_exclude": [],
+      "denominator_source": "susb_2022+nces_ipeds", "denominator_unit": "firms+institutions",
+      "supplement": {
+        "count": 14918,
+        "basis": "measured",
+        "source": "NCES Common Core of Data (13,318 public school districts) + IPEDS (~1,600 public degree-granting institutions)",
+        "source_url": "https://nces.ed.gov/ccd/",
+        "rationale": "SUSB NAICS 61 covers private employer firms only. Public districts and public universities are a large share of observed education victims, so they must be in the denominator."
+      },
+      "confidence": "medium",
+      "sensitive_information": true,
+      "regulatory_regimes": ["FERPA", "state breach notification", "COPPA (K-12)"],
+      "notes": "Private (SUSB 61) + public (NCES/IPEDS). Public institutions added as a constant, not scraped."
+    },
+    {
+      "ransomware_live_sector": "Manufacturing",
+      "industry": "Manufacturing",
+      "industry_id": "manufacturing",
+      "naics": ["31-33"], "naics_exclude": ["311", "312"],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "high",
+      "sensitive_information": false,
+      "regulatory_regimes": ["DFARS/CMMC (defense suppliers)", "ITAR (defense)"],
+      "notes": "NAICS is the literal range string '31-33' in SUSB, not a 2-digit code. Food (311) and beverage (312) manufacturing are EXCLUDED here and assigned to Agriculture and Food Production, matching the DBIR industry name 'Agriculture, Forestry, Fishing and Food Production'."
+    },
+    {
+      "ransomware_live_sector": "Construction",
+      "industry": "Construction",
+      "industry_id": "construction",
+      "naics": ["23"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "high",
+      "sensitive_information": false,
+      "regulatory_regimes": [],
+      "notes": "Clean 1:1. Large denominator (782,487) dominated by very small contractors, which pushes the observed rate low."
+    },
+    {
+      "ransomware_live_sector": "Financial Services",
+      "industry": "Finance and Insurance",
+      "industry_id": "finance-and-insurance",
+      "naics": ["52"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "high",
+      "sensitive_information": true,
+      "regulatory_regimes": ["GLBA", "NYDFS Part 500", "SEC Reg S-P", "PCI-DSS", "state breach notification"],
+      "notes": "Clean 1:1 with NAICS 52."
+    },
+    {
+      "ransomware_live_sector": "Business Services",
+      "industry": "Professional, Scientific, Technical Services, Real Estate and Wholesale Trade",
+      "industry_id": "professional-scientific-technical-services-real-estate-and-wholesale-trade",
+      "naics": ["54", "53", "42", "55", "56"], "naics_exclude": ["5415"],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "low",
+      "sensitive_information": false,
+      "regulatory_regimes": ["state breach notification"],
+      "notes": "WEAKEST SEGMENT. Spans 5 unrelated NAICS sectors with very different risk profiles: Professional/Scientific/Technical (872,305), Real Estate (366,557 - mostly 1-4 employee landlords and brokers), Wholesale (277,932), Management of Companies (25,413), Admin/Waste (376,192). 5415 (Computer Systems Design) is excluded and assigned to Technology. Report a with/without-NAICS-53 sensitivity; the headline rate for this sector is close to meaningless."
+    },
+    {
+      "ransomware_live_sector": "Consumer Services",
+      "industry": "Retail Trade and Consumer Services",
+      "industry_id": "retail-trade-and-consumer-services",
+      "naics": ["44-45", "81"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "low",
+      "sensitive_information": true,
+      "regulatory_regimes": ["PCI-DSS", "state breach notification"],
+      "notes": "Retail (literal range '44-45') + Other Services (81). NAICS 71 (Arts/Entertainment) is deliberately NOT here - it is assigned to Hospitality, whose DBIR industry name explicitly includes 'Arts and Entertainment'. Large micro-firm-dominated denominator."
+    },
+    {
+      "ransomware_live_sector": "Technology",
+      "industry": "Information Technology",
+      "industry_id": "information-technology",
+      "naics": ["5112", "518", "5191", "5415"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "medium",
+      "sensitive_information": false,
+      "regulatory_regimes": ["SOC 2 (contractual)", "state breach notification"],
+      "notes": "A sub-sector composite with no single NAICS home: Software Publishers (5112, 13,674) + Data Processing/Hosting (518, 11,482) + Other Information Services (5191, 10,873) + Computer Systems Design (5415, 127,147). 5415 sits inside NAICS 54 and is excluded from Business Services to avoid double-assignment. 517 (Telecom) deliberately excluded - assigned to Telecommunication."
+    },
+    {
+      "ransomware_live_sector": "Telecommunication",
+      "industry": "Telecommunications",
+      "industry_id": "telecommunications",
+      "naics": ["517"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "medium",
+      "sensitive_information": true,
+      "regulatory_regimes": ["CPNI (FCC)", "CALEA", "state breach notification"],
+      "notes": "Small denominator (12,086) makes this the highest observed rate; rate is sensitive to a handful of victims. Report the Poisson CI prominently."
+    },
+    {
+      "ransomware_live_sector": "Transportation/Logistics",
+      "industry": "Transportation and Warehousing",
+      "industry_id": "transportation-and-warehousing",
+      "naics": ["48-49"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "high",
+      "sensitive_information": false,
+      "regulatory_regimes": ["TSA Security Directives (pipeline/rail)", "C-TPAT"],
+      "notes": "Literal range string '48-49'."
+    },
+    {
+      "ransomware_live_sector": "Energy",
+      "industry": "Energy and Utilities",
+      "industry_id": "energy-and-utilities",
+      "naics": ["22", "21"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "medium",
+      "sensitive_information": false,
+      "regulatory_regimes": ["NERC CIP (bulk electric)", "TSA Security Directives (pipeline)", "CIRCIA"],
+      "notes": "Utilities (22, 6,772) + Mining/Oil & Gas Extraction (21, 17,341). Small denominator; publicly-owned utilities are excluded from SUSB, which understates the denominator and overstates the rate."
+    },
+    {
+      "ransomware_live_sector": "Hospitality and Tourism",
+      "industry": "Accommodation, Food Services, Arts and Entertainment",
+      "industry_id": "accommodation-food-services-arts-and-entertainment",
+      "naics": ["72", "71"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "medium",
+      "sensitive_information": true,
+      "regulatory_regimes": ["PCI-DSS", "state breach notification"],
+      "notes": "Accommodation/Food Services (72) + Arts/Entertainment/Recreation (71), matching the DBIR industry name. 71 is assigned here and NOT to Consumer Services."
+    },
+    {
+      "ransomware_live_sector": "Agriculture and Food Production",
+      "industry": "Agriculture, Forestry, Fishing and Food Production",
+      "industry_id": "agriculture-forestry-fishing-and-food-production",
+      "naics": ["11", "311", "312"], "naics_exclude": [],
+      "denominator_source": "susb_2022", "denominator_unit": "firms",
+      "supplement": null,
+      "confidence": "low",
+      "sensitive_information": false,
+      "regulatory_regimes": ["FSMA (food safety)"],
+      "notes": "Crop/animal production (11, 22,599) + food mfg (311, 25,675) + beverage mfg (312, 11,382), the latter two excluded from Manufacturing. DELIBERATE CHOICE: USDA NASS counts ~1.9M farms vs SUSB's 22,599, but NASS counts every farm including those with no payroll and no IT estate. Employer firms are the realistic target population; using 1.9M would wrongly dilute the rate ~30x. Recorded as an assumption (A-AGRI-DENOM)."
+    },
+    {
+      "ransomware_live_sector": "Public Sector",
+      "industry": "Public Administration (Government)",
+      "industry_id": "public-administration-government",
+      "naics": [], "naics_exclude": [],
+      "denominator_source": "census_of_governments_2022", "denominator_unit": "governments",
+      "supplement": {
+        "count": 90887,
+        "basis": "measured",
+        "source": "US Census Bureau, 2022 Census of Governments (90,837 local governments: 3,031 counties, 19,429 municipalities, 16,228 townships, 12,546 school districts, 39,603 special districts; plus 50 state governments)",
+        "source_url": "https://www.census.gov/programs-surveys/cog/data/tables.html",
+        "rationale": "NAICS 92 (Public Administration) is absent from SUSB entirely - SUSB covers private employer firms only. Verified: zero rows match NAICS 92."
+      },
+      "confidence": "low",
+      "sensitive_information": true,
+      "regulatory_regimes": ["CJIS", "state breach notification", "CIRCIA", "FISMA (federal)"],
+      "notes": "DIFFERENT UNIT: governments, not firms. A county is one unit but runs dozens of separately attackable agencies, so this rate is NOT comparable to the firm-based rates and must never share an unlabelled column with them."
+    }
+  ]
+}
