@@ -22,7 +22,8 @@ data/
   sources.txt          every distinct URL cited
   raw/                 unprocessed API pulls (created by the fetch scripts)
   graph/               knowledge-graph export: node/rel CSVs, load.cypher, queries.cypher, style.grass
-  mongo/               the 6 MongoDB collections as JSON, ready for Atlas
+  mongo/               the 11 MongoDB collections as JSON, ready for Atlas
+  naics_crosswalk.json ransomware.live sector -> NAICS map (the frequency model's join)
 
 scripts/
   fetch_ransomware_live.py   pull victims from ransomware.live (by sector or by year)
@@ -31,13 +32,17 @@ scripts/
   validate.js                coverage + integrity checks on the built dataset
   export_graph.js            reshape into a knowledge graph (Neo4j + explorer feed)
   build_explorer.js          regenerate explorer.html with data inlined (incl. Insights tab)
-  export_mongo.js            shape the dataset into the 6 MongoDB collections
+  export_mongo.js            shape the dataset into the 8 narrative MongoDB collections
   load_mongo.py              upsert the collections into Atlas + build indexes
   server.js                  Node: serve explorer.html + live insights from Atlas
   embed_graph.py             add per-type local-embedding vector indexes to Neo4j
   ingest.py                  classify raw incident text into the schema (LLM) -> industries.json
   fetch_sec.py               pull SEC 8-K cyber filings, classify + enrich attacker from ransomware.live
   fetch_ransomwhere.py       on-chain ransom-PAID per group (Ransomwhere) -> groups collection
+  fetch_exposure.py          Census SUSB firm counts by NAICS x size -> the rate DENOMINATOR
+  estimate_underreporting.py capture-recapture vs Comparitech -> measured under-reporting R
+  fetch_hhs_ocr.py           HHS OCR mandatory healthcare breach list (JSF/PrimeFaces scrape)
+  build_frequency.py         numerator / denominator -> the industry x size frequency table
   rag_core.py                the GraphRAG engine (routing + retrieval + synthesis)
   api.py                     FastAPI: POST /api/ask + live insights (the production API)
   ask.py                     CLI front end to the same engine
@@ -50,9 +55,11 @@ Worth being precise about, because the numbers differ by two orders of magnitude
 | Layer | Size | What it is |
 |---|---|---|
 | **Bulk scrape** | **27,108 victims** across all 14 sectors, 2015–2026 | Every leak-site posting, sector-tagged. Names, groups, dates, countries — but almost no impact data (only ~13% carry a press link, ~1% a ransom figure). |
-| **Researched incidents** | **107** | Hand-researched exemplars with financial loss, ransom, downtime and recovery, each cited. These are the ones where impact was publicly reported. |
+| **Researched incidents** | **625** | Hand-researched and harvested exemplars with financial loss, ransom, downtime and recovery, each cited. These are the ones where impact was publicly reported. (107 hand-researched + 518 from SEC 8-K and security-news harvesting.) |
 
-The taxonomy is derived from both. Quote 27,108 for frequency and the 107 for severity — they are not interchangeable.
+The taxonomy is derived from both. Quote 27,108 for frequency and the 625 for severity — they are not interchangeable.
+
+For an actual **rate** rather than a count, see [The frequency model](#the-frequency-model-industry--size) below: 27,108 is a numerator, and a numerator alone cannot say how likely an attack is.
 
 Sector totals (leak-site postings, 2015 – July 2026):
 
@@ -73,14 +80,14 @@ A further 2,748 postings carry the sector value `Not Found` (unclassified upstre
 | | |
 |---|---|
 | Industries | 14 |
-| Researched incidents | 107 |
+| Researched incidents | 625 |
 | Hazard categories | 94 |
 | Exposure categories | 90 |
 | Taxonomy subcategories | 984 |
 | Aggregate loss/frequency stats | 179 |
 | Unique cited sources | 376 |
 
-**Incident coverage** — every one of the 107 incidents carries at least one cited source URL. 89 (83%) have downtime/recovery detail, 48 (45%) have a financial-impact figure, 47 (44%) have a ransom figure. The rest are marked *"not publicly disclosed"*, which is a genuine public-reporting gap, not missing research. Agents were explicitly instructed never to estimate a figure they could not source.
+**Incident coverage** — every one of the 625 incidents carries at least one cited source URL. 335 (54%) have downtime/recovery detail, 345 (55%) describe data impact, 157 (25%) carry a ransom figure (92 of them parsed to a number) and 99 (16%) a financial-impact figure (71 parsed). The rest are marked *"not publicly disclosed"*, which is a genuine public-reporting gap, not missing research — agents were explicitly instructed never to estimate a figure they could not source. Coverage rates are lower than at 107 incidents because the bulk SEC/news harvest reaches further down the disclosure tail, where fewer numbers are ever published.
 
 **Spread** — incidents run 2017–2026, weighted toward 2023–2026, and split almost evenly between US (53) and non-US (54) organisations. Most-represented groups: LockBit, Conti, Qilin, ShinyHunters, REvil/Sodinokibi, INC Ransom, Clop, Everest.
 
@@ -264,7 +271,7 @@ handles the scale better and is the friendlier surface for showing someone else.
 | Hazard | 50 | Country | 35 |
 | Exposure | 86 | Statistic | 197 |
 | Subcategory | 984 | Source | 376 |
-| Incident | 107 | Theme | 25 |
+| Incident | 625 | Theme | 25 |
 | Company | 103 | **Victim** (bulk) | **27,108** |
 
 Relationships: `FACES`, `EXPOSES`, `INCLUDES`, `HAD_INCIDENT`, `HIT`, `PERPETRATED_BY`,
@@ -304,8 +311,12 @@ incident — so it won't invent records.
 | Source | Access | Best for |
 |---|---|---|
 | **SEC EDGAR full-text search** (`efts.sec.gov`) | API | Financial impact — 8-K Item 1.05 material-cyber filings (since Dec 2023). |
-| **Maine AG breach notifications** | structured list | Clean victim/date/records-affected registry. |
-| **California AG breach list**, **HHS OCR portal** | HTML table / CSV | Breach victim + people affected (HHS = healthcare ≥500). |
+| ~~**Maine AG breach notifications**~~ | **disabled** | Was a clean victim/date/records-affected registry, but Maine took the public portal down after it was hit with fake submissions. **Do not plan around it.** |
+| **Washington State AG data-breach report** | PDF + portal | Ransomware *share* of breaches: 2024 saw 279 notifications of which 113 were ransomware-caused. Directional check, not a rate — WA law triggers on any WA resident, so it skews to multi-state and larger firms. |
+| **Census SUSB** (`www2.census.gov/.../susb`) | static CSV, no key | Firm counts by NAICS x employment size — the **denominator** for any frequency rate. Already wired up in `fetch_exposure.py`. |
+| **NAIC Cybersecurity Insurance Market Report** | PDF | Level validation: ~50,000 cyber claims on 4,368,614 policies in 2024 = 1.14% all-cyber claim frequency. The sanity anchor our ransomware-only rate must sit below. |
+| **HHS OCR breach portal** | JSF scrape (wired up) | **7,925 records, 2009-2026.** Mandatory reporting for healthcare breaches affecting 500+ individuals, so near-census within that frame. No API and no CSV: see `fetch_hhs_ocr.py` for the ViewState/TabView/AJAX-paging dance. |
+| **California AG breach list** | HTML table | Breach victim + people affected. |
 | **ransomware.live** | API (already used) | Victim/group/sector/country/date — the frequency spine. |
 | **The Record, BleepingComputer, DataBreaches.net** | HTML/RSS | Ransom paid + downtime narrative (needs LLM extraction). |
 
@@ -345,7 +356,7 @@ shaping logic lives in one place (`export_mongo.js`, Node) so there is a single 
 of the business rules; the Python loader only moves JSON into Atlas and builds indexes.
 
 ```bash
-node scripts/export_mongo.js          # data/*.json  ->  data/mongo/*.json (6 collections)
+node scripts/export_mongo.js          # data/*.json  ->  data/mongo/*.json (8 collections)
 python scripts/load_mongo.py --dry-run # validate, no connection needed
 python scripts/load_mongo.py           # upsert into Atlas + create indexes
 ```
@@ -363,14 +374,196 @@ pip install pymongo
 | Collection | Docs | Shape |
 |---|---:|---|
 | `industries` | 14 | Curated taxonomy, one doc per industry. Embeds hazards/exposures (with subcategories), aggregate stats, a `bulk_summary`, and `incident_ids` referencing `incidents`. Serves the explorer directly. |
-| `incidents` | 107 | Normalized, one per researched attack. `financial` and `ransom` each carry `{text, usd}` — the raw reported string **and** a parsed number, so analytics never re-parse. |
+| `incidents` | 625 | Normalized, one per researched attack. `financial` and `ransom` each carry `{text, usd}` — the raw reported string **and** a parsed number, so analytics never re-parse. |
 | `victims` | 27,108 | The flat bulk scrape. Indexed on `sector_key`, `group`, `year`, `country` (+ compound `sector_key+year`) so group-bys are fast. |
 | `taxonomy` | 136 | Deduped hazard/exposure categories with the industries each spans, its family, and reach. Powers the matrix without recomputation. |
 | `insights` | 1 | Materialized dashboard aggregates (by sector/year/group/country, heatmap, parsed losses) so charts never scan 27k rows. |
 | `synthesis` | 1 | Cross-industry narrative, themes, global statistics, takeaways. |
+| `groups` | 106 | Per-group on-chain ransom **paid** (Ransomwhere), so payment behaviour is a group attribute rather than a per-incident guess. |
+| `comparitech` | 5,942 | Comparitech's curated trackers, extracted from their Tableau maps. Kept **independent** of `victims` so the two can be used for capture-recapture. |
+| `frequency_exposure` | 127 | Census SUSB firm counts per industry x employee band: the rate **denominator**, stored as fetched so the join is re-checkable. |
+| `frequency_calibration` | 1 | The capture-recapture working: A/B/overlap per stratum, Chapman estimates, the dependence sweep, and the published under-reporting schedule. |
+| `hhs_ocr` | 7,925 | The HHS OCR breach portal, 2009-2026: healthcare's **mandatory** 500+-individual breach list. The only non-voluntary victim list in the project, which is what makes it usable for calibration. |
+| `frequency` | 127 | The frequency table. Four `kind`s: `cell` (104, industry x band), `industry_marginal` (14), `size_marginal` (8) and `method` (1, the audit spine). |
 
 **Idempotent:** every document is keyed by `_id` and replaced in place, so re-running after a
 re-scrape updates rather than duplicates.
+
+## The frequency model (industry x size)
+
+Everything above counts attacks. Counts are numerators, and a numerator cannot answer the
+question an underwriter actually asks: **how likely is a given firm to be hit?** That needs a
+denominator (how many firms exist) and a segmentation (which firms).
+
+```bash
+python scripts/fetch_exposure.py           # Census SUSB  -> frequency_exposure.json (denominator)
+python scripts/fetch_hhs_ocr.py            # mandatory healthcare list -> hhs_ocr.json
+python scripts/estimate_underreporting.py  # capture-recapture -> frequency_calibration.json
+python scripts/build_frequency.py          # the model   -> frequency.json
+python scripts/load_mongo.py               # into Atlas
+```
+
+Stdlib only — no pip install needed for these three.
+
+### Result (2025, US)
+
+Rates are per 10,000 firms per year. `observed` counts only leak-site listings with a confirmed
+US country; `central` additionally corrects for country gaps and under-reporting.
+
+| Industry | 2025 US victims | Firms | observed /10k | central /10k | Crosswalk |
+|---|---:|---:|---:|---:|---|
+| Telecommunication | 44 | 12,086 | 36.4 | 274 | medium |
+| Energy and Utilities | 71 | 24,113 | 29.4 | 222 | medium |
+| Manufacturing | 581 | 202,208 | 28.7 | 216 | high |
+| Technology | 419 | 163,176 | 25.7 | 200 | medium |
+| Agriculture and Food Production | 110 | 59,656 | 18.4 | 139 | low |
+| Public Sector | 140 | 90,887* | 15.4 | 132 | low |
+| Education | 174 | 118,205 | 14.7 | 124 | medium |
+| Financial Services | 228 | 244,536 | 9.3 | 71 | high |
+| Transportation/Logistics | 126 | 237,527 | 5.3 | 42 | high |
+| Healthcare | 365 | 693,801 | 5.3 | 32 | high |
+| Construction | 295 | 782,487 | 3.8 | 29 | high |
+| Business Services | 523 | 1,791,252 | 2.9 | 22 | **low** |
+| Consumer Services | 293 | 1,374,640 | 2.1 | 16 | low |
+| Hospitality and Tourism | 90 | 723,013 | 1.2 | 10 | medium |
+| **All industries** | **3,459** | **6,517,587** | **5.3** | **40** | |
+
+\* governments, not firms — a different unit (see below).
+
+All-industry central rate is **0.40%/yr** (low 0.32%, high 0.58%). The sanity anchor: NAIC
+reports **1.14%** all-cyber claim frequency for 2024. Ransomware is a subset of all-cyber, so
+landing below it is the expected result — this is a check, never a fitting target.
+
+### What is measured, and what is modelled
+
+Every number carries a `basis` of `measured`, `estimated`, `assumed` or `derived`, plus
+`assumption_ids[]` that resolve in the `method` doc. Nothing is a bare number.
+
+| Layer | Basis | Notes |
+|---|---|---|
+| Denominator (firm counts) | measured | Census SUSB 2022, NAICS-crosswalked |
+| Numerator (2025 US victims) | measured | ~97% have a confirmed country |
+| Country adjustment | estimated | +3.5% only — see below |
+| Size elasticity b = 0.85 | estimated | weighted R² = 0.90, n = 227 |
+| Flat above 1,000 employees | assumed | the power law over-predicts the top band 4x |
+| Size x industry interaction | **assumed absent** | 65 US labelled records cannot support 14 curves |
+| Under-reporting R | estimated | capture-recapture, 3 of 14 sectors measured |
+
+**Three things worth knowing, because each overturned an assumption we started with:**
+
+1. **BEA does not publish firm counts.** It publishes value added and gross output. Firm counts
+   come from Census SUSB, which needs no API key. (BEA gross output is still the right exposure
+   base for a *revenue*-rated product — that is a v2 extension.)
+2. **The missing-country problem is a 2021-2023 problem, not a 2025 one.** It is 24.9%
+   corpus-wide but 86.4% in 2021 and only **3.1% in 2025**. Restricting to 2025 (required anyway,
+   since it is the only year with complete 12-month coverage across all 14 sectors) reduces the
+   country adjustment from a major correction to a +3.5% footnote.
+3. **Under-reporting can be measured rather than assumed.** Two partially-overlapping victim
+   lists (leak-site + Comparitech) support a Chapman capture-recapture estimate. It yields
+   R = 4.7x (Healthcare), 6.4x (Education), 6.5x (Public Sector) as **hard lower bounds**.
+
+### Why R is a lower bound, and how far up it can go
+
+Chapman assumes the two lists sample independently. They do not: Comparitech partly sources from
+leak sites, which inflates the overlap and so deflates the population estimate. But the bias is
+**bounded in both directions**, because a record copied from the leak site necessarily matches
+it — so leak-sourced records can be at most `M/B` of Comparitech, which is 15-21% by stratum.
+Sweeping the sourced fraction over that bounded range gives the published schedule:
+
+| Sourced fraction of overlap | Healthcare | Education | Public Sector | Mean | |
+|---|---:|---:|---:|---:|---|
+| 0% (lists independent) | 4.68 | 6.37 | 6.45 | **5.8** | published **low** |
+| 25% | 5.89 | 8.14 | 8.24 | **7.4** | published **central** |
+| 50% | 8.31 | 11.63 | 11.79 | **10.6** | published **high** |
+| 75% | 15.48 | 21.82 | 22.14 | 19.8 | unstable, sensitivity only |
+
+The schedule is therefore *derived*, not asserted. (The 5.4 / 7.0 / 12.0 schedule we had assumed
+before measuring it is recovered almost exactly, which is reassuring but was not guaranteed.)
+
+### A second route disagrees by 3x, and that gap is the real uncertainty
+
+Everything above leans on Comparitech, a *voluntary* curation — hence the independence problem.
+HHS OCR is different: reporting a healthcare breach affecting 500+ individuals is **mandatory**,
+so within that frame the list is close to a census. Inside a census frame you do not need
+Chapman at all: the leak-site capture rate is directly measurable and its reciprocal is the
+multiplier.
+
+| HHS stratum | records | matched | leak-site capture | implied R | max possible capture |
+|---|---:|---:|---:|---:|---:|
+| All breach types | 6,801 | 211 | 3.1% | 32.2x | 15.5% |
+| Hacking/IT incident | 4,390 | 201 | 4.6% | 21.8x | 24.1% |
+| Ransomware-indicated | 1,226 | 52 | 4.2% | 23.6x | 86.2% |
+| **Ransomware-indicated, 2019+** | **1,107** | **51** | **4.6%** | **21.7x** | **95.5%** |
+
+The last row is the one to read: at 95.5% max-possible capture the two list sizes are comparable,
+so the low capture rate is not an artifact of comparing a small list to a large one. Leak sites
+appear to carry under 5% of mandatorily-reported large healthcare ransomware breaches.
+
+**So which is right, 5-8x or 22x?** Neither cleanly, and the honest answer is to report both:
+
+- Chapman on Comparitech is biased **down** by positive list dependence.
+- The HHS capture rate is biased **down as a capture rate** — and so its reciprocal biased
+  **up** — by frame mismatch: HHS has a 500+ individuals floor while healthcare's 693,801 firms
+  are mostly small practices that could never qualify; HHS uses legal entity names
+  (`Humana Inc`) where leak sites post brands and domains (`HUMANA.COM`); and the
+  ransomware flag is keyword-derived from a web description that is missing for ~12% of rows.
+
+The published schedule follows the **conservative** route, which means the rates in the table
+above are more likely too low than too high. Treat 5-8x as a floor, and read the HHS route as
+evidence that the *high* scenario is better supported than the central one — particularly for
+healthcare, whose measured 5.9x is probably a substantial underestimate.
+
+Two details worth repeating, because each one quietly corrupted this number before being caught:
+
+- Matching `encrypt` in HHS descriptions inflated the ransomware count by 36%, because HIPAA
+  narratives use encryption as *mitigation* language ("an employee sent an **unencrypted** email",
+  "the stolen laptop was encrypted"). The flag now requires `ransom`, `extort` or a named strain.
+- Strain names must be **word-bounded**. Unbounded, `conti` matched 90 descriptions through
+  "**conti**nued" and `hive` matched 12 through "arc**hive**" — 102 spurious ransomware flags,
+  which together with the `encrypt` problem had the count at 1,863 instead of the correct 1,246.
+
+Both were found by a verification check rather than by reading the number and finding it plausible,
+which is the only reason they were found at all: 1,863 looked entirely reasonable.
+
+### Read the ranking, not the level
+
+R multiplies every rate, so it moves the whole table up or down together and largely cancels out
+of the *ordering*. This is checked rather than asserted: the industry ranking is **identical in
+all 14 positions** between the observed and the fully-adjusted numerator, so the ordering is a
+product of the data and not of the assumptions. The ordering is the defensible product; the
+absolute level carries a multiplicative uncertainty of at least 2x (see the two routes above).
+Specific warnings:
+
+- **`Business Services` is not risk-homogeneous.** It spans five unrelated NAICS sectors and
+  1.79M firms, including 366K micro-realtors and landlords. Its headline rate is close to
+  meaningless; use the constituent NAICS codes instead.
+- **`Public Sector` is counted in governments, not firms** (NAICS 92 is absent from SUSB
+  entirely). One county is one unit but runs many separately attackable agencies. Never put this
+  rate in an unlabelled column beside the firm-based ones.
+- **This measures leak-site *listing* frequency, not attack frequency.** `attackdate` equals
+  `discovered` for 65% of records, so the date is largely the posting date.
+- **Band-level cells are much weaker than the industry marginals,** because the size curve is
+  pooled across industries. Prefer the marginals.
+- **The smallest band is the weakest point.** Firmographic labels come from ZoomInfo-style
+  profiles, which are sparse below ~5-10 employees, so the 1-4 band (63% of all US firms) rests
+  on 7 records and b = 0.85 is probably too steep.
+
+### Two dimensions carried as flags, deliberately not as multipliers
+
+`sensitive_information` + `regulatory_regimes` (HIPAA, GLBA/NYDFS 500, FERPA, PCI-DSS, CJIS,
+DFARS/CMMC, NERC CIP, TSA SDs) and a `process_dependence_index` — the share of an industry's
+hazard and exposure taxonomy falling in the operational-disruption families (Manufacturing 0.31,
+Transportation 0.28, Energy 0.25 ... Technology 0.10, Financial 0.10, Education 0.09).
+
+Both are segmentation, not coefficients. There is no evidence base for a frequency multiplier on
+either, and process dependence is really a *severity* construct — multiplying it into frequency
+would double-count it.
+
+### Not in v1
+
+A fitted Poisson/NB model with credibility weighting; an explorer view; non-US scope; severity
+(loss given attack); per-victim firmographic enrichment of the 22,153 domains; rolling the 2022
+denominators forward to 2025 (worth <5%, and downward).
 
 ### Live mode — the explorer reading from Atlas
 
