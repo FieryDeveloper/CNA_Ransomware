@@ -158,6 +158,14 @@ def to_incident(rec: dict) -> dict:
     }
 
 
+def victim_slug(name: str) -> str:
+    """Mirror of `slug()` in scripts/export_mongo.js, which builds the incident _id.
+    Keep the two in sync: if they diverge, duplicates slip past dedup here and then
+    collide on _id at load time, which loses a record silently."""
+    s = re.sub(r"[^a-z0-9]+", "-", str(name or "").lower())
+    return s.strip("-")[:80]
+
+
 def ingest_record(rec: dict, dry: bool = False) -> str:
     """Validate + append one extracted record to industries.json. Returns a
     status: 'added' | 'dry' | 'skip:<reason>'. Reusable by batch fetchers."""
@@ -177,9 +185,15 @@ def ingest_record(rec: dict, dry: bool = False) -> str:
 
     # Global dedup: one organisation = one incident, even if a later filing
     # (amendment, 10-Q) gets classified into a different industry.
-    vic = rec["victim"].strip().lower()
+    #
+    # Dedup on the SAME slug export_mongo.js turns into the Mongo _id, not on the
+    # raw lowercased name. A raw comparison let "Evolve Bank & Trust" (research) and
+    # "Evolve Bank Trust" (SEC/news harvest) both through as distinct victims; the
+    # slug then collapsed them to one _id and the Atlas upsert silently dropped one.
+    # Keying dedup on the _id slug makes that collision impossible by construction.
+    vic = victim_slug(rec["victim"])
     for ind in industries:
-        if vic in {(e.get("victim") or "").strip().lower() for e in ind.get("example_incidents", [])}:
+        if vic in {victim_slug(e.get("victim")) for e in ind.get("example_incidents", [])}:
             return "skip:duplicate"
     if dry:
         return "dry"

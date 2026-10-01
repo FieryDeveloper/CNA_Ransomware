@@ -23,7 +23,7 @@ from __future__ import annotations
 import json
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
@@ -60,14 +60,21 @@ def main() -> int:
     recs = json.loads(raw).get("result", [])
     print(f"{len(recs)} payment addresses")
 
-    agg = defaultdict(lambda: {"usd": 0.0, "payments": 0, "first": None, "last": None, "addresses": 0})
+    # Aggregate by the SAME key we write as _id. Ransomwhere reports case variants
+    # of the same family ("JigSaw"/"Jigsaw", "Decryptiomega"/"DecryptIomega"); keying
+    # this dict on the raw string aggregated them separately, and then both docs
+    # collided on the case-folded _id at load time so one silently overwrote the
+    # other. That lost real money — Jigsaw's two variants hold $2,082.62 and $399.88.
+    agg = defaultdict(lambda: {"usd": 0.0, "payments": 0, "first": None, "last": None,
+                               "addresses": 0, "names": Counter()})
     unlabeled = 0.0
     for r in recs:
         fam = r.get("family") or "Unlabeled"
         if fam.lower() == "unlabeled":
             unlabeled += sum((t.get("amountUSD") or 0) for t in r.get("transactions", []))
             continue
-        a = agg[fam]
+        a = agg[group_token(fam)]
+        a["names"][fam] += 1
         a["addresses"] += 1
         for t in r.get("transactions", []):
             a["usd"] += t.get("amountUSD") or 0
@@ -78,13 +85,18 @@ def main() -> int:
                 a["first"] = min(a["first"], d) if a["first"] else d
                 a["last"] = max(a["last"], d) if a["last"] else d
 
-    docs = []
-    for fam, a in agg.items():
+    docs, merged = [], []
+    for token, a in agg.items():
         if a["usd"] <= 0:
             continue
+        # Display name: the most-seen casing, alphabetical tie-break for determinism.
+        fam = sorted(a["names"].items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+        if len(a["names"]) > 1:
+            merged.append((token, dict(a["names"]), round(a["usd"], 2)))
         docs.append({
-            "_id": group_token(fam),
+            "_id": token,
             "family": fam,
+            "family_variants": sorted(a["names"]) if len(a["names"]) > 1 else None,
             "ransom_paid_usd": round(a["usd"], 2),
             "payments": a["payments"],
             "addresses": a["addresses"],
@@ -93,6 +105,18 @@ def main() -> int:
             "source": "ransomwhere.re",
         })
     docs.sort(key=lambda d: -d["ransom_paid_usd"])
+
+    if merged:
+        print(f"\nmerged {len(merged)} case-variant families (would otherwise collide "
+              f"on _id and lose payments):")
+        for token, names, usd in sorted(merged, key=lambda m: -m[2]):
+            print(f"  {token:22} ${usd:>12,.2f}  <- " + " + ".join(f"{k} x{v}" for k, v in names.items()))
+    ids = [d["_id"] for d in docs]
+    if len(set(ids)) != len(ids):
+        from collections import Counter as _C
+        print(f"VALIDATION FAILED: duplicate _id after merge: "
+              f"{[k for k, v in _C(ids).items() if v > 1]}")
+        return 1
 
     total = sum(d["ransom_paid_usd"] for d in docs)
     print(f"\ngroups with tracked payments: {len(docs)}")

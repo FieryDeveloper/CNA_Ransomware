@@ -3597,13 +3597,16 @@
         "financial_impact": "Specific dollar cost not publicly disclosed by Evolve; the company offered two years of free credit monitoring/identity protection to affected individuals, an ongoing cost not quantified publicly. Reputational/partner-relationship impact on its fintech clients was significant but not dollar-quantified.",
         "ransom_demanded_or_paid": "Evolve confirmed it did NOT pay the ransom demand (amount not publicly disclosed), leading LockBit to publish the stolen data.",
         "downtime_and_recovery": "Attackers accessed and downloaded data from Evolve's databases/file shares over a window from February to May 2024 before the bank discovered the intrusion in May 2024; public notification did not begin until July 8, 2024.",
-        "data_impact": "At least 7.6 million individuals' personal data affected, including names, Social Security numbers, bank account details, card PANs, wire/settlement files, in clear text; downstream fintech partners (Affirm, Mercury, Wise, and others) were also impacted.",
+        "data_impact": "At least 7.6 million individuals' personal data affected, including names, Social Security numbers, bank account details, card PANs, wire/settlement files, in clear text; downstream fintech partners (Affirm, Mercury, Wise, and others) were also impacted. Precise figure later reported as 7,640,112.",
         "sources": [
           "https://techcrunch.com/2024/07/09/evolve-bank-says-ransomware-gang-stole-personal-data-on-millions-of-customers/",
           "https://www.theregister.com/2024/07/09/evolve_lockbit_attack/",
           "https://www.infosecurity-magazine.com/news/cyber-attack-evolve-bank-exposed/",
-          "https://www.getevolved.com/cybersecurity-incident/"
-        ]
+          "https://www.getevolved.com/cybersecurity-incident/",
+          "https://www.bleepingcomputer.com/news/security/evolve-bank-says-data-breach-impacts-76-million-americans/"
+        ],
+        "incident_type": "data-extortion",
+        "ingest_source": "research+sec/news (merged duplicate)"
       },
       {
         "victim": "Central Bank of Libya",
@@ -3901,23 +3904,6 @@
           "CISA",
           "Multi-State Information Sharing and Analysis Center (MS-ISAC)",
           "Department of Health and Human Services (HHS)"
-        ]
-      },
-      {
-        "victim": "Evolve Bank Trust",
-        "group": "LockBit",
-        "date": "February 09, 2024",
-        "country": "not publicly disclosed",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "Evolve Bank Trust experienced a data breach affecting 7.6 million Americans due to a LockBit ransomware attack. The breach was discovered on May 29, 2024, but the initial compromise occurred on February 09, 2024, allowing attackers significant dwell time in the network. Evolve is offering credit monitoring and identity protection services to those affected.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "Evolve identified unauthorized activity on May 29, 2024, after initially believing it was a hardware failure.",
-        "data_impact": "7,640,112 people impacted; specific data types not disclosed.",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/evolve-bank-says-data-breach-impacts-76-million-americans/",
-          "BleepingComputer"
         ]
       },
       {
