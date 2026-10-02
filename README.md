@@ -6,11 +6,16 @@ Base incident data comes from public ransomware leak-site trackers. Each notable
 
 ---
 
-> **Explaining this to someone?** See [EXPLAINER.md](EXPLAINER.md) — a 10-minute walkthrough with worked examples, coverage answers, and the automation question.
+> **New here, or explaining this to someone?** Start with
+> **[RESULTS.md](RESULTS.md)** — what we built and what it says, in plain language
+> with the headline numbers and no jargon.
+>
+> **Presenting it?** See [EXPLAINER.md](EXPLAINER.md) — a 10-minute walkthrough with worked examples, coverage answers, and the automation question.
 
 ## What's in here
 
 ```
+RESULTS.md             ← plain-language summary: what we built, what it says
 explorer.html          ← self-contained interactive explorer; open in any browser
 
 data/
@@ -102,10 +107,10 @@ source URL. Beyond that:
 
 | Field | Disclosed | |
 |---|---:|---|
-| Downtime / recovery detail | 332 | 59% |
-| Data impact described | 330 | 58% |
-| Ransom figure | 172 | 30% (74 parsed to a number) |
-| Financial impact | 141 | 25% (61 parsed to a number) |
+| Data impact described | 328 | 58% |
+| Downtime / recovery detail | 323 | 57% |
+| Ransom figure | 136 | 24% (73 parsed to a number) |
+| Financial impact | 90 | 16% (58 parsed to a number) |
 
 The rest are marked *"not publicly disclosed"*, which is a genuine public-reporting
 gap rather than missing research &mdash; agents were explicitly instructed never to
