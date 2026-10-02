@@ -109,8 +109,11 @@
           "https://www.bleepingcomputer.com/news/security/mgm-resorts-ransomware-attack-led-to-100-million-loss-data-theft/",
           "https://www.infosecurity-magazine.com/news/mgm-resorts-dollar100m-costs/",
           "https://www.techtarget.com/searchsecurity/news/366554695/MGM-faces-100M-loss-from-ransomware-attack",
-          "https://www.forbes.com/sites/steveweisman/2025/03/12/mgm-ransomware--attack-update/"
-        ]
+          "https://www.forbes.com/sites/steveweisman/2025/03/12/mgm-ransomware--attack-update/",
+          "https://www.bleepingcomputer.com/news/security/securing-helpdesks-from-hackers-what-we-can-learn-from-the-mgm-breach/"
+        ],
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news"
       },
       {
         "victim": "Caesars Entertainment",
@@ -260,7 +263,8 @@
         "data_impact": "Data was taken from the Company's network; no evidence that customer databases were stolen.",
         "sources": [
           "https://www.sec.gov/Archives/edgar/data/1041061/000110465923004769/tm233852d1_8k.htm",
-          "not publicly disclosed"
+          "not publicly disclosed",
+          "https://www.bleepingcomputer.com/news/security/kfc-pizza-hut-owner-discloses-data-breach-after-ransomware-attack/"
         ]
       },
       {
@@ -420,23 +424,6 @@
         ]
       },
       {
-        "victim": "MGM Resorts",
-        "group": "not publicly disclosed",
-        "date": "not publicly disclosed",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The MGM Resorts service desk was hacked through sophisticated social engineering tactics, allowing attackers to gain unauthorized access and deploy ransomware across the network. This incident caused significant operational disruptions and highlighted the need for improved security measures at helpdesks.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "widespread system outages and operational disruptions",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/securing-helpdesks-from-hackers-what-we-can-learn-from-the-mgm-breach/",
-          "not publicly disclosed"
-        ]
-      },
-      {
         "victim": "Gallery Systems",
         "group": "not publicly disclosed",
         "date": "December 28, 2023",
@@ -468,23 +455,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/ransomware-attack-on-indie-game-maker-wiped-all-player-accounts/",
           "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "casinos",
-        "group": "Silent Ransom Group (SRG)",
-        "date": "2022",
-        "country": "not publicly disclosed",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "The FBI has issued a warning about ransomware gangs targeting casinos through third-party gaming vendors. The Silent Ransom Group (SRG) has been involved in data theft and extortion attacks, tricking victims into installing malicious tools that allow them to exfiltrate sensitive data without encrypting files.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "personally identifiable information of employees and patrons",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/fbi-ransomware-gangs-hack-casinos-via-3rd-party-gaming-vendors/",
-          "Federal Bureau of Investigation"
         ]
       },
       {
@@ -540,24 +510,6 @@
         ]
       },
       {
-        "victim": "Yum! Brands",
-        "group": "not publicly disclosed",
-        "date": "January 13, 2023",
-        "country": "United Kingdom",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Yum! Brands, the owner of KFC and Pizza Hut, experienced a ransomware attack on January 13, 2023, resulting in the theft of personal information of employees. The attack led to the temporary closure of around 300 restaurants in the U.K., but the company reported no evidence of customer data being affected.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "300 restaurants shut down temporarily for one day",
-        "data_impact": "personal information of employees including names, driver's license numbers, and other ID card numbers",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/kfc-pizza-hut-owner-discloses-data-breach-after-ransomware-attack/",
-          "BleepingComputer",
-          "U.S. Securities and Exchange Commission"
-        ]
-      },
-      {
         "victim": "Crown Resorts",
         "group": "Clop",
         "date": null,
@@ -572,24 +524,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/crown-resorts-confirms-ransom-demand-after-goanywhere-breach/",
           "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "media and entertainment organizations",
-        "group": "IceFire",
-        "date": "mid-February 2023",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "IceFire ransomware has expanded its operations to target Linux systems, previously focusing on Windows. The ransomware encrypts files on compromised systems and employs a strategic approach to avoid complete system shutdowns. The group has been active since at least March 2022 and has recently resumed attacks using a new variant of their malware.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/icefire-ransomware-now-encrypts-both-linux-and-windows-systems/",
-          "BleepingComputer",
-          "SentinelLabs"
         ]
       },
       {
@@ -1499,23 +1433,6 @@
           "https://www.bleepingcomputer.com/news/security/building-materials-giant-knauf-hit-by-black-basta-ransomware-gang/",
           "BleepingComputer"
         ]
-      },
-      {
-        "victim": "large construction group",
-        "group": "Lilith",
-        "date": null,
-        "country": "South America",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A new ransomware operation named 'Lilith' has emerged, targeting a large construction group in South America as its first victim. The ransomware performs double-extortion attacks, stealing data before encrypting files and threatening public exposure if the ransom is not paid. The incident highlights the growing threat of this new ransomware strain in the cyber landscape.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-lilith-ransomware-emerges-with-extortion-site-lists-first-victim/",
-          "Cyble"
-        ]
       }
     ],
     "aggregate_stats": [
@@ -2060,7 +1977,9 @@
           "https://www.bleepingcomputer.com/news/security/university-of-hawaii-cancer-center-ransomware-attack-affects-nearly-12-million-people/",
           "https://www.securityweek.com/hackers-accessed-university-of-hawaii-cancer-center-patient-data-they-werent-immediately-notified/",
           "https://www.govinfosecurity.com/cancer-center-research-study-hack-affects-12m-a-30912"
-        ]
+        ],
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news"
       },
       {
         "victim": "Highline Public Schools",
@@ -2169,23 +2088,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/ai-generated-slopoly-malware-used-in-interlock-ransomware-attack/",
           "IBM X-Force"
-        ]
-      },
-      {
-        "victim": "University of Hawaii Cancer Center",
-        "group": "not publicly disclosed",
-        "date": "August 2025",
-        "country": "USA",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The University of Hawaii Cancer Center experienced a ransomware attack in August 2025, resulting in the theft of data affecting nearly 1.2 million individuals. The university confirmed that it paid the attackers for a decryption tool and to ensure the destruction of the stolen information.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "paid to obtain a decryption tool and secure destruction of the information",
-        "downtime_and_recovery": "caused extensive damage and delayed restoration efforts",
-        "data_impact": "approximately 1.2 million individuals affected, including names and Social Security numbers (SSNs), driver's license numbers, and health information",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/university-of-hawaii-cancer-center-ransomware-attack-affects-nearly-12-million-people/",
-          "not publicly disclosed"
         ]
       },
       {
@@ -2479,24 +2381,6 @@
           "https://www.bleepingcomputer.com/news/security/ransomware-hits-technion-university-to-protest-tech-layoffs-and-israel/",
           "BleepingComputer",
           "vx-underground CyberIL"
-        ]
-      },
-      {
-        "victim": "university in Colombia",
-        "group": "Clop",
-        "date": "December 2022",
-        "country": "Colombia",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Clop ransomware gang has developed a Linux variant that targets Oracle database servers, allowing victims to recover their files for free due to flaws in the encryption scheme. This variant was first spotted in December 2022 during an attack against a university in Colombia, highlighting its early development stage and weaknesses that make it less effective than its Windows counterpart.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/clop-ransomware-flaw-allowed-linux-victims-to-recover-files-for-months/",
-          "BleepingComputer",
-          "SentinelLabs"
         ]
       },
       {
@@ -2900,7 +2784,9 @@
           "https://industrialcyber.co/mining-oil-gas/romanias-oil-pipeline-operator-conpet-targeted-in-cyberattack-as-qilin-alleges-1tb-data-breach/",
           "https://therecord.media/romania-conpet-oil-pipeline-ransomware-attack",
           "https://shieldworkz.com/blogs/how-a-side-hustle-paralyzed-romania%E2%80%99s-national-oil-pipeline"
-        ]
+        ],
+        "incident_type": "data-extortion",
+        "ingest_source": "sec/news"
       },
       {
         "victim": "Ecopetrol",
@@ -2960,12 +2846,13 @@
         "summary": "South Staffordshire Water Plc was fined $1.3 million by the Information Commissioner's Office after a cyberattack exposed the personal data of 663,887 customers and employees. The breach, which began in September 2020 and escalated between May and July 2022, was linked to the Cl0p ransomware gang, although the company initially dismissed these claims. The leaked data included sensitive personal information and was published on the dark web.",
         "financial_impact": "$1.3 million",
         "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
+        "downtime_and_recovery": "IT disruption reported, but water supply remains operational",
         "data_impact": "663,887 customers and employees; full names, physical addresses, email addresses, phone numbers, dates of birth, customer account credentials, bank account details, employee HR data such as National Insurance numbers",
         "sources": [
           "https://www.bleepingcomputer.com/news/security/uk-fines-water-supplier-13m-for-exposing-data-of-664k-customers/",
           "Information Commissioner's Office",
-          "not publicly disclosed"
+          "not publicly disclosed",
+          "https://www.bleepingcomputer.com/news/security/hackers-attack-uk-water-supplier-but-extort-wrong-company/"
         ]
       },
       {
@@ -2983,23 +2870,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/the-gentlemen-ransomware-now-uses-systembc-for-bot-powered-attacks/",
           "Check Point"
-        ]
-      },
-      {
-        "victim": "Conpet S.A.",
-        "group": "Qilin",
-        "date": "not publicly disclosed",
-        "country": "Romania",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "Conpet S.A., Romania's national oil pipeline operator, confirmed that the Qilin ransomware gang stole company data in a recent attack. The breach involved data exfiltration, with the attackers claiming to have stolen nearly 1TB of documents, including sensitive personal and financial information. The company is collaborating with the Romanian National Cyber Security Directorate to investigate the incident.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "operations remained unaffected",
-        "data_impact": "nearly 1TB of documents, including financial information and passport scans; personal information such as names, postal addresses, personal identification numbers, and bank account numbers",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/romanias-oil-pipeline-operator-conpet-confirms-data-stolen-in-attack/",
-          "BleepingComputer"
         ]
       },
       {
@@ -3037,25 +2907,6 @@
           "Romanian National Cyber Security Directorate (DNSC)",
           "BleepingComputer",
           "Center for Internet Security (CIS)"
-        ]
-      },
-      {
-        "victim": "U.S. energy company",
-        "group": "Sichuan Silence",
-        "date": "April 2020",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "In April 2020, the Chinese cybersecurity firm Sichuan Silence was involved in a series of Ragnarok ransomware attacks targeting U.S. critical infrastructure, including an energy company. The attackers exploited a zero-day vulnerability in Sophos XG firewalls to deploy malware and attempted to activate ransomware on victims' networks.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "approximately 81,000 firewalls compromised, including over 23,000 in the U.S.",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-sanctions-chinese-firm-for-hacking-firewalls-in-ragnarok-ransomware-attacks/",
-          "U.S. Treasury Department",
-          "Department of Justice",
-          "Sophos CISO Ross McKerchar"
         ]
       },
       {
@@ -3127,23 +2978,6 @@
         ]
       },
       {
-        "victim": "Trans-Northern Pipelines",
-        "group": "ALPHV/BlackCat",
-        "date": "November 2023",
-        "country": "Canada",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The ALPHV/BlackCat ransomware gang has claimed responsibility for a network breach at Trans-Northern Pipelines, which is currently under investigation. The U.S. State Department is offering rewards for information on the gang's leaders and affiliates, highlighting the group's significant impact on various sectors, including energy.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-offers-up-to-15-million-for-tips-on-alphv-ransomware-gang/",
-          "BleepingComputer"
-        ]
-      },
-      {
         "victim": "Trans-Northern Pipelines Inc.",
         "group": "ALPHV/BlackCat",
         "date": "November 2023",
@@ -3157,7 +2991,8 @@
         "data_impact": "183GB of documents stolen, including company information and contact details of several TNPI employees.",
         "sources": [
           "https://www.bleepingcomputer.com/news/security/trans-northern-pipelines-investigating-alphv-ransomware-attack-claims/",
-          "BleepingComputer"
+          "BleepingComputer",
+          "https://www.bleepingcomputer.com/news/security/us-offers-up-to-15-million-for-tips-on-alphv-ransomware-gang/"
         ]
       },
       {
@@ -3313,23 +3148,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/the-week-in-ransomware-august-26th-2022-fighting-back/",
           "The Week in Ransomware - August 26th 2022 - Fighting back"
-        ]
-      },
-      {
-        "victim": "South Staffordshire Water",
-        "group": "Clop",
-        "date": "not publicly disclosed",
-        "country": "UK",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "South Staffordshire Water experienced IT disruption due to a cyberattack, but their water supply systems remained operational. The Clop ransomware gang initially misidentified Thames Water as their victim but later corrected this to South Staffordshire Water, claiming to have exfiltrated data and threatening to leak it after negotiations failed.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "IT disruption reported, but water supply remains operational",
-        "data_impact": "5TB of data exfiltrated, including passports, driver's licenses, and SCADA system screenshots",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/hackers-attack-uk-water-supplier-but-extort-wrong-company/",
-          "not publicly disclosed"
         ]
       },
       {
@@ -3725,7 +3543,8 @@
         "data_impact": "limited data including some client information and personally identifiable information, Company administrative and user data, and a small percentage of Company user accounts associated with employees and contractors",
         "sources": [
           "https://www.sec.gov/Archives/edgar/data/1137774/000119312524040749/d766318d8ka.htm",
-          "United States Securities and Exchange Commission"
+          "United States Securities and Exchange Commission",
+          "https://www.bleepingcomputer.com/news/security/prudential-financial-now-says-25-million-impacted-by-data-breach/"
         ]
       },
       {
@@ -3743,40 +3562,6 @@
         "sources": [
           "https://www.sec.gov/Archives/edgar/data/320335/000032033524000056/gl-20241017.htm",
           "United States Securities and Exchange Commission"
-        ]
-      },
-      {
-        "victim": "multiple U.S. organizations including a financial services firm and a nonprofit",
-        "group": "BlackCat (ALPHV)",
-        "date": "October 2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A former employee of DigitalMint, Angelo Martino, was involved in BlackCat ransomware attacks against multiple U.S. organizations, demanding ransoms and threatening to leak stolen data. The group is linked to over 60 breaches and has collected at least $300 million in ransom payments from more than 1,000 victims.",
-        "financial_impact": "$16,484,000 (Victim 1), $25,660,000 (financial services firm), $26,793,000 (nonprofit)",
-        "ransom_demanded_or_paid": "approximately $1,000,000 ransom payment demanded; various amounts paid by victims",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-ransomware-negotiator-gets-4-years-in-prison-for-blackcat-attacks/",
-          "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "multiple U.S. organizations including financial services firms and nonprofits",
-        "group": "BlackCat (ALPHV)",
-        "date": "October 2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A former employee of DigitalMint was sentenced for his involvement in BlackCat ransomware attacks targeting U.S. companies. The group demanded significant ransom payments, including $1,000,000 from one victim, and extorted multiple organizations, including financial services firms and nonprofits, for millions in total. The FBI linked the BlackCat gang to over 60 breaches and at least $300 million in ransom payments.",
-        "financial_impact": "$16,484,000 (Victim 1), $25,660,000 (financial services firm), $26,793,000 (nonprofit)",
-        "ransom_demanded_or_paid": "$1,000,000 ransom payment demanded; various amounts paid by victims",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-ransomware-negotiator-gets-4-years-in-prison-for-blackcat-attacks/",
-          "BleepingComputer"
         ]
       },
       {
@@ -3828,24 +3613,6 @@
         "data_impact": "No payment card data has been compromised; any accessed files were encrypted with no evidence of usable data exposure.",
         "sources": [
           "https://www.bleepingcomputer.com/news/security/payments-platform-bridgepay-confirms-ransomware-attack-behind-outage/",
-          "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "Fortune 100 company",
-        "group": "not publicly disclosed",
-        "date": null,
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A Fortune 100 company in the finance sector was targeted by ransomware attackers using a new malware strain called PDFSider. The attackers employed social engineering tactics to gain remote access and delivered the malware through spearphishing emails containing a legitimate executable and a malicious DLL file.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-pdfsider-windows-malware-deployed-on-fortune-100-firms-network/",
-          "Resecurity",
           "BleepingComputer"
         ]
       },
@@ -3924,25 +3691,6 @@
         ]
       },
       {
-        "victim": "Prudential Financial",
-        "group": "ALPHV",
-        "date": "February 4, 2024",
-        "country": "not publicly disclosed",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "Prudential Financial reported a data breach impacting over 2.5 million individuals, with personal information compromised. The breach was detected on February 5, 2024, after unauthorized access occurred on February 4, 2024, and was claimed by the ALPHV ransomware gang.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "2,556,210 people affected; personal information including names, driver's license numbers, and non-driver identification card numbers",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/prudential-financial-now-says-25-million-impacted-by-data-breach/",
-          "BleepingComputer",
-          "U.S. Securities and Exchange Commission",
-          "Maine Attorney General's Office"
-        ]
-      },
-      {
         "victim": "Infosys McCamish Systems (IMS)",
         "group": "LockBit",
         "date": "November 2023",
@@ -3975,23 +3723,6 @@
           "https://www.bleepingcomputer.com/news/security/equilend-warns-employees-their-data-was-stolen-by-ransomware-gang/",
           "BleepingComputer",
           "Bloomberg"
-        ]
-      },
-      {
-        "victim": "Bank of America",
-        "group": "LockBit",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The U.S. State Department is offering up to $15 million for information on the LockBit ransomware gang, which has executed over 2,000 attacks globally since January 2020. LockBit has been linked to more than $144 million in ransom payments, and law enforcement recently seized its infrastructure in a global crackdown.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "more than $144 million in ransom payments",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-offers-15-million-bounty-for-info-on-lockbit-ransomware-gang/",
-          "BleepingComputer"
         ]
       },
       {
@@ -4152,23 +3883,6 @@
           "https://www.bleepingcomputer.com/news/security/ransomware-attack-on-ion-group-impacts-derivatives-trading-market/",
           "BleepingComputer",
           "FIA"
-        ]
-      },
-      {
-        "victim": "small-to-midsize businesses",
-        "group": "Holy Ghost",
-        "date": "not publicly disclosed",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Holy Ghost ransomware operation, linked to North Korean hackers, has been targeting small businesses for over a year, employing a double extortion strategy. The group has compromised various sectors, including banks and schools, and typically demands ransoms between 1.2 to 5 bitcoins.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "between 1.2 to 5 bitcoins, or up to about $100,000",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/microsoft-links-holy-ghost-ransomware-operation-to-north-korean-hackers/",
-          "Microsoft Threat Intelligence Center"
         ]
       },
       {
@@ -4759,42 +4473,6 @@
         ]
       },
       {
-        "victim": "over 500 critical infrastructure organizations",
-        "group": "Medusa",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Medusa ransomware gang has breached over 500 critical infrastructure organizations in the United States since June 2021, impacting multiple sectors including Healthcare and Public Health. The operation has evolved into a Ransomware-as-a-Service model, recruiting affiliates to gain access to potential victims.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "between $100 USD and $1 million USD",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/cisa-medusa-ransomware-hit-over-500-critical-infrastructure-orgs/",
-          "CISA",
-          "Department of Health and Human Services",
-          "Federal Bureau of Investigation"
-        ]
-      },
-      {
-        "victim": "medical technology startup",
-        "group": "Ransom Cartel",
-        "date": "August 2022",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Maksim Silnikau, the creator of the Ransom Cartel ransomware operation, was sentenced to 16 years in prison for his role in attacks against at least 18 companies worldwide. The operation extorted at least $5.2 million from victims, including a medical technology startup and law firms, causing significant business disruptions.",
-        "financial_impact": "$2.2 million",
-        "ransom_demanded_or_paid": "$125,000 and $300,000",
-        "downtime_and_recovery": "disrupted operations for two months",
-        "data_impact": "corporate data stolen from at least 18 companies",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/ransom-cartel-ransomware-creator-sentenced-to-16-years-in-prison/",
-          "U.S. Department of Justice"
-        ]
-      },
-      {
         "victim": "Medical Computer Business Services (MCBS)",
         "group": "PEAR (Pure Extraction and Ransom)",
         "date": "2025-09-22",
@@ -4827,23 +4505,6 @@
           "https://www.bleepingcomputer.com/news/security/mckesson-discloses-breach-after-shinyhunters-claims-patient-data-theft/",
           "BleepingComputer",
           "CyberInsider"
-        ]
-      },
-      {
-        "victim": "Tampa medical device manufacturer",
-        "group": "BlackCat (ALPHV)",
-        "date": "May 2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Two former employees of cybersecurity firms were sentenced for their roles in BlackCat ransomware attacks targeting U.S. companies. The Tampa medical device manufacturer was notably affected, paying $1.27 million after its servers were encrypted and receiving a ransom demand of $10 million.",
-        "financial_impact": "$1.27 million",
-        "ransom_demanded_or_paid": "$10 million ransom demand; $1.27 million paid",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-ransomware-negotiators-get-4-years-in-prison-over-blackcat-attacks/",
-          "BleepingComputer"
         ]
       },
       {
@@ -4883,41 +4544,6 @@
         ]
       },
       {
-        "victim": "U.S. healthcare organizations",
-        "group": "Lazarus",
-        "date": null,
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The North Korean Lazarus group is linked to Medusa ransomware attacks targeting U.S. healthcare organizations. The group has claimed at least 80 victims and is known for demanding ransoms as high as $15 million, with an average demand of around $260,000.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "up to $15 million, average around $260,000",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/north-korean-lazarus-group-linked-to-medusa-ransomware-attacks/",
-          "Symantec report"
-        ]
-      },
-      {
-        "victim": "12 U.S. organizations",
-        "group": "INC ransomware",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "An operational security failure by the INC ransomware gang allowed researchers to recover data stolen from a dozen U.S. organizations across various sectors. The investigation revealed that the ransomware had left behind artifacts that exposed attacker infrastructure, leading to the recovery of encrypted data from multiple victims.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "encrypted data from 12 unrelated organizations",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/inc-ransomware-opsec-fail-allowed-data-recovery-for-12-us-orgs/",
-          "Cyber Centaurs",
-          "BleepingComputer"
-        ]
-      },
-      {
         "victim": "Covenant Health",
         "group": "Qilin",
         "date": "May 18, 2025",
@@ -4932,78 +4558,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/covenant-health-says-may-data-breach-impacted-nearly-478-000-patients/",
           "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "multiple victims across the United States including a Maryland pharmaceutical company, a California engineering firm, a Tampa medical device manufacturer, a Virginia drone manufacturer, and a California doctor's office",
-        "group": "BlackCat (ALPHV)",
-        "date": "2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Two former employees of cybersecurity incident response companies pleaded guilty to conspiracy to obstruct commerce by extortion through BlackCat ransomware attacks. They targeted multiple U.S. companies, demanding ransoms ranging from $300,000 to $10 million, and were paid $1.27 million by one victim after encrypting its servers.",
-        "financial_impact": "$1.27 million",
-        "ransom_demanded_or_paid": "demanded $10 million, paid $1.27 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-cybersecurity-experts-plead-guilty-to-blackcat-alphv-ransomware-attacks/",
-          "BleepingComputer",
-          "court documents"
-        ]
-      },
-      {
-        "victim": "multiple victims across the United States",
-        "group": "BlackCat (ALPHV)",
-        "date": "2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Two former employees of cybersecurity incident response companies pleaded guilty to conspiracy to obstruct commerce by extortion through BlackCat ransomware attacks. They targeted multiple U.S. companies, including a medical device manufacturer, and were involved in demanding ransoms ranging from $300,000 to $10 million, ultimately receiving $1.27 million from one victim.",
-        "financial_impact": "$1.27 million",
-        "ransom_demanded_or_paid": "demanded $10 million, paid $1.27 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-cybersecurity-experts-plead-guilty-to-blackcat-alphv-ransomware-attacks/",
-          "BleepingComputer",
-          "court documents"
-        ]
-      },
-      {
-        "victim": "multiple U.S. companies including a Maryland pharmaceutical company, a California engineering firm, a Tampa medical device manufacturer, a Virginia drone manufacturer, and a California doctor's office",
-        "group": "BlackCat (ALPHV)",
-        "date": "2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Two former employees of cybersecurity incident response companies pleaded guilty to conspiracy to obstruct commerce by extortion through BlackCat ransomware attacks. They targeted multiple U.S. companies, demanding ransoms ranging from $300,000 to $10 million, and were paid $1.27 million by one victim after encrypting its servers.",
-        "financial_impact": "$1.27 million",
-        "ransom_demanded_or_paid": "demanded $10 million, paid $1.27 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-cybersecurity-experts-plead-guilty-to-blackcat-alphv-ransomware-attacks/",
-          "BleepingComputer",
-          "court documents",
-          "Justice Department statements"
-        ]
-      },
-      {
-        "victim": "medical billing services company",
-        "group": "Black Kingdom",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Rami Khaled Ahmed, a Yemeni national, has been indicted for conducting 1,500 ransomware attacks using Black Kingdom malware on Microsoft Exchange servers. The attacks targeted various U.S.-based victims, including a medical billing services company, demanding ransom payments of $10,000 in Bitcoin. Ahmed faces multiple charges, including conspiracy and intentional damage to a protected computer, with potential sentences totaling up to 15 years if convicted.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "$10,000 in Bitcoin",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-indicts-black-kingdom-ransomware-admin-for-microsoft-exchange-attacks/",
-          "U.S. Department of Justice announcement"
         ]
       },
       {
@@ -5143,24 +4697,6 @@
         "data_impact": "940.7GB of sensitive healthcare data including full names, emails, addresses, phone numbers, date of birth, emergency contacts, Medicare card numbers, medical record numbers, medical history, diagnoses and treatments, medications and prescriptions, and appointment details.",
         "sources": [
           "https://www.bleepingcomputer.com/news/security/australian-ivf-giant-genea-breached-by-termite-ransomware-gang/",
-          "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "EU healthcare organizations",
-        "group": "not publicly disclosed",
-        "date": "June to October 2024",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The NailaoLocker ransomware has been used in attacks against European healthcare organizations, exploiting a vulnerability to deploy malware and encrypt files. The ransom note does not indicate that data was stolen, which is atypical for ransomware operations.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-nailaolocker-ransomware-used-against-eu-healthcare-orgs/",
-          "Orange CERT",
           "BleepingComputer"
         ]
       },
@@ -5374,23 +4910,6 @@
           "https://www.bleepingcomputer.com/news/security/ransomware-attack-forces-umc-health-system-to-divert-some-patients/",
           "UMC Health System announcement",
           "news articles on the incident"
-        ]
-      },
-      {
-        "victim": "hospitals",
-        "group": "Storm-0501",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Storm-0501 ransomware group has escalated its attacks to target hybrid cloud environments, compromising various organizations including hospitals and government agencies. They deploy the Embargo ransomware after gaining access through weak credentials and exploiting vulnerabilities, often extracting sensitive data before encryption.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "$1 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "500GB of stolen sensitive data",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/embargo-ransomware-escalates-attacks-to-cloud-environments/",
-          "Microsoft"
         ]
       },
       {
@@ -5689,25 +5208,6 @@
         ]
       },
       {
-        "victim": "100 Romanian hospitals",
-        "group": "Backmydata",
-        "date": "2024-02-12",
-        "country": "Romania",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A ransomware attack targeted the Hipocrate Information System used by 100 hospitals in Romania, leading to the encryption of data and systems going offline. The attackers demanded a ransom of 3.5 BTC, while cybersecurity experts are investigating the incident and assessing recovery options.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "3.5 BTC (roughly 157,000)",
-        "downtime_and_recovery": "Systems taken offline; hospitals reverted to paper records due to shutdown of servers and internet.",
-        "data_impact": "25 hospitals confirmed data encrypted; personal and medical data status unclear.",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/ransomware-attack-forces-100-romanian-hospitals-to-go-offline/",
-          "Romanian Ministry of Health",
-          "DNSC statements",
-          "BleepingComputer"
-        ]
-      },
-      {
         "victim": "Capital Health",
         "group": "LockBit",
         "date": "November 2023",
@@ -5863,28 +5363,6 @@
         ]
       },
       {
-        "victim": "multiple organizations",
-        "group": "Rhysida",
-        "date": "September 2023",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The FBI and CISA issued a warning about the Rhysida ransomware gang, which has been targeting various sectors including healthcare, education, and manufacturing since its emergence in May 2023. The gang is known for exploiting vulnerabilities and using phishing attacks to gain access to networks, leading to opportunistic ransomware attacks.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/fbi-and-cisa-warn-of-opportunistic-rhysida-ransomware-attacks/",
-          "FBI",
-          "CISA",
-          "BleepingComputer",
-          "Sophos",
-          "Check Point Research",
-          "PRODAFT"
-        ]
-      },
-      {
         "victim": "MCNA Dental",
         "group": "not publicly disclosed",
         "date": "not publicly disclosed",
@@ -5984,24 +5462,8 @@
         "data_impact": "500,000 social security numbers, passports, driver's licenses, corporate documents, and patient's medical information.",
         "sources": [
           "https://www.bleepingcomputer.com/news/security/rhysida-claims-ransomware-attack-on-prospect-medical-threatens-to-sell-data/",
-          "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "Prospect Medical Group",
-        "group": "Rhysida",
-        "date": "August 4, 2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Rhysida ransomware group has targeted Prospect Medical Group, impacting 17 hospitals and 166 clinics across the United States. The U.S. Department of Health and Human Services has identified Rhysida as a significant threat to the healthcare sector following these attacks.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "17 hospitals and 166 clinics affected",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/the-week-in-ransomware-august-11th-2023-targeting-healthcare/",
-          "The Week in Ransomware - August 11th 2023"
+          "BleepingComputer",
+          "https://www.bleepingcomputer.com/news/security/the-week-in-ransomware-august-11th-2023-targeting-healthcare/"
         ]
       },
       {
@@ -6318,25 +5780,6 @@
         ]
       },
       {
-        "victim": "over 1,300 companies",
-        "group": "Hive",
-        "date": "November 2022",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The FBI reported that the Hive ransomware gang has extorted approximately $100 million from over 1,300 victims since June 2021. The advisory highlights that Hive actors threaten to reinfect networks of organizations that do not pay the ransom, targeting various industries, particularly Healthcare and Public Health entities.",
-        "financial_impact": "$100 million",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/fbi-hive-ransomware-extorted-100m-from-over-1-300-victims/",
-          "FBI",
-          "Cybersecurity and Infrastructure Security Agency (CISA)",
-          "Department of Health and Human Services (HHS)"
-        ]
-      },
-      {
         "victim": "Medibank",
         "group": "REvil",
         "date": "October 26, 2022",
@@ -6389,25 +5832,6 @@
         ]
       },
       {
-        "victim": "U.S. Healthcare and Public Health sector",
-        "group": "Daixin Team",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Daixin Team is a ransomware and data extortion group actively targeting the U.S. Healthcare and Public Health sector. They have been linked to multiple incidents involving the encryption of healthcare systems and the theft of sensitive patient information, using double extortion tactics to pressure victims into paying ransoms.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "patient health information (PHI) and personal identifiable information (PII)",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-govt-warns-of-daixin-team-targeting-health-orgs-with-ransomware/",
-          "CISA",
-          "FBI",
-          "Department of Health and Human Services (HHS)"
-        ]
-      },
-      {
         "victim": "CommonSpirit",
         "group": "not publicly disclosed",
         "date": "October 12th 2022",
@@ -6456,25 +5880,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/the-week-in-ransomware-october-7th-2022-a-20-year-sentence/",
           "The Week in Ransomware - October 7th 2022"
-        ]
-      },
-      {
-        "victim": "Ukrainian entity",
-        "group": "Bl00dy Ransomware Gang",
-        "date": "not publicly disclosed",
-        "country": "Ukraine",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Bl00dy Ransomware Gang has utilized a leaked LockBit 3.0 ransomware builder in an attack on a Ukrainian entity. This gang, which began operating around May 2022, targets networks, steals corporate data, and encrypts devices, using a Telegram channel for extortion instead of a Tor data leak site.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/leaked-lockbit-30-builder-used-by-bl00dy-ransomware-gang-in-attacks/",
-          "BleepingComputer",
-          "DataBreaches.net",
-          "VirusTotal"
         ]
       },
       {
@@ -6981,8 +6386,11 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/hunters-international-ransomware-claims-attack-on-tata-technologies/",
           "https://techcrunch.com/2025/03/11/tata-technologies-data-leaked-by-ransomware-gang/",
-          "https://securityaffairs.com/174953/data-breach/ransomware-group-hunters-international-claims-to-have-hacked-tata-technologies.html"
-        ]
+          "https://securityaffairs.com/174953/data-breach/ransomware-group-hunters-international-claims-to-have-hacked-tata-technologies.html",
+          "https://www.bleepingcomputer.com/news/security/indian-tech-giant-tata-technologies-hit-by-ransomware-attack/"
+        ],
+        "incident_type": "ransomware",
+        "ingest_source": "sec/news"
       },
       {
         "victim": "QuickLogic Corporation",
@@ -7019,20 +6427,21 @@
         ]
       },
       {
-        "victim": "DISH Network Corporation",
-        "group": "not publicly disclosed",
+        "victim": "Dish Network",
+        "group": "Black Basta",
         "date": "February 23, 2023",
         "country": "United States",
-        "incident_type": "data-extortion",
+        "incident_type": "ransomware",
         "ingest_source": "sec/news",
-        "summary": "On February 23, 2023, DISH Network Corporation announced a network outage due to a cyber-security incident. Following the incident, it was determined that certain data was extracted from the Corporation's IT systems, potentially including personal information, prompting an ongoing investigation.",
+        "summary": "Dish Network experienced a ransomware attack on February 23, 2023, which likely resulted in the payment of a ransom based on the company's communications. The attack compromised confidential records and sensitive information of current and former employees, but customer data was not affected. The incident has led to multiple class-action lawsuits against the company for alleged cybersecurity failures.",
         "financial_impact": "not publicly disclosed",
         "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "The Corporation's internal communications, customer call centers, and internet sites have been affected, but DISH, Sling, and their wireless and data networks remain operational. The Corporation is actively engaged in restoring the affected systems and is making steady progress.",
-        "data_impact": "It is possible that the extracted data includes personal information.",
+        "downtime_and_recovery": "massive outage that affected its websites and apps",
+        "data_impact": "296,851 individuals affected; exposed information includes names, personal identifiers, driver's license numbers, health insurance information, and COVID-19 vaccination status",
         "sources": [
-          "https://www.sec.gov/Archives/edgar/data/1001082/000155837023002254/dish-20230223x8k.htm",
-          "not publicly disclosed"
+          "https://www.bleepingcomputer.com/news/security/dish-network-likely-paid-ransom-after-recent-ransomware-attack/",
+          "BleepingComputer",
+          "https://www.sec.gov/Archives/edgar/data/1001082/000155837023002254/dish-20230223x8k.htm"
         ]
       },
       {
@@ -7071,7 +6480,7 @@
       },
       {
         "victim": "Rackspace Technology",
-        "group": "not publicly disclosed",
+        "group": "Play ransomware",
         "date": "late 2022",
         "country": "not publicly disclosed",
         "incident_type": "ransomware",
@@ -7083,7 +6492,8 @@
         "data_impact": "not publicly disclosed",
         "sources": [
           "https://www.sec.gov/Archives/edgar/data/1810019/000181001924000029/rxtlenderpresentationcle.htm",
-          "EX-99.3 7 rxtlenderpresentationcle.htm"
+          "EX-99.3 7 rxtlenderpresentationcle.htm",
+          "https://www.bleepingcomputer.com/news/security/new-play-ransomware-linux-version-targets-vmware-esxi-vms/"
         ]
       },
       {
@@ -7210,58 +6620,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/jadepuffer-agentic-attacks-now-target-ai-model-data-with-ransomware/",
           "Sysdig"
-        ]
-      },
-      {
-        "victim": "IT services firm",
-        "group": "Spirals",
-        "date": "June",
-        "country": "South Asia",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A new ransomware group called Spirals executed a corporate intrusion and encrypted an IT services firm's network in under 24 hours. The attack involved data theft and encryption, with threats of public exposure of stolen data unless a ransom was paid.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-spirals-ransomware-encrypts-victim-network-in-under-24-hours/",
-          "Symantec Threat Hunter Team"
-        ]
-      },
-      {
-        "victim": "multiple U.S. organizations",
-        "group": "Ryuk",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Karen Serobovich Vardanyan, a member of the Ryuk ransomware gang, pleaded guilty to hacking U.S. companies and deploying ransomware to encrypt their systems. He was involved in multiple attacks, including one on a Michigan company that paid 200 BTC, and is estimated to have contributed to around $15 million in ransom payments across various organizations.",
-        "financial_impact": "$15 million",
-        "ransom_demanded_or_paid": "1,610 bitcoins (valued at around $15 million)",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/ryuk-ransomware-member-pleads-guilty-in-the-us-faces-15-years-in-prison/",
-          "U.S. Department of Justice"
-        ]
-      },
-      {
-        "victim": "U.S. government agencies",
-        "group": "Qilin",
-        "date": null,
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "CISA has ordered U.S. government agencies to secure their Check Point Remote Access VPN and Mobile Access deployments against a critical vulnerability exploited in zero-day attacks by Qilin ransomware affiliates. The vulnerability allows unauthenticated remote attackers to bypass authentication and establish a VPN connection, affecting a few dozen organizations worldwide.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/cisa-orders-feds-to-patch-check-point-flaw-exploited-by-ransomware-gangs/",
-          "CISA",
-          "Check Point"
         ]
       },
       {
@@ -7452,59 +6810,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/qilin-ransomware-claims-attack-at-lee-enterprises-leaks-stolen-data/",
           "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "Asian software and services company",
-        "group": "Emperor Dragonfly",
-        "date": "late 2024",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "In late 2024, a China-based threat actor known as Emperor Dragonfly launched a ransomware attack against an Asian software and services company, deploying RA World ransomware and demanding a ransom of $2 million. This incident highlights the potential overlap between state-backed cyber espionage and financially motivated cybercrime, as the tools used were previously associated with espionage activities.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "$2 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/chinese-espionage-tools-deployed-in-ra-world-ransomware-attack/",
-          "Symantec Threat Hunter Team",
-          "Palo Alto Networks Unit 42"
-        ]
-      },
-      {
-        "victim": "South Asian software company",
-        "group": "RA World",
-        "date": "November 2024",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "In November 2024, a South Asian software company was targeted in a ransomware attack by the RA World group, which is linked to a China-based threat actor known as Emperor Dragonfly. The attackers demanded a ransom of $2 million after deploying the RA World ransomware, following a series of espionage activities in the region.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "$2 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/chinese-espionage-tools-deployed-in-ra-world-ransomware-attack/",
-          "Symantec Threat Hunter Team",
-          "Palo Alto Networks Unit 42"
-        ]
-      },
-      {
-        "victim": "Tata Technologies Ltd.",
-        "group": "not publicly disclosed",
-        "date": null,
-        "country": "India",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Tata Technologies Ltd. experienced a ransomware attack that temporarily affected some of its IT services. Despite the attack, client delivery services remained fully operational, and the company is currently investigating the incident with cybersecurity experts.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "Some IT services were suspended temporarily and have now been restored.",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/indian-tech-giant-tata-technologies-hit-by-ransomware-attack/",
-          "India's national stock exchange notification"
         ]
       },
       {
@@ -7718,24 +7023,6 @@
         ]
       },
       {
-        "victim": "Rackspace",
-        "group": "Play ransomware",
-        "date": "not publicly disclosed",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Play ransomware has developed a Linux version specifically targeting VMware ESXi virtual machines, marking a significant shift in their attack strategy. This ransomware not only encrypts files but also employs double-extortion tactics by stealing sensitive documents to pressure victims into paying. The FBI has reported that the group has breached approximately 300 organizations worldwide until October 2023.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-play-ransomware-linux-version-targets-vmware-esxi-vms/",
-          "Trend Micro",
-          "BleepingComputer"
-        ]
-      },
-      {
         "victim": "KADOKAWA corporation",
         "group": "BlackSuit",
         "date": "June 8, 2023",
@@ -7769,23 +7056,6 @@
           "https://www.bleepingcomputer.com/news/security/p2pinfect-botnet-targets-redis-servers-with-new-ransomware-module/",
           "Cado Security",
           "Unit 42"
-        ]
-      },
-      {
-        "victim": "Kaseya",
-        "group": "REvil",
-        "date": "not publicly disclosed",
-        "country": "not publicly disclosed",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "Yaroslav Vasinskyi, a member of the REvil ransomware group, was sentenced to 13 years in prison for his role in over 2,500 ransomware attacks, including the Kaseya supply-chain attack. The group engaged in double extortion, stealing corporate data and threatening to leak it if ransoms were not paid, demanding over $700 million in total. Vasinskyi was arrested in 2021 and extradited to the U.S. in 2022, where he pleaded guilty to multiple charges.",
-        "financial_impact": "$16 million",
-        "ransom_demanded_or_paid": "over $700 million",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/revil-hacker-behind-kaseya-ransomware-attack-gets-13-years-in-prison/",
-          "U.S. Department of Justice"
         ]
       },
       {
@@ -8161,23 +7431,6 @@
         ]
       },
       {
-        "victim": "Oxford-based company",
-        "group": "not publicly disclosed",
-        "date": null,
-        "country": "United Kingdom",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "Ashley Liles, a former IT employee, was sentenced to over three years in prison for attempting to blackmail his employer during a ransomware attack. He impersonated the ransomware gang and tried to redirect the ransom payment to his own cryptocurrency wallet, but the company did not comply with the demands, leading to his arrest and conviction.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "accessed private emails of a board member over 300 times",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/it-worker-jailed-for-impersonating-ransomware-gang-to-extort-employer/",
-          "South East Regional Organised Crime Unit (SEROCU) press release"
-        ]
-      },
-      {
         "victim": "TSMC (Taiwan Semiconductor Manufacturing Company)",
         "group": "LockBit",
         "date": null,
@@ -8227,23 +7480,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/the-week-in-ransomware-may-19th-2023-a-shifting-landscape/",
           "The Week in Ransomware - May 19th 2023"
-        ]
-      },
-      {
-        "victim": "Dish Network",
-        "group": "Black Basta",
-        "date": "February 23, 2023",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Dish Network experienced a ransomware attack on February 23, 2023, which likely resulted in the payment of a ransom based on the company's communications. The attack compromised confidential records and sensitive information of current and former employees, but customer data was not affected. The incident has led to multiple class-action lawsuits against the company for alleged cybersecurity failures.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "massive outage that affected its websites and apps",
-        "data_impact": "296,851 individuals affected; exposed information includes names, personal identifiers, driver's license numbers, health insurance information, and COVID-19 vaccination status",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/dish-network-likely-paid-ransom-after-recent-ransomware-attack/",
-          "BleepingComputer"
         ]
       },
       {
@@ -8398,24 +7634,6 @@
         "sources": [
           "https://www.bleepingcomputer.com/news/security/msi-confirms-security-breach-following-ransomware-attack-claims/",
           "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "over 130 organizations",
-        "group": "Clop",
-        "date": null,
-        "country": "not publicly disclosed",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "Clop ransomware claims to have breached over 130 organizations by exploiting a zero-day vulnerability in the GoAnywhere MFT secure file transfer tool. They allegedly stole data but did not deploy ransomware, opting instead to extort their victims by threatening to leak the stolen documents.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "temporary service outage; service continues to be restored on a customer-by-customer basis",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/clop-ransomware-claims-it-breached-130-orgs-using-goanywhere-zero-day/",
-          "BleepingComputer",
-          "Huntress Threat Intelligence"
         ]
       },
       {
@@ -9088,7 +8306,9 @@
           "https://www.scworld.com/brief/stolen-data-from-continental-ransomware-attack-for-sale-for-50m",
           "https://www.securityweek.com/ransomware-gang-offers-sell-files-stolen-continental-50-million/",
           "https://borncity.com/win/2022/12/17/ransomware-at-continental-infection-via-an-employees-browser-download/"
-        ]
+        ],
+        "incident_type": "data-extortion",
+        "ingest_source": "sec/news"
       },
       {
         "victim": "Yamaha Motor Philippines, Inc.",
@@ -9294,20 +8514,21 @@
         ]
       },
       {
-        "victim": "Johnson Controls International plc",
-        "group": "not publicly disclosed",
-        "date": "2023-09-23",
+        "victim": "Johnson Controls International",
+        "group": "Dark Angels",
+        "date": "September 23, 2023",
         "country": "Ireland",
         "incident_type": "ransomware",
         "ingest_source": "sec/news",
-        "summary": "Johnson Controls International plc experienced a ransomware incident that disrupted portions of its internal IT infrastructure and applications. The incident was detected on September 23, 2023, and the company has since implemented its incident management and response plan, engaging cybersecurity experts to assist in the investigation and remediation efforts.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "The company has largely restored the impacted applications and systems and continues to execute business continuity and restoration plans for the remaining impacted applications and systems.",
-        "data_impact": "not publicly disclosed",
+        "summary": "Johnson Controls International confirmed that a ransomware attack in September 2023 cost the company $27 million and resulted in a data breach. The Dark Angels ransomware gang was responsible for the attack, which involved unauthorized access, data exfiltration, and deployment of ransomware, leading to significant service disruptions.",
+        "financial_impact": "$27 million",
+        "ransom_demanded_or_paid": "$51 million",
+        "downtime_and_recovery": "The attack forced the firm to shut down large portions of its IT infrastructure, affecting customer-facing systems.",
+        "data_impact": "over 27 TB of confidential data stolen",
         "sources": [
-          "https://www.sec.gov/Archives/edgar/data/833444/000083344423000038/jci-20231113.htm",
-          "United States Securities and Exchange Commission"
+          "https://www.bleepingcomputer.com/news/security/johnson-controls-says-ransomware-attack-cost-27-million-data-stolen/",
+          "BleepingComputer",
+          "https://www.sec.gov/Archives/edgar/data/833444/000083344423000038/jci-20231113.htm"
         ]
       },
       {
@@ -9740,23 +8961,6 @@
         ]
       },
       {
-        "victim": "Johnson Controls International",
-        "group": "Dark Angels",
-        "date": "September 23, 2023",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Johnson Controls International confirmed that a ransomware attack in September 2023 cost the company $27 million and resulted in a data breach. The Dark Angels ransomware gang was responsible for the attack, which involved unauthorized access, data exfiltration, and deployment of ransomware, leading to significant service disruptions.",
-        "financial_impact": "$27 million",
-        "ransom_demanded_or_paid": "$51 million",
-        "downtime_and_recovery": "The attack forced the firm to shut down large portions of its IT infrastructure, affecting customer-facing systems.",
-        "data_impact": "over 27 TB of confidential data stolen",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/johnson-controls-says-ransomware-attack-cost-27-million-data-stolen/",
-          "BleepingComputer"
-        ]
-      },
-      {
         "victim": "Nissan Australia",
         "group": "Akira",
         "date": "not publicly disclosed",
@@ -9977,23 +9181,6 @@
         "data_impact": "not publicly disclosed",
         "sources": [
           "https://www.bleepingcomputer.com/news/security/canadian-mining-firm-shuts-down-mill-after-ransomware-attack/",
-          "BleepingComputer"
-        ]
-      },
-      {
-        "victim": "Continental",
-        "group": "LockBit",
-        "date": "not publicly disclosed",
-        "country": "Germany",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "The LockBit ransomware gang has claimed responsibility for a cyberattack on Continental, threatening to publish stolen data unless their demands are met. Continental detected a security breach in early August and is currently investigating the incident with external cybersecurity experts.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "Continental took all necessary defensive measures to restore the full integrity of its IT systems with the support of external cybersecurity experts; investigation ongoing.",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/lockbit-ransomware-claims-attack-on-continental-automotive-giant/",
           "BleepingComputer"
         ]
       },
@@ -10362,23 +9549,6 @@
         ]
       },
       {
-        "victim": "major U.S. services company",
-        "group": "DragonForce",
-        "date": "December 2025",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "DragonForce ransomware utilized a custom malware named 'Backdoor.Turn' to exploit Microsoft Teams relays for command-and-control communications. The attack, which occurred in December 2025, involved the exfiltration of data and encryption of the victim's systems after establishing a foothold through an SQL server vulnerability.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/ransomware-gang-abuses-microsoft-teams-relays-to-hide-malicious-traffic/",
-          "Symantec"
-        ]
-      },
-      {
         "victim": "multi-billion-dollar American defense contractor and IT services provider",
         "group": "Kyber",
         "date": "March 2026",
@@ -10447,23 +9617,6 @@
           "https://www.bleepingcomputer.com/news/security/fidelity-national-financial-hackers-stole-data-of-13-million-people/",
           "SEC Form 8-K filing",
           "Fidelity National Financial announcement"
-        ]
-      },
-      {
-        "victim": "architecture companies",
-        "group": "LockBit Locker",
-        "date": null,
-        "country": "Spain",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Spain's National Police has issued a warning about a sophisticated ransomware campaign targeting architecture companies through phishing emails. The attackers, using the 'LockBit Locker' ransomware, employ social engineering tactics to build trust with victims before executing the ransomware to encrypt their files.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/spain-warns-of-lockbit-locker-ransomware-phishing-attacks/",
-          "BleepingComputer"
         ]
       },
       {
@@ -11116,25 +10269,6 @@
         ]
       },
       {
-        "victim": "government agencies",
-        "group": "Gunra",
-        "date": "April 2025",
-        "country": "United States and South Korea",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The U.S. and South Korea issued a joint advisory warning about the Gunra ransomware, which targets government and critical infrastructure organizations. Gunra, a sophisticated double-extortion ransomware variant derived from the Conti source code, has been observed exploiting vulnerabilities in Fortinet firewalls and VPN gateways to gain access to victim networks.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-warns-of-gunra-ransomware-attacks-against-government-critical-infrastructure/",
-          "U.S. federal agencies",
-          "South Korea's National Policy Agency",
-          "AhnLab"
-        ]
-      },
-      {
         "victim": "Die Linke",
         "group": "Qilin",
         "date": "March 27, 2023",
@@ -11447,25 +10581,6 @@
         ]
       },
       {
-        "victim": "local government",
-        "group": "LockBit",
-        "date": "February 22, 2024",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "LockBit ransomware was deployed on a local government system after exploiting vulnerabilities in ScreenConnect software. The attacks were confirmed by cybersecurity firms, indicating that despite law enforcement actions against LockBit, some affiliates continue to operate.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-screenconnect-rce-flaw-exploited-in-ransomware-attacks/",
-          "Sophos",
-          "Huntress",
-          "BleepingComputer"
-        ]
-      },
-      {
         "victim": "Fulton County, Georgia",
         "group": "LockBit",
         "date": "January 2023",
@@ -11691,25 +10806,6 @@
         ]
       },
       {
-        "victim": "U.S. federal agencies",
-        "group": "Clop",
-        "date": "May 27, 2023",
-        "country": "United States",
-        "incident_type": "data-extortion",
-        "ingest_source": "sec/news",
-        "summary": "The Clop ransomware gang conducted data-theft attacks using a zero-day vulnerability in the MOVEit Transfer platform, claiming to have stolen data from numerous companies and federal agencies. They began extorting these companies by listing their names on a data leak site, threatening to leak data if a ransom was not paid.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "data stolen from hundreds of companies, including federal agencies",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-govt-offers-10-million-bounty-for-info-on-clop-ransomware/",
-          "CNN",
-          "BleepingComputer",
-          "vx-underground"
-        ]
-      },
-      {
         "victim": "Louisiana and Oregon DMVs",
         "group": "Clop",
         "date": "June 16th 2023",
@@ -11868,23 +10964,6 @@
         ]
       },
       {
-        "victim": "government organizations",
-        "group": "not publicly disclosed",
-        "date": null,
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The PureCrypter malware campaign has targeted multiple government organizations in the Asia-Pacific and North America regions, delivering various types of malware including ransomware. The attack utilized a compromised non-profit organization to host additional malware and employed techniques to evade detection.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/purecrypter-malware-hits-govt-orgs-with-ransomware-info-stealers/",
-          "Menlo Security"
-        ]
-      },
-      {
         "victim": "Fire Rescue Victoria",
         "group": "Vice Society",
         "date": "2022-12-15",
@@ -11956,78 +11035,6 @@
           "BleepingComputer",
           "VRT news",
           "Het Laatste Nieuws"
-        ]
-      },
-      {
-        "victim": "government agency in Chile",
-        "group": "ARCrypter",
-        "date": "August 2022",
-        "country": "Chile",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The ARCrypter ransomware, a new strain identified in August 2022, has been attacking key organizations worldwide, including a government agency in Chile. The ransomware encrypts files and appends the .crypt extension, with ransom demands varying, reportedly starting at $5,000.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "as low as $5,000",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/previously-unidentified-arcrypter-ransomware-expands-worldwide/",
-          "BleepingComputer",
-          "BlackBerry"
-        ]
-      },
-      {
-        "victim": "Ukrainian government agencies",
-        "group": "Cuba Ransomware",
-        "date": "October 21, 2023",
-        "country": "Ukraine",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "Cuba ransomware affiliate Tropical Scorpius has targeted Ukrainian government agencies with phishing emails leading to malware installation. The malware, known as ROMCOM RAT, allows attackers to perform various malicious activities on infected systems.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/cuba-ransomware-affiliate-targets-ukrainian-govt-agencies/",
-          "CERT-UA",
-          "BlackBerry"
-        ]
-      },
-      {
-        "victim": "U.S. critical infrastructure organizations",
-        "group": "not publicly disclosed",
-        "date": "not publicly disclosed",
-        "country": "United States",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The U.S. Treasury Department sanctioned ten individuals and two entities linked to Iran's Islamic Revolutionary Guard Corps for their involvement in ransomware attacks against U.S. organizations. This group has been associated with various malicious cyber activities, particularly targeting critical infrastructure and private industries.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/us-govt-sanctions-ten-iranians-linked-to-ransomware-attacks/",
-          "U.S. Department of the Treasury",
-          "Secureworks",
-          "Microsoft"
-        ]
-      },
-      {
-        "victim": "Chile government agency",
-        "group": "not publicly disclosed",
-        "date": "August 25, 2023",
-        "country": "Chile",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "A ransomware attack impacted operations and online services of a Chilean government agency, targeting Microsoft and VMware ESXi servers. The attackers encrypted files and threatened to leak data unless a ransom was paid, using a new strain of ransomware that has not been definitively linked to any known group.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-ransomware-hits-windows-linux-servers-of-chile-govt-agency/",
-          "BleepingComputer"
         ]
       },
       {
@@ -14033,24 +13040,6 @@
         ]
       },
       {
-        "victim": "Asian airline",
-        "group": "Money Message",
-        "date": "March 28, 2023",
-        "country": "not publicly disclosed",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "The Money Message ransomware group has emerged, targeting victims globally and demanding million-dollar ransoms to prevent data leaks and provide decryptors. They have claimed to have stolen files from an Asian airline, which has annual revenue close to $1 billion, and have provided proof of the breach through screenshots of the accessed file system.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "million dollar ransoms",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-money-message-ransomware-demands-million-dollar-ransoms/",
-          "BleepingComputer",
-          "Zscaler's ThreatLabz"
-        ]
-      },
-      {
         "victim": "Royal Mail",
         "group": "LockBit",
         "date": "January 10, 2023",
@@ -14100,25 +13089,6 @@
           "https://www.bleepingcomputer.com/news/security/lockbit-ransomware-claims-attack-on-port-of-lisbon-in-portugal/",
           "BleepingComputer",
           "Publico"
-        ]
-      },
-      {
-        "victim": "multiple Ukrainian organizations",
-        "group": "Sandworm",
-        "date": "not publicly disclosed",
-        "country": "Ukraine",
-        "incident_type": "ransomware",
-        "ingest_source": "sec/news",
-        "summary": "New ransomware attacks in Ukraine have been linked to the Russian military threat group Sandworm, utilizing a new ransomware named RansomBoggs. The malware encrypts files using AES-256 and appends a .chsch extension, with ransom notes referencing the character James P. Sullivan from Monsters Inc.",
-        "financial_impact": "not publicly disclosed",
-        "ransom_demanded_or_paid": "not publicly disclosed",
-        "downtime_and_recovery": "not publicly disclosed",
-        "data_impact": "not publicly disclosed",
-        "sources": [
-          "https://www.bleepingcomputer.com/news/security/new-ransomware-attacks-in-ukraine-linked-to-russian-sandworm-hackers/",
-          "1",
-          "2",
-          "3"
         ]
       },
       {

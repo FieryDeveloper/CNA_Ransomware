@@ -166,6 +166,83 @@ def victim_slug(name: str) -> str:
     return s.strip("-")[:80]
 
 
+_SUFFIX = re.compile(r"(?:inc|corp|corporation|company|co|group|technology|technologies|ltd|"
+                     r"limited|llc|plc|ag|sa|nv|bv|gmbh|holdings|international|incorporated)$")
+
+
+def victim_key(name: str) -> str:
+    """Dedup key: the slug with legal suffixes stripped, so "Continental" and
+    "Continental AG" collapse. Slug equality alone let 13 same-company pairs
+    through (Rackspace/Rackspace Technology, Yum! Brands/Yum! Brands Inc.)."""
+    k = re.sub(r"[^a-z0-9]+", "", str(name or "").lower())
+    prev = None
+    while prev != k:                     # stacked suffixes: "Yum! Brands, Inc."
+        prev = k
+        k = _SUFFIX.sub("", k)
+    return k or victim_slug(name)
+
+
+# A "victim" that is a DESCRIPTION rather than an organisation. These come from
+# articles about sentencings, indictments and bounties, which name no single victim
+# but do quote the gang's lifetime totals -- and the classifier then attributed
+# those totals to the descriptor. Both of the dataset's two largest ransom figures
+# were this bug ($700M "Kaseya" was REvil's total across 2,500 attacks; $144M
+# "Bank of America" was LockBit's lifetime total). A record like this cannot be
+# joined, deduped or counted, so it is rejected at the door.
+GENERIC_VICTIM = re.compile(r"""(?ix)
+    ^\s*(?:
+        (?:multiple|several|various|numerous|unnamed|undisclosed|unspecified)
+      | (?:over|more\s+than|at\s+least|about|approximately|some)\s+[\d,]+
+      | [\d,]+\s+(?:\w+\s+){0,2}
+          (?:organi[sz]ations?|companies|firms|victims|entities|businesses|hospitals|
+             agencies|schools|universities|municipalities)
+    )
+    | (?:organi[sz]ations?|companies|firms|victims|entities|businesses|hospitals|
+         agencies|schools|universities|municipalities|startups?|manufacturers?|
+         providers?|retailers?|vendors?|airlines?|casinos)\s*$
+    """)
+
+
+def is_generic_victim(name: str) -> bool:
+    """True when the victim is a descriptor, not a named organisation. Deliberately
+    conservative: it must not reject real names whose head noun is generic, such as
+    "The Coca-Cola Company" or "Prospect Medical Group"."""
+    v = (name or "").strip()
+    if not v:
+        return True
+    if GENERIC_VICTIM.search(v):
+        return True
+    # Nothing distinctive left once filler, geography and generic nouns are removed.
+    FILLER = {
+        "a", "an", "the", "and", "or", "of", "in", "to", "at", "including", "across",
+        "major", "large", "small", "midsize", "small-to-midsize", "fortune",
+        "us", "u.s.", "u.s", "usa", "american", "european", "eu", "uk", "british",
+        "asian", "asia", "south", "ukrainian", "ukraine", "german", "french", "swiss",
+        "canadian", "australian", "romanian", "united", "states", "state", "national",
+        "federal", "global", "worldwide", "local", "government", "governments",
+        "company", "companies", "organization", "organizations", "organisation",
+        "organisations", "firm", "firms", "business", "businesses", "entity", "entities",
+        "victim", "victims", "startup", "startups", "manufacturer", "manufacturers",
+        "provider", "providers", "agency", "agencies", "institution", "institutions",
+        "hospital", "hospitals", "retailer", "retailers", "vendor", "vendors",
+        "airline", "airlines", "council", "healthcare", "health", "care", "medical",
+        "device", "media", "entertainment", "architecture", "critical", "infrastructure",
+        "software", "technology", "services", "service", "sector", "industry",
+        "public", "energy", "billing", "construction", "it", "casinos", "university",
+        # Bare country/region names: "university in Colombia" names no university.
+        # Safe because an org named after a place keeps its other token, e.g.
+        # "Bank of Zambia" -> ["bank"], "Air France" -> ["air"].
+        "colombia", "chile", "brazil", "mexico", "india", "china", "japan", "korea",
+        "israel", "turkey", "egypt", "nigeria", "kenya", "poland", "spain", "italy",
+        "portugal", "greece", "ireland", "norway", "sweden", "denmark", "finland",
+        "netherlands", "belgium", "austria", "switzerland", "argentina", "peru",
+        "colombian", "indian", "chinese", "japanese", "korean", "israeli", "turkish",
+        "dutch", "belgian", "austrian", "spanish", "italian", "irish", "polish",
+    }
+    toks = [t.strip(".,()") for t in re.split(r"[\s,]+", v.lower()) if t.strip(".,()")]
+    return not [t for t in toks if t not in FILLER and not re.fullmatch(r"[\d.]+", t)]
+
+
 def ingest_record(rec: dict, dry: bool = False) -> str:
     """Validate + append one extracted record to industries.json. Returns a
     status: 'added' | 'dry' | 'skip:<reason>'. Reusable by batch fetchers."""
@@ -177,6 +254,8 @@ def ingest_record(rec: dict, dry: bool = False) -> str:
     # reject placeholders — a record with no real victim name is useless
     if not vic_raw or re.match(r"(?i)^(not (publicly )?disclosed|unknown|undisclosed|n/?a|redacted|the company|confidential)$", vic_raw):
         return "skip:no-victim"
+    if is_generic_victim(vic_raw):
+        return "skip:generic-victim"
 
     industries = json.loads(DATA.read_text(encoding="utf-8"))
     target = next((i for i in industries if i["industry"] == rec["industry"]), None)
@@ -191,9 +270,9 @@ def ingest_record(rec: dict, dry: bool = False) -> str:
     # "Evolve Bank Trust" (SEC/news harvest) both through as distinct victims; the
     # slug then collapsed them to one _id and the Atlas upsert silently dropped one.
     # Keying dedup on the _id slug makes that collision impossible by construction.
-    vic = victim_slug(rec["victim"])
+    vic = victim_key(rec["victim"])
     for ind in industries:
-        if vic in {victim_slug(e.get("victim")) for e in ind.get("example_incidents", [])}:
+        if vic in {victim_key(e.get("victim")) for e in ind.get("example_incidents", [])}:
             return "skip:duplicate"
     if dry:
         return "dry"
