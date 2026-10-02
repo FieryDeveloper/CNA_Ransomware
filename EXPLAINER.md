@@ -11,6 +11,12 @@ For file formats and how to re-run the pipeline, see [README.md](README.md).
 
 The gap this fills: leak-site trackers tell you a company was hit but nothing about impact. Press reporting has impact but isn't structured. This joins the two.
 
+**Then it answers the question neither of them can.** Counting attacks tells you who
+gets hit *often*; it cannot tell you how *likely* any one firm is to be hit, because a
+count has no denominator. Dividing by Census firm counts turns "Manufacturing had 581 US
+victims" into "a manufacturer carries roughly 22x the risk of a restaurant" — which is
+the form an underwriter can actually price. See §7c.
+
 ---
 
 ## 2. Coverage — the numbers people will ask for
@@ -18,29 +24,47 @@ The gap this fills: leak-site trackers tell you a company was hit but nothing ab
 | Question | Answer |
 |---|---|
 | How many industries? | **14** (Verizon DBIR-aligned) |
-| How many victims scraped? | **27,108** |
-| How many researched incidents? | **107** |
-| How many distinct companies? | **103** |
-| How many ransomware groups represented? | **83** |
-| Countries covered? | **57** |
-| Time span? | **2017–2026**, weighted to 2023–2026 |
-| US vs non-US? | 53 / 54 — near even |
+| How many records in total? | **41,644** across five layers |
+| How many victims scraped? | **27,108** leak-site postings |
+| How many researched incidents? | **565** |
+| How many distinct companies? | **561** |
+| How many ransomware groups represented? | **185** in the researched layer, **337** in the scrape |
+| Countries covered? | **87** in the researched layer, **183** in the scrape |
+| Time span? | **2017–2026**, concentrated in 2023 |
+| US vs non-US? | 230 / 218, with 117 undisclosed — near even |
 | Taxonomy size? | 94 hazard + 90 exposure categories, **984 subcategories** |
 | Industry loss statistics? | **179**, each with a named source |
-| Sources cited? | **376 unique URLs** |
+| Sources cited? | **898 unique URLs** |
+| Can it give an attack **rate**? | Yes — **0.40%/firm/year** US central, segmented by industry and firm size |
 
-**The scrape behind it is 250× bigger.** The 107 are deep-researched exemplars sitting on top of **27,108 scraped leak-site victims** across all 14 sectors, 2015–2026 (Business Services 5,209 · Manufacturing 4,439 · Technology 3,146 · Healthcare 2,444 · …). The 107 are simply the ones where impact was *publicly reported* — the scrape gives you frequency, the researched layer gives you severity. Quote them separately; they are not interchangeable.
+**Three more victim lists sit alongside the scrape**, deliberately unmerged:
+**5,942** Comparitech tracker incidents (623 with a ransom amount), **7,925** HHS OCR
+mandatory healthcare breach reports (2009–2026), and **104** ransomware families with
+on-chain ransom **paid** ($336.4M). Keeping them separate is what makes it possible to
+measure how much they are all missing — see question 7.
+
+**The scrape behind it is 48× bigger.** The 565 are researched exemplars sitting on top of **27,108 scraped leak-site victims** across all 14 sectors, 2015–2026 (Business Services 5,209 · Manufacturing 4,439 · Technology 3,146 · Healthcare 2,444 · …). The 565 are simply the ones where impact was *publicly reported* — the scrape gives you frequency, the researched layer gives you severity. Quote them separately; they are not interchangeable.
 
 **Honest coverage caveat:** every incident has a source, but not every field is filled:
 
 | Field | Filled | Why the gap |
 |---|---|---|
-| Cited source | 107/107 (100%) | — |
-| Downtime / recovery | 89 (83%) | usually reported in press |
-| Financial impact | 48 (45%) | only public companies must disclose |
-| Ransom demanded/paid | 47 (44%) | rarely disclosed voluntarily |
+| Cited source | 565/565 (100%) | — |
+| Downtime / recovery | 332 (59%) | usually reported in press |
+| Data impact | 330 (58%) | breach-notification laws force it |
+| Ransom demanded/paid | 172 (30%) | rarely disclosed voluntarily |
+| Financial impact | 141 (25%) | only public companies must disclose |
 
 Blank means *"not publicly disclosed"* — a real reporting gap, not missing work. Agents were told never to estimate a figure they couldn't source.
+
+**And one caveat about the dollar figures specifically.** 46 records were removed from
+this dataset after review because the classifier had attributed a *gang's lifetime
+total* to a single named victim — articles about sentencings and bounties quote
+figures like "linked to more than $144 million in ransom payments", which is LockBit
+across all victims, not that company's ransom. The two largest ransom figures in the
+dataset were both this bug. If you extend the dataset with `ingest.py`, note that it
+now rejects victim names that are descriptions rather than organisations, which is
+what let those records in.
 
 ---
 
@@ -141,6 +165,53 @@ This is a useful thing to say to an underwriting audience, because it splits cle
 
 ---
 
+## 7c. From counts to a rate — the part that took the most care
+
+Everything above is a **numerator**. The frequency model divides by a denominator:
+**6.5M US employer firms** from Census SUSB, crosswalked to the 14 sectors by NAICS code.
+
+| Industry | 2025 US victims | Firms | Rate per 10,000 firms/yr |
+|---|---:|---:|---:|
+| Telecommunication | 44 | 12,086 | **274** |
+| Energy and Utilities | 71 | 24,113 | **222** |
+| Manufacturing | 581 | 202,208 | **216** |
+| Healthcare | 365 | 693,801 | **32** |
+| Construction | 295 | 782,487 | **29** |
+| Hospitality and Tourism | 90 | 723,013 | **10** |
+| **All industries** | **3,459** | **6,517,587** | **40** (= 0.40%/yr) |
+
+Note what the denominator does to the ranking. Healthcare took **5x more victims** than
+Energy (365 vs 71), yet Energy's **rate is 7x higher** — because Healthcare has 693,801
+firms against Energy's 24,113. By count, Healthcare looks like one of the worst-hit
+sectors; by rate it sits in the bottom half. Construction is the same story in miniature:
+alarming by count (295), benign by rate (29), because 782,487 mostly-tiny contractors sit
+in the denominator.
+
+**Three things to say before anyone asks:**
+
+1. **This measures how often a firm gets *listed on a leak site*, not attacked.** For 65%
+   of records the attack date equals the discovery date, so the date is really the posting
+   date. Quiet payers never appear at all.
+2. **Leak sites undercount by roughly 7x, and that figure is *measured*, not assumed.**
+   Two independently-built victim lists overlap partially; how much they overlap tells you
+   how much both are missing (capture–recapture). A second route using healthcare's
+   *mandatory* HHS reporting suggests the undercount could be 20x+, so our published
+   numbers are more likely too low than too high.
+3. **Read the ranking, not the level.** The undercount multiplier scales every industry
+   together, so it moves the level but cancels out of the ordering. The ordering is
+   identical in all 14 positions whether you use the raw observed counts or the fully
+   adjusted ones — that is checked, not asserted.
+
+Sanity check for the sceptic in the room: the NAIC reports a **1.14%** all-cyber insurance
+claim frequency for 2024. Ransomware is a subset of all-cyber, so our 0.40% landing below
+it is the expected result. It is used as a check, never as a target to fit to.
+
+**Open the Frequency tab in [explorer.html](explorer.html)** — the rate table, the size
+curve, the undercount derivation, and every assumption tagged measured / estimated /
+assumed.
+
+---
+
 ## 8. What is the taxonomy based on?
 
 - **Industry list:** Verizon DBIR sector groupings (NAICS-aligned), mapped onto ransomware.live's own `activity` tags. Chosen because DBIR is what the team already references and it makes this comparable to external benchmarks.
@@ -175,11 +246,25 @@ This is a useful thing to say to an underwriting audience, because it splits cle
 ## 10. Known limitations — say these before someone asks
 
 1. **Leak-site data undercounts.** Only victims groups *chose to publish*. Quiet payers and non-leak-site groups are invisible. Counts are a floor.
-2. **Public Administration isn't grounded in the scrape.** Its base pull failed; incidents are press-researched only. Real and cited, but its victim counts aren't comparable. Re-running with the corrected endpoint fixes this — it's the top next step.
+2. **Public Sector is counted in a different unit.** Its scrape is now complete (1,279
+   victims), but NAICS 92 is absent from Census SUSB entirely, so its denominator is
+   **90,887 governments** rather than firms. One county is one unit while running many
+   separately attackable agencies, so that rate must never share an unlabelled column
+   with the firm-based ones.
 3. **Financial figures aren't like-for-like.** A "cost" may be total incident cost, an insurance estimate, a fine, or an analyst estimate. Check the `source` column before aggregating.
 4. **Sector-level loss figures lean on surveys**, not incident disclosure — because disclosure is so sparse. In the Education pull, only 13% of records had a press link and 0.9% a ransom figure.
 5. **Sector tags are the tracker's, not a standard.** Occasionally inconsistent upstream (`Consumer Services` and `Consumer services` both appear).
 6. **Four industry records** (Public Sector, Agriculture, Technology, Telecommunications) completed while the automated output classifier was unavailable and didn't get that secondary review. Sourcing is present and checkable — spot-check before anything load-bearing.
+7. **The size dimension is the weakest part of the frequency model.** Only 227 records
+   carry an employee-count label and just 65 are US, so one pooled size curve is applied
+   to all 14 industries and the size×industry interaction is explicitly *assumed absent*.
+   The smallest band — 63% of all US firms — rests on 7 records.
+8. **"Business Services" is not risk-homogeneous.** It spans five unrelated NAICS sectors
+   and 1.79M firms, including 366K micro-realtors. Its headline rate is close to
+   meaningless; use the constituent NAICS codes.
+9. **One usable year.** Only 2025 has complete 12-month coverage across all 14 sectors, so
+   there is no trend and no credibility weighting. The 2024→2025 instability is itself a
+   warning that the tracker's sector tagging is not stable across refreshes.
 
 ---
 
@@ -192,7 +277,10 @@ This is a useful thing to say to an underwriting audience, because it splits cle
 | 3–5 | §3 five incidents — lead with Change Healthcare and CDK |
 | 5–7 | §4 + §5 the two taxonomy axes; use healthcare vs manufacturing to show why per-industry matters |
 | 7–8 | **Open [explorer.html](explorer.html) on the Matrix tab** — §7b, let the shape make the point |
-| 8–9 | §6 five statistics — "attacks up, payment rates down, payment sizes up" |
+| 8–9 | **§7c the rate** — Frequency tab; make the Healthcare-vs-Manufacturing denominator point |
 | 9–10 | §9 automation answer + §10 top two limitations |
+
+If you only have five minutes, cut §4–§6 and go straight from §2 to §7c: the
+count→rate step is the part people have not seen elsewhere.
 
 If you only have five minutes: open the matrix, say the one-sentence version (§1), then the hazard/exposure asymmetry (§7b). That's the whole project in two moves.

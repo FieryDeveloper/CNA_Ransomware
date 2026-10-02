@@ -31,7 +31,7 @@ scripts/
   build_dataset.js           assemble agent output into the final dataset
   validate.js                coverage + integrity checks on the built dataset
   export_graph.js            reshape into a knowledge graph (Neo4j + explorer feed)
-  build_explorer.js          regenerate explorer.html with data inlined (incl. Insights tab)
+  build_explorer.js          regenerate explorer.html with data inlined (7 tabs)
   export_mongo.js            shape the dataset into the 8 narrative MongoDB collections
   load_mongo.py              upsert the collections into Atlas + build indexes
   server.js                  Node: serve explorer.html + live insights from Atlas
@@ -48,20 +48,29 @@ scripts/
   ask.py                     CLI front end to the same engine
 ```
 
-## Two layers of data
+## The layers of data
 
-Worth being precise about, because the numbers differ by two orders of magnitude:
+Worth being precise about, because the numbers differ by orders of magnitude and
+they are **not** interchangeable:
 
-| Layer | Size | What it is |
-|---|---|---|
-| **Bulk scrape** | **27,108 victims** across all 14 sectors, 2015–2026 | Every leak-site posting, sector-tagged. Names, groups, dates, countries — but almost no impact data (only ~13% carry a press link, ~1% a ransom figure). |
-| **Researched incidents** | **625** | Hand-researched and harvested exemplars with financial loss, ransom, downtime and recovery, each cited. These are the ones where impact was publicly reported. (107 hand-researched + 518 from SEC 8-K and security-news harvesting.) |
+| Layer | Records | What it is | Why it exists |
+|---|---:|---|---|
+| **Leak-site scrape** | **27,108** | Every leak-site posting 2015&ndash;2026, sector-tagged: victim, group, date, country, domain. 337 distinct groups, 183 countries. Almost no impact data (~13% carry a press link, ~1% a ransom figure). | The frequency spine |
+| **Researched incidents** | **565** | Hand-researched and harvested exemplars carrying financial loss, ransom, downtime and recovery, each cited. | Severity, with provenance |
+| **Comparitech trackers** | **5,942** | Curated incidents extracted from their Tableau maps. 623 carry a ransom amount, 1,229 a payment flag, 2,990 a records-affected count. | Per-incident ransom figures, and an **independent** list |
+| **HHS OCR portal** | **7,925** | Healthcare's *mandatory* 500+-individual breach list, 2009&ndash;2026. 1,246 ransomware-indicated, 4,773 hacking/IT, 1.09B individuals affected in total. | A near-census, so under-reporting can be **measured** |
+| **Ransomwhere groups** | **104** | On-chain ransom **paid** per ransomware family, $336.4M total. | Payment behaviour as a group attribute, not a per-incident guess |
 
-The taxonomy is derived from both. Quote 27,108 for frequency and the 625 for severity — they are not interchangeable.
+**41,644 records in total.** The three victim lists are deliberately kept separate
+rather than merged: because they were built by different means, the overlap between
+them is what makes it possible to estimate how much they are all missing. Merging
+them would destroy that, and it is the basis of the under-reporting estimate.
 
-For an actual **rate** rather than a count, see [The frequency model](#the-frequency-model-industry--size) below: 27,108 is a numerator, and a numerator alone cannot say how likely an attack is.
+Quote 27,108 for frequency and 565 for severity. For an actual **rate** rather than
+a count, see [the frequency model](#the-frequency-model-industry-x-size): 27,108 is
+a numerator, and a numerator alone cannot say how likely an attack is.
 
-Sector totals (leak-site postings, 2015 – July 2026):
+Sector totals (leak-site postings, 2015 &ndash; July 2026):
 
 | Sector | Victims | Sector | Victims |
 |---|---:|---|---:|
@@ -73,25 +82,85 @@ Sector totals (leak-site postings, 2015 – July 2026):
 | Financial Services | 1,643 | Energy | 826 |
 | Hospitality & Tourism | 771 | Telecommunication | 357 |
 
-A further 2,748 postings carry the sector value `Not Found` (unclassified upstream) and are excluded from the per-sector figures above. The year-by-year pull totals 29,888 rows including those.
+A further 2,748 postings carry the sector value `Not Found` (unclassified upstream)
+and are excluded from the per-sector figures. The year-by-year pull totals 29,888
+rows including those.
 
 ## Dataset at a glance
 
-| | |
-|---|---|
-| Industries | 14 |
-| Researched incidents | 625 |
-| Hazard categories | 94 |
-| Exposure categories | 90 |
-| Taxonomy subcategories | 984 |
-| Aggregate loss/frequency stats | 179 |
-| Unique cited sources | 376 |
+| | | | |
+|---|---:|---|---:|
+| Industries | 14 | Hazard categories | 94 |
+| Researched incidents | 565 | Exposure categories | 90 |
+| Taxonomy subcategories | 984 | Deduped taxonomy nodes | 136 |
+| Aggregate loss/frequency stats | 179 | Unique cited source URLs | 898 |
+| Leak-site victims | 27,108 | Ransomware groups seen | 337 |
+| Frequency table cells | 104 | Countries represented | 183 |
 
-**Incident coverage** — every one of the 625 incidents carries at least one cited source URL. 335 (54%) have downtime/recovery detail, 345 (55%) describe data impact, 157 (25%) carry a ransom figure (92 of them parsed to a number) and 99 (16%) a financial-impact figure (71 parsed). The rest are marked *"not publicly disclosed"*, which is a genuine public-reporting gap, not missing research — agents were explicitly instructed never to estimate a figure they could not source. Coverage rates are lower than at 107 incidents because the bulk SEC/news harvest reaches further down the disclosure tail, where fewer numbers are ever published.
+**Incident coverage.** Every one of the 565 incidents carries at least one cited
+source URL. Beyond that:
 
-**Spread** — incidents run 2017–2026, weighted toward 2023–2026, and split almost evenly between US (53) and non-US (54) organisations. Most-represented groups: LockBit, Conti, Qilin, ShinyHunters, REvil/Sodinokibi, INC Ransom, Clop, Everest.
+| Field | Disclosed | |
+|---|---:|---|
+| Downtime / recovery detail | 332 | 59% |
+| Data impact described | 330 | 58% |
+| Ransom figure | 172 | 30% (74 parsed to a number) |
+| Financial impact | 141 | 25% (61 parsed to a number) |
 
----
+The rest are marked *"not publicly disclosed"*, which is a genuine public-reporting
+gap rather than missing research &mdash; agents were explicitly instructed never to
+estimate a figure they could not source.
+
+**Spread.** Incidents run 2017&ndash;2026, concentrated in 2023 (168), 2022 (71) and
+2024 (71), and split 230 US / 218 non-US with 117 undisclosed. Most-represented
+groups: LockBit, Clop, Black Basta, Qilin, Rhysida, RansomHub, Conti, Akira, Play,
+Hive. Provenance: 463 from the SEC/news harvest, 101 hand-researched, 1 merged.
+
+### Examples of what a researched incident carries
+
+Costliest by reported total impact:
+
+| Victim | Reported impact | Group | What drove it |
+|---|---:|---|---|
+| Change Healthcare (UnitedHealth/Optum) | $2.9B | ALPHV/BlackCat, then RansomHub | Clearing-house outage halted US pharmacy claims for weeks |
+| UnitedHealth Group | $2.45B | BlackCat | Parent-level restatement of the same event |
+| MarineMax | $2.39B | Rhysida | Retail/dealer network disruption |
+| CDK Global | $1.0B | BlackSuit | SaaS dealer-management outage across ~15,000 dealerships |
+
+Largest **ransoms** demanded or paid, where reported: Cencora $75M, TSMC $70M,
+Kaseya $70M (REvil's universal-decryptor demand; Kaseya did not pay), Pendragon
+$60M, Intrado $60M, CNA Financial $60M.
+
+**On-chain ransom actually paid**, by family (Ransomwhere, independent of every
+list above): Conti $101.6M, Cuba $60.2M, Netwalker $27.5M, BlackSuit $25.0M,
+BlackCat $21.9M &mdash; $336.4M across 104 families.
+
+> Impact figures are **mixed-basis** by nature: some are company-stated total cost,
+> some recovery spend, some regulatory fines. Each carries its source; read it
+> before quoting, and do not sum the column.
+
+### A data-quality note worth reading before you trust a dollar figure
+
+The two largest "ransom" figures in an earlier version of this dataset were both
+wrong, and wrong in the same way. Articles about **sentencings, indictments and
+bounties** quote a gang's lifetime totals, and the LLM classifier attributed those
+totals to whichever victim the article named:
+
+- `Kaseya` carried **$700M** &mdash; that is REvil's total across ~2,500 attacks.
+  Kaseya's actual demand was $70M, which the hand-researched record had right.
+- `Bank of America` carried **$144M** &mdash; that is LockBit's lifetime ransom
+  total, from a State Department bounty article that was not about a BoA incident.
+
+The same failure mode produced 44 records whose "victim" was a description rather
+than an organisation (`multiple U.S. organizations`, `Tampa medical device
+manufacturer`, `over 130 organizations`). All 46 were removed, and `ingest.py` now
+rejects non-organisation victim names at the door. A further 13 records were the
+same company under two names (`Continental` / `Continental AG`, `Rackspace` /
+`Rackspace Technology`) and were merged.
+
+The lesson generalises: **$700M looked entirely plausible.** These were found by
+checking document counts and reading the top of every ranked list, not by the
+numbers looking wrong.
 
 ## Data sources, and why
 
@@ -174,9 +243,23 @@ python scripts/fetch_ransomware_live.py --years 2015-2026 --skip-existing
 
 ### Viewing the data
 
-- **[explorer.html](explorer.html)** — open in a browser. Matrix view first: rows are
-  categories, columns are industries. It shows at a glance that hazards are shared across
-  industries while exposures are almost entirely industry-specific.
+**[explorer.html](explorer.html)** — a single self-contained file with the data inlined;
+open it in any browser, no server needed. Seven tabs:
+
+| Tab | What it answers |
+|---|---|
+| **Matrix** | Which hazards and exposures hit which industries. Rows are categories, columns industries — it shows at a glance that hazards are largely **shared** across industries while exposures are almost entirely **industry-specific**. |
+| **Insights** | The 27,108-victim layer: by sector, year, group and country, plus a group&times;sector heatmap where specialists show as bright rows in one or two columns. |
+| **Frequency** | The actuarial view: attack **rates** per 10,000 firms, the size curve, the under-reporting derivation, and every assumption with its basis. The only tab that divides by a denominator. |
+| **Industries** | One card per industry, click through to hazards, exposures, stats and incidents. |
+| **Categories** | The taxonomy from the category side: which industries each hazard or exposure reaches. |
+| **Incidents** | The 565 researched incidents, searchable by victim, group or impact. |
+| **Cross-industry** | The synthesis narrative: themes, global statistics, takeaways. |
+
+Rebuild it after any data change with `node scripts/build_explorer.js`. The Frequency
+tab appears only once the frequency pipeline has been run — it reads
+`data/mongo/frequency.json`, which is gitignored and regenerable, so a fresh clone
+simply shows six tabs until you build it.
 ## Visualizing in Neo4j
 
 Worth it for the ~27k victim layer, where Cypher beats spreadsheet joins. For the taxonomy
@@ -271,7 +354,7 @@ handles the scale better and is the friendlier surface for showing someone else.
 | Hazard | 50 | Country | 35 |
 | Exposure | 86 | Statistic | 197 |
 | Subcategory | 984 | Source | 376 |
-| Incident | 625 | Theme | 25 |
+| Incident | 565 | Theme | 25 |
 | Company | 103 | **Victim** (bulk) | **27,108** |
 
 Relationships: `FACES`, `EXPOSES`, `INCLUDES`, `HAD_INCIDENT`, `HIT`, `PERPETRATED_BY`,
@@ -374,7 +457,7 @@ pip install pymongo
 | Collection | Docs | Shape |
 |---|---:|---|
 | `industries` | 14 | Curated taxonomy, one doc per industry. Embeds hazards/exposures (with subcategories), aggregate stats, a `bulk_summary`, and `incident_ids` referencing `incidents`. Serves the explorer directly. |
-| `incidents` | 625 | Normalized, one per researched attack. `financial` and `ransom` each carry `{text, usd}` — the raw reported string **and** a parsed number, so analytics never re-parse. |
+| `incidents` | 565 | Normalized, one per researched attack. `financial` and `ransom` each carry `{text, usd}` — the raw reported string **and** a parsed number, so analytics never re-parse. |
 | `victims` | 27,108 | The flat bulk scrape. Indexed on `sector_key`, `group`, `year`, `country` (+ compound `sector_key+year`) so group-bys are fast. |
 | `taxonomy` | 136 | Deduped hazard/exposure categories with the industries each spans, its family, and reach. Powers the matrix without recomputation. |
 | `insights` | 1 | Materialized dashboard aggregates (by sector/year/group/country, heatmap, parsed losses) so charts never scan 27k rows. |
@@ -388,6 +471,32 @@ pip install pymongo
 
 **Idempotent:** every document is keyed by `_id` and replaced in place, so re-running after a
 re-scrape updates rather than duplicates.
+
+### Live mode — the explorer reading from Atlas
+
+`explorer.html` ships with a baked-in snapshot so it works when opened as a plain file. Served
+by `scripts/server.js`, the Insights tab instead fetches **live** from Atlas and shows a
+"live from Atlas" badge. A static file can't reach MongoDB directly, so this tiny read-only
+server sits between them (Node's built-in http + the mongodb driver, no framework).
+
+```bash
+npm install                                  # the mongodb driver
+export MONGODB_URI='mongodb+srv://...'        # same string as load_mongo.py
+npm run serve                                 # -> http://localhost:8080
+```
+
+Read-only endpoints: `/api/health`, `/api/insights` (mapped to the chart shape), `/api/industries`,
+`/api/synthesis`. The fetch is same-origin, so there's no CORS to configure. Opened as a file
+with no server, the fetch simply fails and the snapshot stands — the self-contained file never
+breaks. Refresh the data any time with `node scripts/export_mongo.js && python scripts/load_mongo.py`;
+the page reflects it on next load.
+
+**Design note — the denormalization line.** `incidents` are their own collection (updatable,
+good for the archive role) but referenced from `industries` via `incident_ids`; the app joins
+with a `$lookup`. Victims are separate because 27k is too much to embed. This keeps the app
+fast, analytics flat, and the archive normalized — the three jobs a single store had to serve.
+
+---
 
 ## The frequency model (industry x size)
 
@@ -564,32 +673,6 @@ would double-count it.
 A fitted Poisson/NB model with credibility weighting; an explorer view; non-US scope; severity
 (loss given attack); per-victim firmographic enrichment of the 22,153 domains; rolling the 2022
 denominators forward to 2025 (worth <5%, and downward).
-
-### Live mode — the explorer reading from Atlas
-
-`explorer.html` ships with a baked-in snapshot so it works when opened as a plain file. Served
-by `scripts/server.js`, the Insights tab instead fetches **live** from Atlas and shows a
-"live from Atlas" badge. A static file can't reach MongoDB directly, so this tiny read-only
-server sits between them (Node's built-in http + the mongodb driver, no framework).
-
-```bash
-npm install                                  # the mongodb driver
-export MONGODB_URI='mongodb+srv://...'        # same string as load_mongo.py
-npm run serve                                 # -> http://localhost:8080
-```
-
-Read-only endpoints: `/api/health`, `/api/insights` (mapped to the chart shape), `/api/industries`,
-`/api/synthesis`. The fetch is same-origin, so there's no CORS to configure. Opened as a file
-with no server, the fetch simply fails and the snapshot stands — the self-contained file never
-breaks. Refresh the data any time with `node scripts/export_mongo.js && python scripts/load_mongo.py`;
-the page reflects it on next load.
-
-**Design note — the denormalization line.** `incidents` are their own collection (updatable,
-good for the archive role) but referenced from `industries` via `incident_ids`; the app joins
-with a `$lookup`. Victims are separate because 27k is too much to embed. This keeps the app
-fast, analytics flat, and the archive normalized — the three jobs a single store had to serve.
-
----
 
 ## Natural-language querying (GraphRAG)
 
