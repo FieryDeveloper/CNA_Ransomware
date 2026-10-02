@@ -206,6 +206,13 @@ a{color:var(--accent)}
 .covl{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .covtrack{height:16px;border-radius:2px;background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 4px,transparent 4px,transparent 8px);border:1px solid var(--line);position:relative;overflow:hidden}
 .covfill{height:100%;background:var(--exposure);border-radius:0}
+.prov{margin-top:11px;padding-top:9px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.6;color:var(--faint)}
+.prov dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 11px}
+.prov dt{font-family:ui-monospace,Consolas,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.055em;color:var(--muted);white-space:nowrap;padding-top:1px}
+.prov dd{margin:0}
+.prov b{color:var(--ink);font-weight:600}
+.prov code{font-family:ui-monospace,Consolas,monospace;font-size:10.5px;background:var(--surface-2);padding:0 3px;border-radius:2px}
+@media(max-width:620px){.prov dl{grid-template-columns:1fr;gap:1px}.prov dt{padding-top:8px}}
 .freqt{width:100%}
 .freqt th{font-size:11px;text-transform:uppercase;letter-spacing:.055em;color:var(--faint);font-weight:600;white-space:nowrap}
 .freqt td,.freqt th{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left}
@@ -637,6 +644,15 @@ function card(title, cap, body, wide) {
   return '<div class="chart' + (wide ? ' wide' : '') + '"><h3>' + title + '</h3><div class="cap">' + cap + '</div>' + body + '</div>';
 }
 
+/** Provenance block: where a card's numbers came from and how they were computed.
+ *  Kept separate from the caption because "what this shows" and "how it was made"
+ *  are different questions, and the second is the one asked in review. */
+function prov(rows) {
+  return '<div class="prov"><dl>'
+    + rows.filter((r) => r && r[1]).map(([k, v]) => '<dt>' + k + '</dt><dd>' + v + '</dd>').join('')
+    + '</dl></div>';
+}
+
 /* ---------- Frequency ----------
    The one tab that reports a RATE rather than a count. Everything else in this
    explorer is a numerator; here each number is divided by how many firms exist,
@@ -683,7 +699,13 @@ function renderFreq() {
         + '<td class="r mono">' + d.mult + '<span class="pill ' + (d.multBasis === 'estimated' ? 'meas' : 'asm') + '">'
         + (d.multBasis === 'estimated' ? 'measured' : 'assumed') + '</span></td>'
         + '<td><span class="pill c-' + esc(d.conf) + '">' + esc(d.conf) + '</span></td></tr>').join('')
-    + '</tbody></table></div>', true));
+    + '</tbody></table></div>'
+    + prov([
+        ['Victims', 'Leak-site postings collected from the <b>ransomware.live</b> API (<code>api.ransomware.live</code>), which aggregates the extortion sites ransomware crews run to name victims who have not paid. 27,108 postings pulled across 2015&ndash;2026, then filtered to <code>country = US</code> with an attack date in 2025, and deduplicated to distinct organisations rather than distinct listings &mdash; one firm can be posted by two crews under double extortion.'],
+        ['Firms', 'US Census Bureau <b>Statistics of U.S. Businesses (SUSB) 2022</b>, the official count of American employer firms broken down by industry code and employee band. Each of the 14 sectors is mapped to its NAICS industry codes by a hand-curated crosswalk, which is what the <b>Crosswalk</b> column grades. Two sectors are absent from SUSB entirely: <b>Public Sector</b> uses the 2022 Census of Governments (90,887 government bodies, a different unit) and <b>Education</b> adds 14,918 public districts and universities from NCES/IPEDS.'],
+        ['Calculation', '<code>rate = victims &divide; firms &times; 10,000</code>. <b>obs/10k</b> uses the raw US-confirmed count and involves no modelling at all. <b>central/10k</b> adds two corrections: a weighting for records with no country (only 3.1% of 2025 records, worth about +3.5%), then the under-reporting multiplier R from the card below. <b>low&ndash;high</b> is the same arithmetic at the low and high R.'],
+        ['Why 2025', 'It is the only year in which all 14 sectors have complete 12-month coverage. Earlier years are missing whole sector-months upstream: Construction shows 29 US victims in 2024 against 303 in 2025, which is a tagging artifact rather than a real surge.'],
+      ]), true));
 
   ch.push(card('Relative risk, central estimate',
     'Same numbers as bars, so the spread is visible. Telecommunication and Energy sit at the top on '
@@ -691,7 +713,11 @@ function renderFreq() {
     + 'dominated by very small businesses.',
     bars(F.industries, { label: (d) => d.tag, value: (d) => d.rCen,
       fmt: (v) => per10k(v), tip: (d) => 'central ' + per10k(d.rCen) + ' per 10k/yr<br>observed '
-        + per10k(d.rObs) + '<br>' + fmtN(d.firms) + ' ' + d.unit }), true));
+        + per10k(d.rObs) + '<br>' + fmtN(d.firms) + ' ' + d.unit })
+    + prov([
+        ['Source', 'The same figures as the table above, nothing recomputed. Drawn as bars because the distribution is two clusters rather than a smooth gradient, which digits alone hide.'],
+        ['Read it as', 'Relative risk: a bar four times longer means roughly four times the annual chance that a firm in that industry appears on a leak site.'],
+      ]), true));
 
   /* --- size dimension ----------------------------------------------------- */
   ch.push(card('Risk scales with headcount',
@@ -715,7 +741,13 @@ function renderFreq() {
     + '</tbody></table></div>'
     + '<p class="cap" style="margin-top:9px">Weakest link in the whole model: these labels come from '
     + 'firmographic profiles that are sparse below about 5–10 employees, so the 1–4 band '
-    + '— <b>63% of all US firms</b> — rests on 7 records, and b is probably too steep.</p>', true));
+    + '— <b>63% of all US firms</b> — rests on 7 records, and b is probably too steep.</p>'
+    + prov([
+        ['Firms per band', 'SUSB 2022 again, but the <b>unduplicated</b> US totals (6,395,635 firms). Summing the sectors instead would count a firm once per sector it operates in, which over-weights large firms and flattens the curve from 0.85 to 0.75.'],
+        ['Victim sizes', 'Parsed from the business-profile prose attached to some leak-site records, such as <i>&ldquo;It employs 20to49 people and has 5Mto10M of revenue&rdquo;</i>. Only <b>227 of 27,108</b> records carry one and just <b>65 are US</b>, which is why a single global curve is fitted and applied to all 14 industries instead of 14 separate ones.'],
+        ['Calculation', '<code>relative rate = share of victims &divide; share of firms</code>, so 1.0 is an average firm. The fitted column is a weighted least-squares line through those points in log-log space, giving <code>rate &prop; employees<sup>0.85</sup></code>, held flat above 1,000 employees.'],
+        ['Known bias', 'Business profiles barely exist for the smallest firms, so their victim share is understated and the fitted slope comes out <b>too steep</b>. The direction of that error is known even though its size is not.'],
+      ]), true));
 
   /* --- under-reporting ---------------------------------------------------- */
   if (F.strata.length) {
@@ -743,7 +775,15 @@ function renderFreq() {
           + 'sweep rather than asserted: low <b>' + F.schedule.low.value + '×</b> / central <b>'
           + F.schedule.central.value + '×</b> / high <b>' + F.schedule.high.value
           + '×</b>. The 0% column assumes the two lists are independent, which they are not, so it '
-          + 'is a hard <b>lower bound</b>.</p>' : ''), true));
+          + 'is a hard <b>lower bound</b>.</p>' : '')
+    + prov([
+        ['List A', '<b>Leak-site</b> &mdash; the ransomware.live scrape, US records, all years, deduplicated to distinct organisations.'],
+        ['List B', "<b>Independent</b> &mdash; <b>Comparitech</b>'s public ransomware trackers. They publish these as interactive Tableau maps with no download option, so the records were extracted by driving a headless Chrome browser and capturing the data the map itself loads. 5,942 incidents, 4,968 of them US."],
+        ['Matching', 'Company names are normalised &mdash; lowercased, <code>www.</code> and domain endings stripped, bracketed asides and legal suffixes (<i>Inc, LLC, Ltd, Corp</i>) removed &mdash; then matched exactly, and failing that by fuzzy similarity above 90% against candidates sharing a distinctive word. That is what lets <i>&ldquo;Carient Heart &amp; Vascular&rdquo;</i> match <i>&ldquo;Carient Heart and Vascular LLC&rdquo;</i>.'],
+        ['Calculation', "Chapman's capture&ndash;recapture estimator: <code>N = ((A+1)(B+1) &divide; (M+1)) &minus; 1</code>, then <code>R = N &divide; A</code>. It is the method used to count wildlife: tag some animals, come back later, and the fraction of your second sample already tagged reveals the population size. A small overlap between two independently built lists means both are missing a great deal."],
+        ['The sweep', 'Chapman assumes the two lists are independent. Comparitech partly sources <i>from</i> leak sites, which inflates the overlap and so deflates the estimate. The columns ask what happens if 25%, 50% or 75% of the overlap is copying rather than genuine recapture. The sweep stops where it does because a copied record <b>necessarily</b> matches, so copying cannot exceed the observed overlap rate (15&ndash;21% here) &mdash; the data bounds its own correction.'],
+        ['Why only 3 sectors', '2,841 of the 4,968 US Comparitech records are labelled only <i>&ldquo;Business&rdquo;</i>, which spans most of our industries and cannot be assigned to one. Healthcare, Education and Government are the only strata with usable labels; the other 11 industries carry the central figure as a transported assumption.'],
+      ]), true));
   }
 
   if (F.hhs) {
@@ -769,7 +809,14 @@ function renderFreq() {
       + '<b>down</b> by list dependence, the HHS reciprocal biased <b>up</b> by frame mismatch (the 500 '
       + 'floor excludes the small practices that dominate healthcare; HHS records legal names where leak '
       + 'sites post brands). The table above follows the conservative route, so these rates are more '
-      + 'likely <b>too low</b> than too high.</p>', true));
+      + 'likely <b>too low</b> than too high.</p>'
+    + prov([
+        ['Source', 'The <b>HHS Office for Civil Rights breach portal</b> (<code>ocrportal.hhs.gov</code>), the US federal registry where healthcare organisations are <b>legally required</b> to report any breach affecting 500 or more people. 7,925 records spanning 2009&ndash;2026.'],
+        ['How collected', 'The portal has no API and no export. It splits its data across an &ldquo;Under Investigation&rdquo; tab (776 records) and an &ldquo;Archive&rdquo; tab (7,149), serves 100 rows at a time over AJAX, and rotates a session token on every request, so it is walked page by page by a dedicated scraper.'],
+        ['Ransomware flag', "HHS lists every breach type, not just ransomware, so each record's published description is keyword-matched for <i>ransom</i>, <i>extort</i> or a named strain &mdash; 1,246 of 7,925. Bare <i>&ldquo;encrypt&rdquo;</i> is deliberately excluded: HIPAA notices use encryption as a <i>safeguard</i> (&ldquo;an employee sent an <b>un</b>encrypted email&rdquo;), and including it inflated the count by 36%."],
+        ['Calculation', 'Because reporting is mandatory this list is near-complete within its frame, so no statistical estimator is needed: <code>capture = matched &divide; HHS records</code>, and the implied multiplier is simply <code>1 &divide; capture</code>. Same name-matching as the card above.'],
+        ['Max capture', "<code>leak-site records &divide; HHS records</code> &mdash; the ceiling capture could reach if every one of our records matched. Near 100% means a low capture rate is a real finding. The 15.5% on the first row means that row's 32&times; is an artifact of list sizes and should be ignored."],
+      ]), true));
   }
 
   /* --- process dependence ------------------------------------------------- */
@@ -781,7 +828,12 @@ function renderFreq() {
       + 'into the rates: it is a severity-flavoured measure, and folding it into frequency would '
       + 'double-count it.',
       bars(rows, { label: (d) => d.k, value: (d) => d.v,
-        fmt: (v) => v.toFixed(3), tip: (d) => (d.v * 100).toFixed(1) + '% of taxonomy entries are operational' })));
+        fmt: (v) => v.toFixed(3), tip: (d) => (d.v * 100).toFixed(1) + '% of taxonomy entries are operational' })
+    + prov([
+        ['Source', "This project's own hazard and exposure taxonomy &mdash; the hand-researched list, per industry, of what threatens it and what it has exposed. 94 hazard plus 90 exposure categories and 984 subcategories in total."],
+        ['Calculation', 'Every category and subcategory is classified into one of eight families by keyword, then <code>index = entries in &ldquo;OT &amp; Operational Disruption&rdquo; or &ldquo;Business Interruption&rdquo; &divide; all entries</code>. Categories and subcategories are pooled, giving 60&ndash;147 observations per industry; top-level headings alone gave only 10&ndash;16 and ranked Energy below Healthcare, which is not credible.'],
+        ['Not a multiplier', 'This is <b>not</b> used in any rate on this page. It describes how badly a stoppage hurts, which is severity, not how often one happens. Folding it into frequency would double-count it.'],
+      ])));
   }
 
   /* --- the audit spine ---------------------------------------------------- */
@@ -794,7 +846,12 @@ function renderFreq() {
       + '<span class="asmt"><b class="mono">' + esc(a.id) + '</b> ' + esc(a.statement)
       + (a.bias && a.bias !== 'n/a' && a.bias !== 'unknown'
           ? ' <i class="dim">(bias: ' + esc(a.bias) + ')</i>' : '') + '</span></div>').join('')
-    + '</div>', true));
+    + '</div>'
+    + prov([
+        ['Source', 'The <code>method</code> document in the frequency dataset, written by the same script that produces the numbers, so the two cannot drift apart.'],
+        ['What the tags mean', '<b>measured</b> &mdash; taken from a source. <b>estimated</b> &mdash; computed by a stated method from measured inputs. <b>assumed</b> &mdash; our judgement, declared rather than hidden. <b>derived</b> &mdash; arithmetic on the above.'],
+        ['Bias direction', 'Where the consequence of being wrong is predictable it is named: <i>understates</i> or <i>overstates</i>. Every cell in the underlying data also carries the ids of the assumptions it depends on, so any single number traces back to this list.'],
+      ]), true));
 
   ch.push(card('Read the ranking, not the level',
     'The under-reporting multiplier scales every rate together, so it moves the level but largely '
@@ -804,10 +861,14 @@ function renderFreq() {
         : F.ranking.positions_held + ' of ' + F.ranking.of + ' positions held')
     + ' between the observed and the fully-adjusted numerator</span>'
     + '<span class="s">' + (F.ranking.identical ? 'stable' : 'partial') + '</span></div>'
-    + '<ul class="lims">' + F.limitations.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul>', true));
+    + '<ul class="lims">' + F.limitations.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul>'
+    + prov([
+        ['Calculation', 'The 14 industries are sorted twice &mdash; once by the raw observed rate, once by the fully corrected rate &mdash; and the two orderings compared position by position. This runs on every build rather than being asserted once.'],
+        ['Why it matters', 'R scales every industry by the same factor, so it shifts the level while leaving the order nearly untouched. If the ranking survives the corrections, the ranking is a property of the data rather than of our assumptions. The absolute level still carries roughly 2&times; uncertainty.'],
+      ]), true));
 
   $('#fcharts').innerHTML = ch.join('');
-  $('#fnote').innerHTML = 'Denominator: US Census SUSB ' + (F.size.fit_population ? '2022' : '')
+  $('#fnote').innerHTML = 'Each card carries a <b>source and method</b> block beneath it. In brief — Denominator: US Census SUSB ' + (F.size.fit_population ? '2022' : '')
     + ' employer-firm counts, NAICS-crosswalked. Numerator: leak-site listings for ' + F.year
     + ', the only year with complete 12-month coverage across all 14 sectors. '
     + '<b>This measures how often a firm is listed on a leak site, not how often one is attacked</b> '
