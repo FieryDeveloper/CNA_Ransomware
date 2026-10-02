@@ -50,10 +50,10 @@ measure how much they are all missing — see question 7.
 | Field | Filled | Why the gap |
 |---|---|---|
 | Cited source | 565/565 (100%) | — |
-| Data impact | 328 (58%) | breach-notification laws force it |
+| Data impact | 329 (58%) | breach-notification laws force it |
 | Downtime / recovery | 323 (57%) | usually reported in press |
-| Ransom demanded/paid | 136 (24%) | rarely disclosed voluntarily |
-| Financial impact | 90 (16%) | only public companies must disclose |
+| Ransom demanded/paid | 130 (23%) | rarely disclosed voluntarily |
+| Financial impact | 84 (15%) | only public companies must disclose |
 
 Blank means *"not publicly disclosed"* — a real reporting gap, not missing work. Agents were told never to estimate a figure they couldn't source.
 

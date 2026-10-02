@@ -30,6 +30,8 @@ function readOpt(p) {
   catch { return null; }
 }
 const freqDocs = readOpt(path.join(DATA, 'mongo', 'frequency.json'));
+const comparitech = readOpt(path.join(DATA, 'mongo', 'comparitech.json'));
+const hhsOcr = readOpt(path.join(DATA, 'mongo', 'hhs_ocr.json'));
 const freqCal = readOpt(path.join(DATA, 'mongo', 'frequency_calibration.json'));
 const synthesis = fs.existsSync(path.join(DATA, 'synthesis.json'))
   ? JSON.parse(fs.readFileSync(path.join(DATA, 'synthesis.json'), 'utf8'))
@@ -147,10 +149,39 @@ const sectorOf = (ind) => {
   return guess || null;
 };
 
+  // Parse USD from free-text impact strings. Guards against the ICBC trap:
+  // strings that lead with a negation ("not a disclosed loss...") are skipped,
+  // and figures above $5B are dropped as almost certainly not a single-company
+  // loss (the one such value here is ICBC's $62B Treasury settlement volume).
+  // Negation guard: phrases that mean "there is no figure here". Without the
+// {0,3} filler slots, "No single official total disclosed by the company" slipped
+// through and the parser grabbed a stray number out of the prose that followed
+// ($3 for Colonial Pipeline). "Not applicable" does the same for Maersk, where
+// NotPetya had no working payment mechanism at all.
+const NEG = /^\s*(not\s+applicable|not\s+(a\s+)?(publicly\s+|single\s+|official\s+)*disclos|no\s+(\w+\s+){0,3}disclos|undisclosed|not\s+(publicly\s+)?(reported|quantified|available)|n\/a\b)/i;
+
 // ---------------------------------------------------------------------------
 // Insights: cross-sector aggregates over the full ~27k bulk victim records,
 // plus parsed dollar figures from the 107 researched incidents.
 // ---------------------------------------------------------------------------
+const parseUSD = (s) => {
+  if (!s || NEG.test(s)) return null;
+  // The optional (?:to|-|en-dash) group matters: in a range like "$70-75 million"
+// the magnitude suffix follows the SECOND number, so without it the match ended
+// at "$70" and returned 70 instead of 70,000,000. That silently understated
+// Norsk Hydro and Progress Software by six orders of magnitude and made the
+// financial distribution's log-variance meaningless. Takes the LOW end, which is
+// the conservative read of a reported range.
+const m = String(s).match(/\$\s?([\d,]+(?:\.\d+)?)\s*(?:(?:to|-|–|—|and)\s*\$?\s?[\d,]+(?:\.\d+)?\s*)?(billion|bn|b|million|mn|m|k|thousand)?/i);
+  if (!m) return null;
+  let val = parseFloat(m[1].replace(/,/g, ''));
+  const u = (m[2] || '').toLowerCase();
+  if (/^b/.test(u)) val *= 1e9;
+  else if (/^m/.test(u)) val *= 1e6;
+  else if (/^k|thous/.test(u)) val *= 1e3;
+  return val > 5e9 ? null : val;
+};
+
 function buildInsights() {
   const bySector = {}, byYear = {}, byGroup = {}, byCountry = {}, gxs = {};
   // Upstream sometimes tags the same sector with two casings ("Consumer
@@ -186,34 +217,6 @@ function buildInsights() {
     secName[k] = Object.entries(secCasing[k]).sort((a, b) => b[1] - a[1])[0][0];
   }
   const sortDesc = (o) => Object.entries(o).sort((a, b) => b[1] - a[1]);
-
-  // Parse USD from free-text impact strings. Guards against the ICBC trap:
-  // strings that lead with a negation ("not a disclosed loss...") are skipped,
-  // and figures above $5B are dropped as almost certainly not a single-company
-  // loss (the one such value here is ICBC's $62B Treasury settlement volume).
-  // Negation guard: phrases that mean "there is no figure here". Without the
-// {0,3} filler slots, "No single official total disclosed by the company" slipped
-// through and the parser grabbed a stray number out of the prose that followed
-// ($3 for Colonial Pipeline). "Not applicable" does the same for Maersk, where
-// NotPetya had no working payment mechanism at all.
-const NEG = /^\s*(not\s+applicable|not\s+(a\s+)?(publicly\s+|single\s+|official\s+)*disclos|no\s+(\w+\s+){0,3}disclos|undisclosed|not\s+(publicly\s+)?(reported|quantified|available)|n\/a\b)/i;
-  const parseUSD = (s) => {
-    if (!s || NEG.test(s)) return null;
-    // The optional (?:to|-|en-dash) group matters: in a range like "$70-75 million"
-  // the magnitude suffix follows the SECOND number, so without it the match ended
-  // at "$70" and returned 70 instead of 70,000,000. That silently understated
-  // Norsk Hydro and Progress Software by six orders of magnitude and made the
-  // financial distribution's log-variance meaningless. Takes the LOW end, which is
-  // the conservative read of a reported range.
-  const m = String(s).match(/\$\s?([\d,]+(?:\.\d+)?)\s*(?:(?:to|-|–|—|and)\s*\$?\s?[\d,]+(?:\.\d+)?\s*)?(billion|bn|b|million|mn|m|k|thousand)?/i);
-    if (!m) return null;
-    let val = parseFloat(m[1].replace(/,/g, ''));
-    const u = (m[2] || '').toLowerCase();
-    if (/^b/.test(u)) val *= 1e9;
-    else if (/^m/.test(u)) val *= 1e6;
-    else if (/^k|thous/.test(u)) val *= 1e3;
-    return val > 5e9 ? null : val;
-  };
 
   const financial = [], ransom = [];
   for (const ind of industries) {
@@ -317,6 +320,43 @@ function clean(v) {
 const diffs = {};
 for (const d of synthesis.industry_differentiators || []) diffs[norm(d.industry)] = d;
 
+/** Sample sizes and medians for the severity variables, so the findings card can
+ *  state what is and is not modellable without those numbers being hardcoded here
+ *  and silently going stale. Returns null when the sources are absent. */
+function buildSeverity() {
+  const med = (xs) => { const a = xs.slice().sort((x, y) => x - y); return a[Math.floor(a.length / 2)]; };
+  const col = (arr, f) => (arr || []).map(f).filter((v) => typeof v === 'number' && v > 0);
+
+  const hhsRansom = (hhsOcr || []).filter((r) => r.ransomware_indicated);
+  const recs = col(hhsRansom, (r) => r.individuals_affected);
+  const compRansom = col(comparitech, (r) => r.ransom_amount_usd);
+  // Researched incidents live nested under each industry, and their money fields
+  // are raw reported text, so they go through the same parseUSD the rest of this
+  // file uses rather than a second copy of that logic.
+  const allIncidents = industries.flatMap((i) => i.example_incidents || []);
+  const incRansom = col(allIncidents, (r) => parseUSD(r.ransom_demanded_or_paid));
+  const incFin = col(allIncidents, (r) => parseUSD(r.financial_impact));
+
+  // Downtime: narrative text exists for many incidents, but almost none states a
+  // duration cleanly enough to become a number. That gap is itself a finding.
+  const NEG = /^\s*(not\s+(publicly\s+)?(disclos|report)|undisclos|unknown|n\/?a|none)/i;
+  const dtText = allIncidents.filter((r) => r.downtime_and_recovery
+    && !NEG.test(String(r.downtime_and_recovery))).length;
+  const dtNum = allIncidents.filter((r) => /\b\d+\s*(day|week|month|hour)/i
+    .test(String(r.downtime_and_recovery || ''))).length;
+
+  if (!recs.length && !compRansom.length) return null;
+  return {
+    recordsN: recs.length, recordsMedian: recs.length ? med(recs) : null,
+    compRansomN: compRansom.length, compRansomMedian: compRansom.length ? med(compRansom) : null,
+    incRansomN: incRansom.length, incRansomMedian: incRansom.length ? med(incRansom) : null,
+    finN: incFin.length, finMedian: incFin.length ? med(incFin) : null,
+    ransomRatio: (compRansom.length && incRansom.length)
+      ? Math.round(med(incRansom) / med(compRansom)) : null,
+    downtimeText: dtText, downtimeNumeric: dtNum,
+  };
+}
+
 /** Reshape the frequency collection into exactly what the Frequency tab draws.
  *  Returns null when the pipeline has not been run, which hides the tab. */
 function buildFreq() {
@@ -375,6 +415,7 @@ function buildFreq() {
       sweep: Object.values(x.dependence_sensitivity || {}).map((k) => ({ k: k.kappa, R: k.R })),
     })),
     schedule: freqCal && freqCal.published_schedule || null,
+    sev: buildSeverity(),
     hhs: freqCal && freqCal.hhs_cross_check ? {
       A: freqCal.hhs_cross_check.A_leaksite_healthcare,
       headline: freqCal.hhs_cross_check.headline,
@@ -643,6 +684,14 @@ a{color:var(--accent)}
 .covl{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .covtrack{height:16px;border-radius:2px;background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 4px,transparent 4px,transparent 8px);border:1px solid var(--line);position:relative;overflow:hidden}
 .covfill{height:100%;background:var(--exposure);border-radius:0}
+.finds{margin:0;padding-left:0;list-style:none;counter-reset:f}
+.finds li{counter-increment:f;position:relative;padding:0 0 13px 34px;font-size:13px;line-height:1.62}
+.finds li:last-child{padding-bottom:0}
+.finds li::before{content:counter(f);position:absolute;left:0;top:1px;width:21px;height:21px;
+  border:1px solid var(--line);border-radius:50%;text-align:center;line-height:20px;
+  font-family:ui-monospace,Consolas,monospace;font-size:10.5px;color:var(--faint)}
+.finds b{color:var(--ink)}
+.finds .sub{display:block;color:var(--faint);font-size:12px;margin-top:2px}
 .prov{margin-top:11px;padding-top:9px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.6;color:var(--faint)}
 .prov dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:4px 11px}
 .prov dt{font-family:ui-monospace,Consolas,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.055em;color:var(--muted);white-space:nowrap;padding-top:1px}
@@ -1302,6 +1351,82 @@ function renderFreq() {
     + prov([
         ['Calculation', 'The 14 industries are sorted twice &mdash; once by the raw observed rate, once by the fully corrected rate &mdash; and the two orderings compared position by position. This runs on every build rather than being asserted once.'],
         ['Why it matters', 'R scales every industry by the same factor, so it shifts the level while leaving the order nearly untouched. If the ranking survives the corrections, the ranking is a property of the data rather than of our assumptions. The absolute level still carries roughly 2&times; uncertainty.'],
+      ]), true));
+
+  /* --- the ten findings, last so it reads as a conclusion ----------------- */
+  const S = F.sev || {};
+  const m$ = (v) => v == null ? '?' : (v >= 1e6 ? '$' + (v / 1e6).toFixed(1) + 'M'
+    : v >= 1e3 ? '$' + Math.round(v / 1e3) + 'k' : '$' + v);
+  const find = [
+    ['A typical US firm has about a <b>' + F.allRate + '% chance per year</b> of being named on a '
+     + 'ransomware leak site \u2014 roughly <b>1 in ' + Math.round(100 / F.allRate) + '</b>.',
+     'But that average hides a <b>' + F.spread + '\u00d7 gap</b> between the riskiest and safest '
+     + 'industry, so the average is the least useful number on this page.'],
+    ['<b>Counting attacks gives the wrong answer.</b> Healthcare took '
+     + Math.round(F.industries.find((d) => d.tag === 'Healthcare').obs
+       / F.industries.find((d) => d.tag === 'Energy').obs) + '\u00d7 more victims than Energy, yet '
+     + 'Energy\u2019s risk is ' + (F.industries.find((d) => d.tag === 'Energy').rCen
+       / F.industries.find((d) => d.tag === 'Healthcare').rCen).toFixed(0) + '\u00d7 higher.',
+     'Healthcare has ' + fmtN(F.industries.find((d) => d.tag === 'Healthcare').firms) + ' firms '
+     + 'against Energy\u2019s ' + fmtN(F.industries.find((d) => d.tag === 'Energy').firms) + '. By '
+     + 'count Healthcare looks worst-hit; by risk it sits in the bottom half.'],
+    ['<b>Risk rises with company size</b>, at roughly <code>employees<sup>'
+     + F.size.elasticity_b.toFixed(2) + '</sup></code>. Ten times bigger is about seven times more '
+     + 'likely, not ten.',
+     'Firms with 100\u2013499 staff are <b>1.5% of US businesses but 30% of victims</b>. Firms with '
+     + '1\u20134 staff are <b>63% of businesses but 3% of victims</b>.'],
+    ['<b>Under-reporting can be measured rather than guessed.</b> Comparing two independently built '
+     + 'victim lists gives a multiplier of <b>' + F.strata.map((x) => x.R + '\u00d7').join(', ')
+     + '</b> for ' + F.strata.map((x) => x.name).join(', ') + '.',
+     'Most published work picks this number by judgement. Here the overlap between the two lists '
+     + 'does the work, and the data also bounds how wrong the estimate can be.'],
+    ['<b>A second, independent route disagrees by 3\u00d7.</b> Leak sites carry only <b>'
+     + (F.hhs ? (100 * F.hhs.headline.leaksite_capture_rate_of_hhs).toFixed(1) : '4.6') + '%</b> of '
+     + 'the breaches US healthcare providers are legally required to report, implying a multiplier '
+     + 'nearer <b>' + (F.hhs ? F.hhs.headline.implied_R_reciprocal.toFixed(0) : '22') + '\u00d7</b>.',
+     'We published the conservative figure, which means <b>these rates are more likely too low than '
+     + 'too high</b>. That is a more useful thing to be able to say than a single confident number.'],
+    ['<b>Read the ranking, not the level.</b> The industry order is <b>identical in all '
+     + F.ranking.of + ' positions</b> whether you use raw counts or fully corrected ones.',
+     'The multiplier scales every industry equally, so it moves the level while leaving the order '
+     + 'alone. Treat the ordering as solid and the absolute level as carrying roughly '
+     + '2\u00d7 uncertainty.'],
+    ['<b>Missing location data turned out to be a pre-2024 problem.</b> It affects 86% of 2021 '
+     + 'records but only <b>3% of ' + F.year + '</b>.',
+     'So the ' + F.year + ' numerator is about 97% directly measured, and correcting for the gap '
+     + 'moves the total by only about +3.5% rather than being a major modelling step.'],
+    ['<b>Damage is measurable in records stolen, not in money.</b> We hold <b>'
+     + (S.recordsN ? fmtN(S.recordsN) : '1,246') + '</b> measurements of people affected (median '
+     + (S.recordsMedian ? fmtN(S.recordsMedian) : '12,859') + ') against just <b>'
+     + (S.finN || 58) + '</b> total-cost figures.',
+     'Anyone modelling severity should work in records affected. Dollar figures are too few, and '
+     + 'they mix company cost, recovery spend and regulatory fines.'],
+    ['<b>Our two ransom datasets disagree ' + (S.ransomRatio || 19) + '\u00d7 on the typical '
+     + 'demand</b> \u2014 ' + m$(S.compRansomMedian) + ' against ' + m$(S.incRansomMedian) + '.',
+     'Not an error: the larger sample is a broad tracker, the smaller one is incidents newsworthy '
+     + 'enough to research in depth, and newsworthy means big. Pooling them would badly overstate '
+     + 'the typical ransom.'],
+    ['<b>Downtime is effectively not measurable from public sources.</b> '
+     + (S.downtimeText || 323) + ' incidents describe recovery in words; only about <b>'
+     + (S.downtimeNumeric || 10) + '</b> state a duration precisely enough to use as a number.',
+     'If downtime matters to a model, it has to come from claims data or interviews. It is not in '
+     + 'the public record, and that absence is worth knowing before planning around it.'],
+  ];
+  ch.push(card('Ten findings',
+    'The things worth repeating from this page, including the ones about the data itself rather '
+    + 'than about ransomware. Numbers 5, 8, 9 and 10 are limitations, not results \u2014 they are '
+    + 'here because they change what you should do with the rest.',
+    '<ol class="finds">' + find.map(([a, b]) =>
+      '<li>' + a + '<span class="sub">' + b + '</span></li>').join('') + '</ol>'
+    + prov([
+        ['Sources', 'Findings 1\u20137 come from this page\u2019s own cards, each of which carries '
+          + 'its own source block. Findings 8\u201310 are computed from the researched-incident, '
+          + 'Comparitech and HHS datasets at build time rather than written in by hand, so they '
+          + 'cannot drift out of date.'],
+        ['Sanity check', 'US insurers report a <b>1.14%</b> claim rate for cyber cover overall in '
+          + '2024 (NAIC). Ransomware is one type of cyber incident among several, so our <b>'
+          + F.allRate + '%</b> sitting below that figure is the expected result. It is used as a '
+          + 'check only, never as a target to fit to.'],
       ]), true));
 
   $('#fcharts').innerHTML = ch.join('');

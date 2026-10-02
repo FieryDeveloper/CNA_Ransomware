@@ -209,10 +209,10 @@ every incident has every detail, because companies are not required to say:
 | Detail | Available |
 |---|---|
 | At least one cited source | 565 of 565 (100%) |
-| What data was affected | 328 (58%) |
+| What data was affected | 329 (58%) |
 | Downtime or recovery detail | 323 (57%) |
-| A ransom figure | 136 (24%) |
-| A total cost figure | 90 (16%) |
+| A ransom figure | 130 (23%) |
+| A total cost figure | 84 (15%) |
 
 Blank does not mean zero. It means nobody published a number. Researchers were
 instructed never to estimate a figure they could not point to a source for.

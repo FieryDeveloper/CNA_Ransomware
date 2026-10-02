@@ -107,10 +107,10 @@ source URL. Beyond that:
 
 | Field | Disclosed | |
 |---|---:|---|
-| Data impact described | 328 | 58% |
+| Data impact described | 329 | 58% |
 | Downtime / recovery detail | 323 | 57% |
-| Ransom figure | 136 | 24% (73 parsed to a number) |
-| Financial impact | 90 | 16% (58 parsed to a number) |
+| Ransom figure | 130 | 23% (73 parsed to a number) |
+| Financial impact | 84 | 15% (58 parsed to a number) |
 
 The rest are marked *"not publicly disclosed"*, which is a genuine public-reporting
 gap rather than missing research &mdash; agents were explicitly instructed never to
