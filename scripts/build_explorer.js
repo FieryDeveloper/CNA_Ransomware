@@ -191,10 +191,21 @@ function buildInsights() {
   // strings that lead with a negation ("not a disclosed loss...") are skipped,
   // and figures above $5B are dropped as almost certainly not a single-company
   // loss (the one such value here is ICBC's $62B Treasury settlement volume).
-  const NEG = /^\s*(not\s+(a\s+)?(publicly\s+|single\s+)*disclos|no\s+(publicly\s+)?disclos|undisclosed|not\s+publicly\s+reported)/i;
+  // Negation guard: phrases that mean "there is no figure here". Without the
+// {0,3} filler slots, "No single official total disclosed by the company" slipped
+// through and the parser grabbed a stray number out of the prose that followed
+// ($3 for Colonial Pipeline). "Not applicable" does the same for Maersk, where
+// NotPetya had no working payment mechanism at all.
+const NEG = /^\s*(not\s+applicable|not\s+(a\s+)?(publicly\s+|single\s+|official\s+)*disclos|no\s+(\w+\s+){0,3}disclos|undisclosed|not\s+(publicly\s+)?(reported|quantified|available)|n\/a\b)/i;
   const parseUSD = (s) => {
     if (!s || NEG.test(s)) return null;
-    const m = String(s).match(/\$\s?([\d,]+(?:\.\d+)?)\s*(billion|bn|million|mn|m|k|thousand)?/i);
+    // The optional (?:to|-|en-dash) group matters: in a range like "$70-75 million"
+  // the magnitude suffix follows the SECOND number, so without it the match ended
+  // at "$70" and returned 70 instead of 70,000,000. That silently understated
+  // Norsk Hydro and Progress Software by six orders of magnitude and made the
+  // financial distribution's log-variance meaningless. Takes the LOW end, which is
+  // the conservative read of a reported range.
+  const m = String(s).match(/\$\s?([\d,]+(?:\.\d+)?)\s*(?:(?:to|-|–|—|and)\s*\$?\s?[\d,]+(?:\.\d+)?\s*)?(billion|bn|b|million|mn|m|k|thousand)?/i);
     if (!m) return null;
     let val = parseFloat(m[1].replace(/,/g, ''));
     const u = (m[2] || '').toLowerCase();
