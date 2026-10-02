@@ -21,6 +21,11 @@ Setup (one time):
 Flags:
   --dry-run   validate the JSON and print what would load; no connection, no
               pymongo needed. Use this to sanity-check before touching Atlas.
+  --prune     also DELETE documents whose _id is no longer in the local file.
+              Upserting is idempotent for additions and edits but not for
+              removals, so without this Atlas keeps serving records that were
+              deleted locally. Off by default because deletion is irreversible;
+              the loader always REPORTS what is stale either way.
 """
 
 from __future__ import annotations
@@ -147,10 +152,13 @@ def real_run() -> int:
     except ImportError:
         raise SystemExit("pymongo not installed - run: pip install pymongo")
 
+    prune = "--prune" in sys.argv
+    stale_report = []
     client = MongoClient(uri)
     client.admin.command("ping")  # fail fast on bad credentials / network
     db = client[DB_NAME]
-    print(f"connected -> {DB_NAME}\n")
+    print(f"connected -> {DB_NAME}"
+          + ("  [--prune: stale documents will be DELETED]" if prune else "") + "\n")
 
     for name in COLLECTIONS:
         path = MONGO_DIR / f"{name}.json"
@@ -167,7 +175,32 @@ def real_run() -> int:
             total += (res.upserted_count or 0) + (res.modified_count or 0) + (res.matched_count or 0)
         for keys, opts in INDEXES.get(name, []):
             coll.create_index(keys, **opts)
-        print(f"  {name:22} {len(docs):>6} docs upserted, {len(INDEXES.get(name, []))} index(es)")
+
+        # Reconcile deletions. Upserting is idempotent for additions and edits but
+        # NOT for removals: bulk_write reports operations rather than resulting
+        # documents, so a collection that shrank locally keeps serving the old rows
+        # from Atlas invisibly. 59 deleted incidents were found this way.
+        local_ids = {d["_id"] for d in docs}
+        stale = [d["_id"] for d in coll.find({}, {"_id": 1}) if d["_id"] not in local_ids]
+        note = f", {len(INDEXES.get(name, []))} index(es)"
+        if stale:
+            if prune:
+                coll.delete_many({"_id": {"$in": stale}})
+                note += f", {len(stale)} stale PRUNED"
+            else:
+                note += f", {len(stale)} STALE (use --prune)"
+            stale_report.append((name, stale))
+        print(f"  {name:22} {len(docs):>6} docs upserted{note}")
+
+    if stale_report and not prune:
+        print("\nSTALE DOCUMENTS still served from Atlas (removed locally, upsert cannot delete):")
+        for name, stale in stale_report:
+            print(f"  {name}: {len(stale)}")
+            for i in stale[:5]:
+                print(f"      {i}")
+            if len(stale) > 5:
+                print(f"      ... and {len(stale) - 5} more")
+        print("  Re-run with --prune to delete them.")
 
     print("\ndone.")
     client.close()
