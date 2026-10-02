@@ -19,6 +19,18 @@ const path = require('path');
 const DATA = path.resolve(__dirname, '..', 'data');
 const RAW = path.join(DATA, 'raw');
 const industries = JSON.parse(fs.readFileSync(path.join(DATA, 'industries.json'), 'utf8'));
+
+// Frequency model output (data/mongo/, gitignored and regenerable). Optional: a
+// fresh clone has not run the pipeline yet, so the Frequency tab is simply omitted
+// rather than rendered broken. Rebuild it with:
+//   python scripts/fetch_exposure.py && python scripts/estimate_underreporting.py
+//   && python scripts/build_frequency.py
+function readOpt(p) {
+  try { return JSON.parse(fs.readFileSync(p, 'utf8').replace(/^\ufeff/, '')); }
+  catch { return null; }
+}
+const freqDocs = readOpt(path.join(DATA, 'mongo', 'frequency.json'));
+const freqCal = readOpt(path.join(DATA, 'mongo', 'frequency_calibration.json'));
 const synthesis = fs.existsSync(path.join(DATA, 'synthesis.json'))
   ? JSON.parse(fs.readFileSync(path.join(DATA, 'synthesis.json'), 'utf8'))
   : {};
@@ -294,6 +306,76 @@ function clean(v) {
 const diffs = {};
 for (const d of synthesis.industry_differentiators || []) diffs[norm(d.industry)] = d;
 
+/** Reshape the frequency collection into exactly what the Frequency tab draws.
+ *  Returns null when the pipeline has not been run, which hides the tab. */
+function buildFreq() {
+  if (!freqDocs || !Array.isArray(freqDocs)) return null;
+  const method = freqDocs.find((d) => d.kind === 'method');
+  const marg = freqDocs.filter((d) => d.kind === 'industry_marginal');
+  const sizes = freqDocs.filter((d) => d.kind === 'size_marginal');
+  if (!method || !marg.length) return null;
+
+  const totNum = marg.reduce((a, d) => a + d.numerator.country_adjusted.value * d.under_reporting_multiplier.value, 0);
+  const totObs = marg.reduce((a, d) => a + d.numerator.observed.value, 0);
+  const totDen = marg.reduce((a, d) => a + d.denominator.firms, 0);
+
+  return {
+    year: method.exposure_year,
+    measures: method.what_is_measured,
+    allRate: +(100 * totNum / totDen).toFixed(3),
+    allObs: totObs,
+    allFirms: totDen,
+    spread: Math.round(Math.max(...marg.map((d) => d.rate.central_per_10k))
+                     / Math.min(...marg.map((d) => d.rate.central_per_10k))),
+    R: method.under_reporting,
+    size: method.size_model,
+    pdi: method.process_dependence_index,
+    ranking: method.ranking_stability,
+    limitations: method.known_limitations,
+    assumptions: method.assumptions.map((a) => ({
+      id: a.id, statement: a.statement, basis: a.basis, bias: a.bias_direction,
+    })),
+    industries: marg.map((d) => ({
+      name: d.industry, tag: d.ransomware_live_sector,
+      obs: d.numerator.observed.value,
+      adj: d.numerator.country_adjusted.value,
+      firms: d.denominator.firms,
+      unit: d.denominator.unit,
+      conf: d.denominator.crosswalk_confidence,
+      rObs: d.rate.observed_per_10k,
+      rLow: d.rate.low_per_10k,
+      rCen: d.rate.central_per_10k,
+      rHigh: d.rate.high_per_10k,
+      mult: d.under_reporting_multiplier.value,
+      multBasis: d.under_reporting_multiplier.basis,
+      ci: d.rate.observed_poisson_ci_95_count,
+      sensitive: d.segmentation.sensitive_information,
+      regimes: d.segmentation.regulatory_regimes || [],
+      pdi: d.segmentation.process_dependence_index,
+    })).sort((a, b) => b.rCen - a.rCen),
+    bands: sizes.map((d) => ({
+      band: d.size_band, firms: d.firms, share: d.firm_share,
+      victims: d.labelled_victims, vshare: d.victim_share,
+      emp: d.relative_rate_empirical, fit: d.relative_rate_fitted,
+    })),
+    strata: (freqCal && freqCal.strata || []).map((x) => ({
+      name: x.stratum, A: x.A_leaksite, B: x.B_comparitech,
+      M: x.fuzzy.M_overlap, R: x.R_point, floor: x.R_lower_bound,
+      sweep: Object.values(x.dependence_sensitivity || {}).map((k) => ({ k: k.kappa, R: k.R })),
+    })),
+    schedule: freqCal && freqCal.published_schedule || null,
+    hhs: freqCal && freqCal.hhs_cross_check ? {
+      A: freqCal.hhs_cross_check.A_leaksite_healthcare,
+      headline: freqCal.hhs_cross_check.headline,
+      variants: Object.entries(freqCal.hhs_cross_check.variants).map(([k, v]) => ({
+        name: k, B: v.B_hhs, M: v.M_fuzzy,
+        cap: v.leaksite_capture_rate_of_hhs, R: v.implied_R_reciprocal,
+        maxCap: v.max_possible_capture,
+      })),
+    } : null,
+  };
+}
+
 const payload = {
   meta: {
     industries: industries.length,
@@ -307,6 +389,7 @@ const payload = {
     bulkTotal,
     generated: new Date().toISOString().slice(0, 10),
   },
+  freq: buildFreq(),
   industries: industries.map((i) => {
     const d = diffs[norm(i.industry)] || {};
     const sec = sectorOf(i);
@@ -549,6 +632,26 @@ a{color:var(--accent)}
 .covl{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .covtrack{height:16px;border-radius:2px;background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 4px,transparent 4px,transparent 8px);border:1px solid var(--line);position:relative;overflow:hidden}
 .covfill{height:100%;background:var(--exposure);border-radius:0}
+.freqt{width:100%}
+.freqt th{font-size:11px;text-transform:uppercase;letter-spacing:.055em;color:var(--faint);font-weight:600;white-space:nowrap}
+.freqt td,.freqt th{padding:6px 9px;border-bottom:1px solid var(--line);text-align:left}
+.freqt td.r,.freqt th.r{text-align:right}
+.freqt tbody tr:hover{background:var(--surface-2)}
+.freqt tr.hl{background:var(--surface-2)}
+.freqt .str{font-weight:600;color:var(--ink)}
+.freqt .dim{color:var(--faint)}
+.pill{display:inline-block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+  padding:1px 5px;border:1px solid var(--line);border-radius:2px;color:var(--faint);margin-left:5px;
+  vertical-align:middle;font-family:ui-monospace,Consolas,monospace}
+.pill.c-high,.pill.meas,.pill.b-measured{color:var(--ink);border-color:var(--ink)}
+.pill.c-low,.pill.asm,.pill.b-assumed{color:var(--accent);border-color:var(--accent)}
+.pill.sens{color:var(--accent);border-color:var(--accent)}
+.asml{display:flex;flex-direction:column;gap:7px}
+.asmrow{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.5}
+.asmrow .pill{margin-left:0;flex:0 0 auto;margin-top:2px}
+.asmt{flex:1 1 auto}
+.lims{margin:11px 0 0;padding-left:18px;font-size:12.5px;line-height:1.62;color:var(--muted)}
+.lims li{margin-bottom:4px}
 .covrow .covv{font-family:ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;font-size:11.5px;color:var(--ink);min-width:34px;text-align:right}
 .covrow:hover .covl{color:var(--ink)}
 .covrow:hover .covtrack{outline:1px solid var(--line-strong)}
@@ -632,6 +735,12 @@ a{color:var(--accent)}
     <p class="note" id="inote"></p>
   </section>
 
+  <section class="panel" id="p-freq" role="tabpanel">
+    <div class="tiles" id="ftiles"></div>
+    <div class="charts" id="fcharts"></div>
+    <p class="note" id="fnote"></p>
+  </section>
+
   <section class="panel" id="p-syn" role="tabpanel">
     <div class="prose" id="syn"></div>
   </section>
@@ -659,7 +768,8 @@ $('#metrics').innerHTML = [
 ].map(([b, s]) => '<div class="metric"><b>' + b + '</b><span>' + s + '</span></div>').join('');
 
 /* tabs */
-const TABS = [['matrix','Matrix'],['insights','Insights'],['ind','Industries'],['cat','Categories'],['inc','Incidents'],['syn','Cross-industry']];
+const TABS = [['matrix','Matrix'],['insights','Insights'],['freq','Frequency'],['ind','Industries'],['cat','Categories'],['inc','Incidents'],['syn','Cross-industry']]
+  .filter(([id]) => id !== 'freq' || D.freq);   // hide Frequency until the pipeline has run
 $('#nav').innerHTML = TABS.map(([id,t],i) =>
   '<button role="tab" data-t="'+id+'" aria-selected="'+(i===0)+'">'+t+'</button>').join('');
 $('#nav').addEventListener('click', (e) => {
@@ -953,6 +1063,187 @@ function card(title, cap, body, wide) {
   return '<div class="chart' + (wide ? ' wide' : '') + '"><h3>' + title + '</h3><div class="cap">' + cap + '</div>' + body + '</div>';
 }
 
+/* ---------- Frequency ----------
+   The one tab that reports a RATE rather than a count. Everything else in this
+   explorer is a numerator; here each number is divided by how many firms exist,
+   so "Manufacturing is hit a lot" becomes "a manufacturer carries N times the
+   risk of a restaurant". Bars are deliberately plain: length is the only encoding. */
+function renderFreq() {
+  const F = D.freq;
+  if (!F) return;
+  const pct = (v) => (v * 100).toFixed(1) + '%';
+  const per10k = (v) => (v == null ? 'n/a' : v.toFixed(v < 10 ? 2 : 1));
+
+  $('#ftiles').innerHTML = [
+    [F.allRate + '%', 'per firm, per year (central)'],
+    [F.spread + '\u00d7', 'spread, highest to lowest sector'],
+    [fmtN(F.allObs), 'US victims in ' + F.year],
+    [fmtN(F.allFirms), 'firms in the denominator'],
+    [F.R.central + '\u00d7', 'under-reporting multiplier'],
+    ['b = ' + F.size.elasticity_b.toFixed(2), 'size elasticity (R\u00b2 ' + F.size.weighted_r2.toFixed(2) + ')'],
+  ].map(([b, s]) => '<div class="tile"><b>' + b + '</b><span>' + s + '</span></div>').join('');
+
+  const ch = [];
+
+  /* --- the headline table ------------------------------------------------- */
+  ch.push(card('Attack rate by industry',
+    'Expected victims per <b>10,000 firms per year</b>, ' + F.year + ', US. '
+    + '<b>Observed</b> counts confirmed-US leak-site listings only and is the defensible floor; '
+    + '<b>central</b> additionally corrects for country gaps and under-reporting. '
+    + 'The low\u2013high band is the under-reporting scenario range, not a confidence interval.',
+    '<div class="mwrap"><table class="freqt"><thead><tr>'
+    + '<th>Industry</th><th class="r">Victims</th><th class="r">Firms</th>'
+    + '<th class="r">obs/10k</th><th class="r">central/10k</th><th class="r">low\u2013high</th>'
+    + '<th class="r">R</th><th>Crosswalk</th></tr></thead><tbody>'
+    + F.industries.map((d) =>
+        '<tr data-tip="<b>' + esc(d.name) + '</b><br>' + esc(d.tag)
+        + '<br>denominator unit: ' + esc(d.unit)
+        + '<br>observed count 95% Poisson CI: ' + (d.ci ? d.ci.join('\u2013') : 'n/a')
+        + (d.regimes.length ? '<br>regimes: ' + esc(d.regimes.join(', ')) : '') + '">'
+        + '<td>' + esc(d.tag) + (d.sensitive ? ' <span class="pill sens">sensitive</span>' : '') + '</td>'
+        + '<td class="r mono">' + fmtN(d.obs) + '</td>'
+        + '<td class="r mono">' + fmtN(d.firms) + '</td>'
+        + '<td class="r mono">' + per10k(d.rObs) + '</td>'
+        + '<td class="r mono str">' + per10k(d.rCen) + '</td>'
+        + '<td class="r mono dim">' + per10k(d.rLow) + '\u2013' + per10k(d.rHigh) + '</td>'
+        + '<td class="r mono">' + d.mult + '<span class="pill ' + (d.multBasis === 'estimated' ? 'meas' : 'asm') + '">'
+        + (d.multBasis === 'estimated' ? 'measured' : 'assumed') + '</span></td>'
+        + '<td><span class="pill c-' + esc(d.conf) + '">' + esc(d.conf) + '</span></td></tr>').join('')
+    + '</tbody></table></div>', true));
+
+  ch.push(card('Relative risk, central estimate',
+    'Same numbers as bars, so the spread is visible. Telecommunication and Energy sit at the top on '
+    + 'small denominators; Construction and Hospitality at the bottom because their firm counts are '
+    + 'dominated by very small businesses.',
+    bars(F.industries, { label: (d) => d.tag, value: (d) => d.rCen,
+      fmt: (v) => per10k(v), tip: (d) => 'central ' + per10k(d.rCen) + ' per 10k/yr<br>observed '
+        + per10k(d.rObs) + '<br>' + fmtN(d.firms) + ' ' + d.unit }), true));
+
+  /* --- size dimension ----------------------------------------------------- */
+  ch.push(card('Risk scales with headcount',
+    'Relative attack rate by employee band, where 1.0 is an average firm. Fitted curve is '
+    + '<b>rate \u221d employees<sup>' + F.size.elasticity_b.toFixed(2) + '</sup></b> '
+    + '(weighted R\u00b2 ' + F.size.weighted_r2.toFixed(2) + ', n = ' + F.size.n_labelled + '). '
+    + 'Flat above 1,000 employees: the raw power law over-predicts the top band about 4\u00d7, and very '
+    + 'large firms are plausibly <b>less</b> likely to be listed given an attack.',
+    '<div class="mwrap"><table class="freqt"><thead><tr><th>Employees</th>'
+    + '<th class="r">Firms</th><th class="r">% of firms</th><th class="r">Labelled victims</th>'
+    + '<th class="r">% of victims</th><th class="r">Observed</th><th class="r">Fitted</th>'
+    + '</tr></thead><tbody>'
+    + F.bands.map((b) =>
+        '<tr><td class="mono">' + esc(b.band) + '</td>'
+        + '<td class="r mono">' + fmtN(b.firms) + '</td>'
+        + '<td class="r mono dim">' + pct(b.share) + '</td>'
+        + '<td class="r mono">' + b.victims + '</td>'
+        + '<td class="r mono dim">' + pct(b.vshare) + '</td>'
+        + '<td class="r mono">' + b.emp.toFixed(2) + '\u00d7</td>'
+        + '<td class="r mono str">' + b.fit.toFixed(2) + '\u00d7</td></tr>').join('')
+    + '</tbody></table></div>'
+    + '<p class="cap" style="margin-top:9px">Weakest link in the whole model: these labels come from '
+    + 'firmographic profiles that are sparse below about 5\u201310 employees, so the 1\u20134 band '
+    + '\u2014 <b>63% of all US firms</b> \u2014 rests on 7 records, and b is probably too steep.</p>', true));
+
+  /* --- under-reporting ---------------------------------------------------- */
+  if (F.strata.length) {
+    const ks = F.strata[0].sweep.map((x) => x.k);
+    ch.push(card('Under-reporting, measured rather than assumed',
+      'Leak sites show only part of reality. Rather than assume the multiplier, we estimate it by '
+      + '<b>capture\u2013recapture</b> against an independently-built victim list: how much the two lists '
+      + 'overlap tells you how much both are missing. Only 3 of 14 sectors have a list clean enough '
+      + 'to stratify. Columns sweep the assumption that some of the overlap is one list copying the '
+      + 'other, which is bounded by the data itself.',
+      '<div class="mwrap"><table class="freqt"><thead><tr><th>Stratum</th>'
+      + '<th class="r">Leak-site</th><th class="r">Independent</th><th class="r">Both</th>'
+      + ks.map((k) => '<th class="r">' + (k * 100) + '% copied</th>').join('')
+      + '</tr></thead><tbody>'
+      + F.strata.map((x) =>
+          '<tr><td>' + esc(x.name) + '</td>'
+          + '<td class="r mono">' + fmtN(x.A) + '</td>'
+          + '<td class="r mono">' + fmtN(x.B) + '</td>'
+          + '<td class="r mono">' + x.M + '</td>'
+          + x.sweep.map((sw) => '<td class="r mono' + (sw.k === 0.25 ? ' str' : ' dim') + '">'
+              + (sw.R == null ? 'n/a' : sw.R.toFixed(1) + '\u00d7') + '</td>').join('')
+          + '</tr>').join('')
+      + '</tbody></table></div>'
+      + (F.schedule ? '<p class="cap" style="margin-top:9px">Published schedule, <b>derived</b> from that '
+          + 'sweep rather than asserted: low <b>' + F.schedule.low.value + '\u00d7</b> / central <b>'
+          + F.schedule.central.value + '\u00d7</b> / high <b>' + F.schedule.high.value
+          + '\u00d7</b>. The 0% column assumes the two lists are independent, which they are not, so it '
+          + 'is a hard <b>lower bound</b>.</p>' : ''), true));
+  }
+
+  if (F.hhs) {
+    ch.push(card('A second route disagrees by 3\u00d7',
+      'The estimate above leans on a voluntary list. Healthcare breach reporting to HHS is '
+      + '<b>mandatory</b> above 500 individuals, so within that frame the list is close to a census '
+      + 'and the leak-site capture rate can be read directly \u2014 no independence assumption needed. '
+      + 'It comes out under 5%, implying a multiplier above 20\u00d7. <b>Max capture</b> is the ceiling '
+      + 'set by the two list sizes: near 100% means the low capture is real, not an artifact of '
+      + 'comparing a small list to a large one.',
+      '<div class="mwrap"><table class="freqt"><thead><tr><th>HHS stratum</th>'
+      + '<th class="r">Records</th><th class="r">Matched</th><th class="r">Capture</th>'
+      + '<th class="r">Implied R</th><th class="r">Max capture</th></tr></thead><tbody>'
+      + F.hhs.variants.map((v) =>
+          '<tr' + (v.name.indexOf('2019') > -1 ? ' class="hl"' : '') + '><td class="mono">'
+          + esc(v.name.replace(/_/g, ' ')) + '</td>'
+          + '<td class="r mono">' + fmtN(v.B) + '</td><td class="r mono">' + v.M + '</td>'
+          + '<td class="r mono str">' + pct(v.cap) + '</td>'
+          + '<td class="r mono">' + v.R.toFixed(1) + '\u00d7</td>'
+          + '<td class="r mono dim">' + pct(v.maxCap) + '</td></tr>').join('')
+      + '</tbody></table></div>'
+      + '<p class="cap" style="margin-top:9px">Neither route is clean: capture\u2013recapture is biased '
+      + '<b>down</b> by list dependence, the HHS reciprocal biased <b>up</b> by frame mismatch (the 500 '
+      + 'floor excludes the small practices that dominate healthcare; HHS records legal names where leak '
+      + 'sites post brands). The table above follows the conservative route, so these rates are more '
+      + 'likely <b>too low</b> than too high.</p>', true));
+  }
+
+  /* --- process dependence ------------------------------------------------- */
+  if (F.pdi && F.pdi.by_sector) {
+    const rows = Object.entries(F.pdi.by_sector).map(([k, v]) => ({ k, v }));
+    ch.push(card('Process dependence',
+      'Share of each industry\u2019s hazard and exposure taxonomy that is about <b>operations stopping</b> '
+      + 'rather than data leaking. Carried as segmentation only and deliberately <b>not</b> multiplied '
+      + 'into the rates: it is a severity-flavoured measure, and folding it into frequency would '
+      + 'double-count it.',
+      bars(rows, { label: (d) => d.k, value: (d) => d.v,
+        fmt: (v) => v.toFixed(3), tip: (d) => (d.v * 100).toFixed(1) + '% of taxonomy entries are operational' })));
+  }
+
+  /* --- the audit spine ---------------------------------------------------- */
+  ch.push(card('What is measured, and what is assumed',
+    'Every number in this tab carries a basis. Nothing here is a bare figure: '
+    + '<span class="pill meas">measured</span> comes from a source, '
+    + '<span class="pill asm">assumed</span> is a judgement we are declaring.',
+    '<div class="asml">' + F.assumptions.map((a) =>
+      '<div class="asmrow"><span class="pill b-' + esc(a.basis) + '">' + esc(a.basis) + '</span>'
+      + '<span class="asmt"><b class="mono">' + esc(a.id) + '</b> ' + esc(a.statement)
+      + (a.bias && a.bias !== 'n/a' && a.bias !== 'unknown'
+          ? ' <i class="dim">(bias: ' + esc(a.bias) + ')</i>' : '') + '</span></div>').join('')
+    + '</div>', true));
+
+  ch.push(card('Read the ranking, not the level',
+    'The under-reporting multiplier scales every rate together, so it moves the level but largely '
+    + 'cancels out of the ordering. That is checked, not asserted.',
+    '<div class="statrow"><span class="m"><b>Ranking stability</b><br>'
+    + (F.ranking.identical ? 'identical in all ' + F.ranking.of + ' positions'
+        : F.ranking.positions_held + ' of ' + F.ranking.of + ' positions held')
+    + ' between the observed and the fully-adjusted numerator</span>'
+    + '<span class="s">' + (F.ranking.identical ? 'stable' : 'partial') + '</span></div>'
+    + '<ul class="lims">' + F.limitations.map((l) => '<li>' + esc(l) + '</li>').join('') + '</ul>', true));
+
+  $('#fcharts').innerHTML = ch.join('');
+  $('#fnote').innerHTML = 'Denominator: US Census SUSB ' + (F.size.fit_population ? '2022' : '')
+    + ' employer-firm counts, NAICS-crosswalked. Numerator: leak-site listings for ' + F.year
+    + ', the only year with complete 12-month coverage across all 14 sectors. '
+    + '<b>This measures how often a firm is listed on a leak site, not how often one is attacked</b> '
+    + '\u2014 attack date equals discovery date for 65% of records. Sanity anchor: NAIC reports 1.14% '
+    + 'all-cyber claim frequency for 2024, and ransomware is a subset of that, so '
+    + F.allRate + '% sitting below it is the expected result.';
+  wireTips($('#fcharts'));
+}
+
+
 function renderInsights() {
   const yrs = I.byYear.filter((y) => +y.year >= 2018); // pre-2018 is a negligible long tail
   const peak = I.byYear.reduce((a, b) => b.n > a.n ? b : a);
@@ -1053,7 +1344,7 @@ $('#qi').addEventListener('input', (e) => renderInds(e.target.value));
 $('#qc').addEventListener('input', (e) => renderCats(e.target.value));
 $('#qn').addEventListener('input', (e) => renderIncs(e.target.value));
 
-buildMatrix(); renderInds(); renderCats(); renderIncs(); renderInsights(); goLive();
+buildMatrix(); renderInds(); renderCats(); renderIncs(); renderInsights(); renderFreq(); goLive();
 </script>
 </body>
 </html>`;
