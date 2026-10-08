@@ -33,6 +33,7 @@ const freqDocs = readOpt(path.join(DATA, 'mongo', 'frequency.json'));
 const comparitech = readOpt(path.join(DATA, 'mongo', 'comparitech.json'));
 const hhsOcr = readOpt(path.join(DATA, 'mongo', 'hhs_ocr.json'));
 const freqCal = readOpt(path.join(DATA, 'mongo', 'frequency_calibration.json'));
+const benchDocs = readOpt(path.join(DATA, 'mongo', 'benchmarks.json'));
 const synthesis = fs.existsSync(path.join(DATA, 'synthesis.json'))
   ? JSON.parse(fs.readFileSync(path.join(DATA, 'synthesis.json'), 'utf8'))
   : {};
@@ -394,6 +395,11 @@ function buildFreq() {
       unit: d.denominator.unit,
       conf: d.denominator.crosswalk_confidence,
       rObs: d.rate.observed_per_10k,
+      rr: d.rate.relative_risk_observed,
+      revB: d.denominator.receipts_busd,
+      revObs: d.rate.observed_per_100b_revenue,
+      revCen: d.rate.central_per_100b_revenue,
+      revCaveat: d.denominator.receipts_caveat,
       rLow: d.rate.low_per_10k,
       rCen: d.rate.central_per_10k,
       rHigh: d.rate.high_per_10k,
@@ -416,6 +422,12 @@ function buildFreq() {
     })),
     schedule: freqCal && freqCal.published_schedule || null,
     sev: buildSeverity(),
+    bench: (benchDocs || []).reduce((o, d) => {
+      if (d.kind === 'repeat_victims') o.repeat = d;
+      if (d.kind === 'victims_by_year') o.years = d.years;
+      if (d.kind === 'dbir_benchmark') o.dbir = d;
+      return o;
+    }, {}),
     hhs: freqCal && freqCal.hhs_cross_check ? {
       A: freqCal.hhs_cross_check.A_leaksite_healthcare,
       headline: freqCal.hhs_cross_check.headline,
@@ -1169,7 +1181,8 @@ function renderFreq() {
     + 'The low\u2013high band is the under-reporting scenario range, not a confidence interval.',
     '<div class="mwrap"><table class="freqt"><thead><tr>'
     + '<th>Industry</th><th class="r">Victims</th><th class="r">Firms</th>'
-    + '<th class="r">obs/10k</th><th class="r">central/10k</th><th class="r">low\u2013high</th>'
+    + '<th class="r">obs/10k</th><th class="r" title="relative risk, observed">RR</th>'
+    + '<th class="r">central/10k</th><th class="r">low\u2013high</th>'
     + '<th class="r">R</th><th>Crosswalk</th></tr></thead><tbody>'
     + F.industries.map((d) =>
         '<tr data-tip="<b>' + esc(d.name) + '</b><br>' + esc(d.tag)
@@ -1180,6 +1193,7 @@ function renderFreq() {
         + '<td class="r mono">' + fmtN(d.obs) + '</td>'
         + '<td class="r mono">' + fmtN(d.firms) + '</td>'
         + '<td class="r mono">' + per10k(d.rObs) + '</td>'
+        + '<td class="r mono">' + (d.rr != null ? d.rr.toFixed(2) + '\u00d7' : '\u2014') + '</td>'
         + '<td class="r mono str">' + per10k(d.rCen) + '</td>'
         + '<td class="r mono dim">' + per10k(d.rLow) + '\u2013' + per10k(d.rHigh) + '</td>'
         + '<td class="r mono">' + d.mult + '<span class="pill ' + (d.multBasis === 'estimated' ? 'meas' : 'asm') + '">'
@@ -1190,6 +1204,7 @@ function renderFreq() {
         ['Victims', 'Leak-site postings collected from the <b>ransomware.live</b> API (<code>api.ransomware.live</code>), which aggregates the extortion sites ransomware crews run to name victims who have not paid. 27,108 postings pulled across 2015&ndash;2026, then filtered to <code>country = US</code> with an attack date in 2025, and deduplicated to distinct organisations rather than distinct listings &mdash; one firm can be posted by two crews under double extortion.'],
         ['Firms', 'US Census Bureau <b>Statistics of U.S. Businesses (SUSB) 2022</b>, the official count of American employer firms broken down by industry code and employee band. Each of the 14 sectors is mapped to its NAICS industry codes by a hand-curated crosswalk, which is what the <b>Crosswalk</b> column grades. Two sectors are absent from SUSB entirely: <b>Public Sector</b> uses the 2022 Census of Governments (90,887 government bodies, a different unit) and <b>Education</b> adds 14,918 public districts and universities from NCES/IPEDS.'],
         ['Calculation', '<code>rate = victims &divide; firms &times; 10,000</code>. <b>obs/10k</b> uses the raw US-confirmed count and involves no modelling at all. <b>central/10k</b> adds two corrections: a weighting for records with no country (only 3.1% of 2025 records, worth about +3.5%), then the under-reporting multiplier R from the card below. <b>low&ndash;high</b> is the same arithmetic at the low and high R.'],
+        ['RR', 'Relative risk on the OBSERVED rate: the industry\u2019s rate divided by the all-industry observed rate. Because the under-reporting multiplier scales every industry equally, it cancels out of this ratio entirely \u2014 RR is the one comparison on this page that rests on no adjustment at all.'],
         ['Why 2025', 'It is the only year in which all 14 sectors have complete 12-month coverage. Earlier years are missing whole sector-months upstream: Construction shows 29 US victims in 2024 against 303 in 2025, which is a tagging artifact rather than a real surge.'],
       ]), true));
 
@@ -1204,6 +1219,88 @@ function renderFreq() {
         ['Source', 'The same figures as the table above, nothing recomputed. Drawn as bars because the distribution is two clusters rather than a smooth gradient, which digits alone hide.'],
         ['Read it as', 'Relative risk: a bar four times longer means roughly four times the annual chance that a firm in that industry appears on a leak site.'],
       ]), true));
+
+  /* --- revenue dimension --------------------------------------------------- */
+  const revRows = F.industries.filter((d) => d.revObs != null)
+    .slice().sort((a, b) => b.revObs - a.revObs);
+  ch.push(card('Attack rate by revenue',
+    'The same victims divided by industry <b>revenue</b> instead of firm count: expected '
+    + 'victims per <b>$100B of annual receipts</b>. A revenue-rated insurance product prices '
+    + 'off exactly this base. Note how the ranking reorders: Telecommunication is first per '
+    + 'firm but mid-table per dollar, because its 12,086 firms carry $669B of revenue.',
+    '<div class="mwrap"><table class="freqt"><thead><tr>'
+    + '<th>Industry</th><th class="r">Revenue ($B)</th><th class="r">Victims</th>'
+    + '<th class="r">obs / $100B</th><th class="r">central / $100B</th>'
+    + '<th class="r">per firm rank</th></tr></thead><tbody>'
+    + revRows.map((d) => {
+        const frank = F.industries.findIndex((x) => x.tag === d.tag) + 1;
+        return '<tr' + (d.revCaveat ? ' data-tip="<b>' + esc(d.tag) + '</b><br>' + esc(d.revCaveat) + '"' : '') + '>'
+          + '<td>' + esc(d.tag) + (d.revCaveat ? ' <span class="pill asm">caveat</span>' : '') + '</td>'
+          + '<td class="r mono">' + fmtN(Math.round(d.revB)) + '</td>'
+          + '<td class="r mono">' + fmtN(d.obs) + '</td>'
+          + '<td class="r mono str">' + d.revObs.toFixed(1) + '</td>'
+          + '<td class="r mono dim">' + d.revCen.toFixed(0) + '</td>'
+          + '<td class="r mono dim">#' + frank + '</td></tr>';
+      }).join('')
+    + '</tbody></table></div>'
+    + '<p class="cap" style="margin-top:9px">Public Sector has no row: governments have no '
+    + 'SUSB receipts. Education\u2019s rate is <b>overstated</b> and flagged \u2014 its receipts '
+    + 'cover private firms only, while its victims include public schools and universities.</p>'
+    + prov([
+        ['Revenue', 'The RCPT column of the same Census SUSB 2022 file that supplies the firm '
+          + 'counts \u2014 total receipts per industry, published in $1,000s (only in Economic '
+          + 'Census years, which 2022 is). Verified by summing: the 14 sectors total $50.5T, '
+          + 'matching 2022 US gross business receipts.'],
+        ['Calculation', '<code>rate = victims \u00f7 (receipts \u00f7 $100B)</code>, with the '
+          + 'same observed and central numerators as the per-firm table. No new modelling: '
+          + 'this is the identical numerator over a different denominator.'],
+        ['Read it as', 'Exposure per dollar rather than per firm. Industries made of many '
+          + 'small firms (Construction) rank higher per dollar than per firm; industries made '
+          + 'of few huge firms (Telecommunication, Financial Services) rank lower.'],
+      ]), true));
+
+  /* --- years and repeat victims -------------------------------------------- */
+  if (F.bench && F.bench.years) {
+    const yr = F.bench.years.filter((y) => y.year >= 2020);
+    const rp = F.bench.repeat;
+    ch.push(card('Years, and repeat victims',
+      'Left: distinct organisations named per year, with how many had a confirmed country. '
+      + 'US counts before 2024 are <b>floors, not totals</b> \u2014 country is known for only '
+      + '14\u201346% of 2021\u20132023 records \u2014 which is why annual US rates are only '
+      + 'computable from 2024 and why the rate table uses 2025. Right: how often the same '
+      + 'organisation is hit again.',
+      '<div class="mwrap"><table class="freqt"><thead><tr><th>Year</th>'
+      + '<th class="r">Listings</th><th class="r">Distinct orgs</th>'
+      + '<th class="r">US-confirmed</th><th class="r">Country known</th></tr></thead><tbody>'
+      + yr.map((y) => '<tr' + (y.complete ? ' class="hl"' : '') + '><td class="mono">' + y.year
+          + (y.complete ? ' <span class="pill meas">rate year</span>' : '')
+          + (y.partial ? ' <span class="pill asm">partial</span>' : '') + '</td>'
+          + '<td class="r mono">' + fmtN(y.listings) + '</td>'
+          + '<td class="r mono">' + fmtN(y.distinct_orgs) + '</td>'
+          + '<td class="r mono">' + fmtN(y.us_confirmed_distinct) + '</td>'
+          + '<td class="r mono dim">' + y.country_known_pct + '%</td></tr>').join('')
+      + '</tbody></table></div>'
+      + (rp ? '<p class="cap" style="margin-top:9px"><b>Repeat victimisation:</b> of '
+          + fmtN(rp.distinct_organisations) + ' distinct organisations ever listed, '
+          + fmtN(rp.listed_more_than_once) + ' (<b>' + (100 * rp.repeat_rate).toFixed(1)
+          + '%</b>) were listed more than once; ' + fmtN(rp.by_two_plus_groups)
+          + ' by two or more <b>different</b> crews, and ' + fmtN(rp.different_group_and_year)
+          + ' by a different crew in a different year \u2014 clear re-attacks, not reposts. '
+          + 'Within US 2025 alone: ' + fmtN(rp.us_2025_repeat) + ' of '
+          + fmtN(rp.us_2025_distinct) + ' (' + (100 * rp.us_2025_repeat_rate).toFixed(1)
+          + '%). A repeat rate this low means attacks are close to independent events, so '
+          + 'treating the rates on this page as per-firm probabilities is a fair '
+          + 'approximation \u2014 but a fitted model should still allow mild clustering.</p>' : '')
+      + prov([
+          ['Source', 'The same ransomware.live scrape as everything else, grouped by year of '
+            + 'attack date. Repeat victims are found by normalising organisation names and '
+            + 'domains and counting keys that appear under more than one listing.'],
+          ['Why repeats matter', 'The frequency table implicitly treats attacks as landing on '
+            + 'different firms. If repeat victimisation were high, rates per FIRM would '
+            + 'overstate how widely risk is spread. At 6.1% lifetime and 3.3% within-year, '
+            + 'the approximation holds.'],
+        ]), true));
+  }
 
   /* --- size dimension ----------------------------------------------------- */
   ch.push(card('Risk scales with headcount',
@@ -1303,6 +1400,73 @@ function renderFreq() {
         ['Calculation', 'Because reporting is mandatory this list is near-complete within its frame, so no statistical estimator is needed: <code>capture = matched &divide; HHS records</code>, and the implied multiplier is simply <code>1 &divide; capture</code>. Same name-matching as the card above.'],
         ['Max capture', "<code>leak-site records &divide; HHS records</code> &mdash; the ceiling capture could reach if every one of our records matched. Near 100% means a low capture rate is a real finding. The 15.5% on the first row means that row's 32&times; is an artifact of list sizes and should be ignored."],
       ]), true));
+  }
+
+  /* --- DBIR benchmark -------------------------------------------------------- */
+  if (F.bench && F.bench.dbir) {
+    const B = F.bench.dbir;
+    const mix = B.industry_mix.rows.slice().sort((a, b) => b.leak_site_share - a.leak_site_share);
+    ch.push(card('Benchmark: Verizon DBIR 2026',
+      'The DBIR is the field’s shared reference, built from a completely different '
+      + 'collection method — incident reports contributed by around 100 organisations '
+      + 'rather than criminal leak sites. It cannot anchor our level (it is a convenience '
+      + 'sample and says so itself), but where the two datasets can be compared, they should '
+      + 'agree. Three comparisons, summarised under the table.',
+      '<div class="mwrap"><table class="freqt"><thead><tr><th>Sector</th>'
+      + '<th class="r">Our share</th><th class="r">DBIR share</th><th class="r">Δ</th>'
+      + '</tr></thead><tbody>'
+      + mix.map((r) => {
+          const d = 100 * (r.leak_site_share - r.dbir_share);
+          return '<tr data-tip="<b>' + esc(r.sector) + '</b><br>ours: ' + fmtN(r.leak_site_2025_distinct)
+            + ' distinct victims (2025, global)<br>DBIR: ' + fmtN(r.dbir_incidents) + ' incidents (Table 3, p.77)">'
+            + '<td>' + esc(r.sector) + '</td>'
+            + '<td class="r mono">' + (100 * r.leak_site_share).toFixed(1) + '%</td>'
+            + '<td class="r mono">' + (100 * r.dbir_share).toFixed(1) + '%</td>'
+            + '<td class="r mono ' + (Math.abs(d) > 5 ? 'str' : 'dim') + '">'
+            + (d > 0 ? '+' : '') + d.toFixed(1) + 'pp</td></tr>';
+        }).join('')
+      + '</tbody></table></div>'
+      + '<p class="cap" style="margin-top:9px">'
+      + '<b>1 · Industry mix:</b> rank correlation ' + B.industry_mix.spearman_rank_correlation
+      + ' — directionally consistent, and the largest gaps line up with <b>who is required '
+      + 'to report</b>: Public Sector and Financial Services are 2–3× heavier in the '
+      + 'DBIR, which receives mandatory and law-enforcement reporting that leak sites never '
+      + 'see.<br><b>2 · Size:</b> the DBIR finds <b>~96%</b> of ransomware victims with '
+      + 'known size are SMBs (under 1,000 staff); our size-labelled victims: <b>'
+      + (100 * B.size_benchmark.ours_share_of_labelled_victims_under_1000).toFixed(1)
+      + '%</b>. Independent agreement on the size composition, from a different collection '
+      + 'method.<br><b>3 · Volume:</b> the DBIR’s contributors alone documented ~'
+      + fmtN(B.volume_floor.dbir_ransomware_breaches_est) + ' ransomware breaches ('
+      + B.volume_floor.derivation + ') — <b>' + B.volume_floor.ratio + '×</b> more than '
+      + 'the ' + fmtN(B.volume_floor.leak_site_2025_distinct_global) + ' organisations every '
+      + 'leak site combined named in 2025. The DBIR is itself far from a census, so this '
+      + 'independently corroborates that leak sites materially undercount.</p>'
+      + '<p class="cap" style="margin-top:9px"><b>The ransom ladder</b> — three medians, '
+      + 'roughly an order of magnitude apart: what victims <b>pay</b> ($140k median, DBIR), '
+      + 'what trackers <b>record</b> being demanded ($428k, Comparitech), what makes the '
+      + '<b>news</b> ($8M, our researched set). Each list up the ladder selects for bigger '
+      + 'incidents; quote the rung, not just the number. The DBIR also reports <b>69% of '
+      + 'victims did not pay</b>.</p>'
+      + '<p class="cap" style="margin-top:9px"><i>“' + esc(B.dbir_figures.statistics_caveat.quote)
+      + '”</i> — DBIR 2026, p.' + B.dbir_figures.statistics_caveat.page
+      + '. That warning is the gap this page exists to fill: turning “share of '
+      + 'breaches” into a per-firm probability requires a denominator.</p>'
+      + prov([
+          ['Source', '<b>' + esc(B.reference.report) + '</b> (' + esc(B.reference.window)
+            + '). Figures transcribed from the published PDF and cited by page: industry '
+            + 'table p.77, headline ransomware figures p.11, SMB share p.98, statistics '
+            + 'caveat p.114.'],
+          ['Mapping', 'The DBIR reports by 2-digit NAICS, so its rows map onto our sectors '
+            + 'directly. Its “Information (51)” spans our Technology and '
+            + 'Telecommunication, which are compared combined. Known misalignment: the DBIR '
+            + 'keeps food manufacturing inside 31–33, while our crosswalk assigns it to '
+            + 'Agriculture.'],
+          ['What it can and cannot check', 'The DBIR counts all incident types and Table 3 '
+            + 'is not split by pattern, so the mix comparison assumes ransomware’s '
+            + 'industry mix resembles the all-incident mix. And because the DBIR is a '
+            + 'contributor sample, it benchmarks COMPOSITION (mix, size split) and provides '
+            + 'a volume floor — never the absolute rate.'],
+        ]), true));
   }
 
   /* --- process dependence ------------------------------------------------- */

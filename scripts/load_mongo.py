@@ -85,6 +85,8 @@ INDEXES = {
     ],
     "frequency_exposure": [([("kind", 1)], {}), ([("industry_id", 1), ("size_band", 1)], {})],
     "frequency_calibration": [],
+    # External benchmarks + dataset context stats (scripts/benchmark_dbir.py)
+    "benchmarks": [([("kind", 1)], {})],
     # HHS OCR mandatory healthcare breach list (scripts/fetch_hhs_ocr.py)
     "hhs_ocr": [
         ([("individuals_affected", -1)], {}),
@@ -119,7 +121,9 @@ COLLECTIONS = ["industries", "incidents", "victims", "taxonomy", "insights", "sy
                #   python scripts/build_frequency.py
                "frequency_exposure", "frequency_calibration", "frequency",
                # Healthcare's mandatory breach list (python scripts/fetch_hhs_ocr.py)
-               "hhs_ocr"]
+               "hhs_ocr",
+               # DBIR benchmark + repeat-victim/by-year context (python scripts/benchmark_dbir.py)
+               "benchmarks"]
 
 
 def dry_run() -> int:

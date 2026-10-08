@@ -355,6 +355,7 @@ def main() -> int:
         R_basis = "estimated" if tag in calib else "assumed"
         o, ad = obs[iid], adj[iid]
         den_tot = et["firms"]
+        receipts_k = et.get("receipts_usd") or 0   # SUSB RCPT, in $1,000s
 
         if et["band_split_available"]:
             wsum = sum(firms[(iid, b)] * rr(b) for b, _, _ in BANDS)
@@ -412,10 +413,30 @@ def main() -> int:
                             "source": et["source"], "vintage": 2022, "naics": et["naics"],
                             "naics_exclude": et["naics_exclude"],
                             "crosswalk_confidence": et["crosswalk_confidence"],
-                            "band_split_available": et["band_split_available"]},
+                            "band_split_available": et["band_split_available"],
+                            # SUSB RCPT is published in $1,000s; verified: the 14 sectors
+                            # sum to $50.5T, matching 2022 US gross business receipts.
+                            # Education's receipts cover PRIVATE firms only while its
+                            # victims include public institutions, so its revenue rate is
+                            # overstated and flagged. Public Sector has no receipts at all.
+                            "receipts_busd": round(receipts_k / 1e6, 1) if receipts_k else None,
+                            "receipts_caveat": (
+                                "receipts cover private SUSB firms only; victims include "
+                                "public institutions, so the revenue rate is overstated"
+                                if iid == "educational-services" else
+                                "governments have no SUSB receipts; no revenue rate"
+                                if iid == "public-administration-government" else None)},
             "rate": {"observed_per_10k": per10k(o), "central_per_10k": per10k(ad*R),
                      "low_per_10k": per10k(ad*r_low), "high_per_10k": per10k(ad*r_high),
-                     "observed_poisson_ci_95_count": poisson_ci(obs_n[iid]), "basis": "derived"},
+                     "observed_poisson_ci_95_count": poisson_ci(obs_n[iid]),
+                     # relative risk on the OBSERVED rate: invariant to the under-reporting
+                     # multiplier, so it is the most assumption-free comparison on the page
+                     "relative_risk_observed": None,   # filled after the loop (needs the total)
+                     "observed_per_100b_revenue": (round(o / (receipts_k * 1e3 / 1e11), 2)
+                                                   if receipts_k else None),
+                     "central_per_100b_revenue": (round(ad * R / (receipts_k * 1e3 / 1e11), 2)
+                                                  if receipts_k else None),
+                     "basis": "derived"},
             "segmentation": {"sensitive_information": et.get("sensitive_information"),
                              "regulatory_regimes": et.get("regulatory_regimes", []),
                              "process_dependence": pdi.get(tag),
@@ -446,6 +467,17 @@ def main() -> int:
     # The robustness claim: the country adjustment and the under-reporting multiplier
     # both move the LEVEL. If the industry ORDERING survives them, the ordering is a
     # product of the data rather than of the assumptions. Check it, do not assert it.
+    # Fill relative risk on the observed rate, now that the all-industry baseline
+    # exists. RR divides out the under-reporting multiplier entirely, so it is the
+    # one industry comparison that rests on no adjustment at all.
+    _tot_o = sum(r[1] for r in marg_rows)
+    _tot_f = sum(r[3] for r in marg_rows)
+    _base = 10000.0 * _tot_o / _tot_f
+    for d in docs:
+        if d.get("kind") == "industry_marginal" and d["rate"].get("observed_per_10k") is not None:
+            d["rate"]["relative_risk_observed"] = round(d["rate"]["observed_per_10k"] / _base, 2)
+            d["rate"]["relative_risk_baseline_per_10k"] = round(_base, 2)
+
     rank_obs = [r[0] for r in sorted(marg_rows, key=lambda r: -(r[4] or 0))]
     rank_cen = [r[0] for r in sorted(marg_rows, key=lambda r: -(r[5] or 0))]
 
