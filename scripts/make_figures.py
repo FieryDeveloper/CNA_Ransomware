@@ -1,10 +1,17 @@
 """
-make_figures.py — publication figures for the frequency model and benchmarks.
+make_figures.py — slide-grade figures for the frequency model and benchmarks.
 
-Six figures, one message each, written to figures/ as PNG (2x for slides).
-Style is deliberately minimal: one hue family (Carolina blue on navy), no
-chart junk, the point of the figure stated in its title and the number that
-carries it labelled directly on the mark rather than read off an axis.
+Design rules, learned the hard way:
+  - No titles or footnotes inside the PNG. The slide supplies the headline and
+    the site's cards supply the sources; baked-in text duplicates both and is
+    the first thing that reads as machine-made.
+  - Nothing small. Each figure is sized to the exact box it occupies on the
+    1920x1080 canvas, and every font size is chosen so no glyph lands under
+    ~24 px on screen. px-per-pt = shown_px / (figsize_in * 72).
+  - One ink, one accent. Ink #1A2433, muted #8A939B, hairline #D9DEE4, a single
+    Carolina Blue #4B9CD3 for the one thing each figure is about. De-emphasised
+    series are grey, never a second hue.
+  - dpi 260, so every image is ~2.2x its display size: crisp on projectors.
 
 Reads  data/mongo/frequency.json, benchmarks.json, frequency_calibration.json
 Writes figures/fig1..fig6 .png
@@ -21,7 +28,6 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 
 ROOT = Path(__file__).resolve().parent.parent
 FIG = ROOT / "figures"
@@ -34,218 +40,204 @@ cal = L("frequency_calibration.json")
 marg = sorted((d for d in freq if d["kind"] == "industry_marginal"),
               key=lambda d: d["rate"]["central_per_10k"])
 sizes = [d for d in freq if d["kind"] == "size_marginal"]
-method = next(d for d in freq if d["kind"] == "method")
 byyear = next(d for d in bench if d["kind"] == "victims_by_year")["years"]
 dbir = next(d for d in bench if d["kind"] == "dbir_benchmark")
 
-NAVY, CAROLINA, SKY, GREY, OX = "#13294B", "#4B9CD3", "#A8CCE4", "#8A939B", "#9E3B33"
+INK, MUTED, HAIR, GREY, ACC = "#1A2433", "#8A939B", "#D9DEE4", "#C7CFD8", "#4B9CD3"
 plt.rcParams.update({
-    "font.family": "Arial", "font.size": 10.5,
-    "axes.edgecolor": "#C9CDD2", "axes.linewidth": 0.8,
-    "axes.titlesize": 12.5, "axes.titleweight": "bold", "axes.titlecolor": NAVY,
-    "axes.labelcolor": "#3A4149", "text.color": "#3A4149",
-    "xtick.color": "#6C737A", "ytick.color": "#3A4149",
+    "font.family": "Arial",
+    "axes.edgecolor": HAIR, "axes.linewidth": 1.0,
+    "axes.labelcolor": MUTED, "text.color": INK,
+    "xtick.color": MUTED, "ytick.color": INK,
     "figure.facecolor": "white", "axes.facecolor": "white",
-    "svg.fonttype": "none",
 })
 
 
-def strip(ax, keep_x=False):
-    for s in ("top", "right"):
-        ax.spines[s].set_visible(False)
-    if not keep_x:
-        ax.spines["bottom"].set_visible(False)
-    ax.spines["left"].set_visible(False)
+def strip(ax, bottom=False, left=False):
+    for side, keep in (("top", False), ("right", False), ("bottom", bottom), ("left", left)):
+        ax.spines[side].set_visible(keep)
     ax.tick_params(length=0)
 
 
-def save(fig, name, note):
-    # Below the canvas (negative figure y): bbox_inches="tight" expands to include
-    # it, so the note never collides with an axis label however short the figure.
-    fig.text(0.015, -0.045, note, fontsize=7.6, color=GREY, va="top", wrap=True)
-    fig.savefig(FIG / f"{name}.png", dpi=220, bbox_inches="tight", facecolor="white")
+def save(fig, name):
+    fig.savefig(FIG / f"{name}.png", dpi=260, bbox_inches="tight",
+                pad_inches=0.06, facecolor="white")
     plt.close(fig)
     print(f"  {name}.png")
 
 
 SHORT = {"Agriculture and Food Production": "Agriculture & Food",
          "Hospitality and Tourism": "Hospitality", "Transportation/Logistics": "Transportation",
-         "Financial Services": "Financial Svcs", "Business Services": "Business Svcs",
-         "Consumer Services": "Consumer Svcs", "Telecommunication": "Telecom"}
+         "Telecommunication": "Telecommunications"}
 nm = lambda t: SHORT.get(t, t)
 
 # ---------------------------------------------------------------- fig 1: rates
-fig, ax = plt.subplots(figsize=(8.6, 5.4))
+# Shown ~1664x660 -> figsize 14x5.55in -> 1.65 px/pt. Base 15pt ~ 25px on screen.
+fig, ax = plt.subplots(figsize=(14, 5.55))
 tags = [nm(d["ransomware_live_sector"]) for d in marg]
-obs = [d["rate"]["observed_per_10k"] for d in marg]
 cen = [d["rate"]["central_per_10k"] for d in marg]
 lo = [d["rate"]["low_per_10k"] for d in marg]
 hi = [d["rate"]["high_per_10k"] for d in marg]
 y = range(len(marg))
-ax.barh(y, cen, height=0.62, color=CAROLINA, zorder=3)
-ax.hlines(y, lo, hi, color=NAVY, lw=1.4, zorder=4)
+ax.barh(y, cen, height=0.58, color=ACC, zorder=3)
+ax.hlines(y, lo, hi, color=INK, lw=1.6, zorder=4)
+# Two right-aligned number columns, clear of the longest whisker (393):
+# the rate in ink, the odds in muted. A table, not floating labels.
 for i, d in enumerate(marg):
-    ax.text(hi[i] + 6, i, f"{cen[i]:.0f}", va="center", fontsize=9.3,
-            color=NAVY, fontweight="bold")
-    unit = " (per government)" if d["denominator"]["unit"] == "governments" else ""
-    if unit:
-        ax.text(2, i, unit.strip(" ()"), va="center", ha="left", fontsize=7.4, color="white")
-ax.set_yticks(list(y), tags)
-ax.set_xlabel("expected victims per 10,000 firms per year — central estimate, 2025 US")
-ax.set_title("Ransomware frequency varies 28× across industries")
-ax.set_xlim(0, max(hi) * 1.1)
+    ax.text(472, i, f"{cen[i]:.0f}", va="center", ha="right", fontsize=17,
+            color=INK, fontweight="bold")
+    ax.text(588, i, f"1 in {10000/cen[i]:,.0f}", va="center", ha="right",
+            fontsize=15, color=MUTED)
+ax.set_yticks(list(y), tags, fontsize=15.5)
+ax.set_xlabel("expected victims per 10,000 firms per year", fontsize=15, labelpad=10)
+ax.set_xlim(0, 592)
+ax.set_ylim(-0.6, len(marg) - 0.4)
 strip(ax)
-ax.xaxis.grid(True, color="#ECEEF0", zorder=0)
-save(fig, "fig1_rate_by_industry",
-     "Bars: central rate (leak-site victims ÷ Census SUSB firm counts × under-reporting 7.4×). "
-     "Whiskers: under-reporting scenario band (5.8–10.6×), not a confidence interval. "
-     "Public Sector is per government, not per firm.")
+ax.xaxis.grid(True, color="#EEF1F4", zorder=0)
+ax.set_xticks([0, 100, 200, 300, 400])
+ax.tick_params(axis="x", labelsize=14)
+save(fig, "fig1_rate_by_industry")
 
 # ---------------------------------------------------------------- fig 2: size
-fig, ax = plt.subplots(figsize=(8.6, 4.6))
+# Shown ~1664x540 -> figsize 14x4.55in.
+fig, ax = plt.subplots(figsize=(14, 4.55))
 bands = [d["size_band"] for d in sizes]
 fsh = [100 * d["firm_share"] for d in sizes]
 vsh = [100 * d["victim_share"] for d in sizes]
 x = range(len(bands))
-w = 0.38
-ax.bar([i - w / 2 for i in x], fsh, width=w, color=SKY, label="share of US firms", zorder=3)
-ax.bar([i + w / 2 for i in x], vsh, width=w, color=NAVY, label="share of victims (size-labelled)", zorder=3)
+w = 0.39
+ax.bar([i - w / 2 for i in x], fsh, width=w, color=GREY, zorder=3)
+ax.bar([i + w / 2 for i in x], vsh, width=w, color=ACC, zorder=3)
 for i in x:
-    ax.text(i - w / 2, fsh[i] + 1.2, f"{fsh[i]:.0f}%", ha="center", fontsize=8.6, color="#5B7FA6")
-    ax.text(i + w / 2, vsh[i] + 1.2, f"{vsh[i]:.0f}%", ha="center", fontsize=8.6,
-            color=NAVY, fontweight="bold")
-ax.set_xticks(list(x), bands)
-ax.set_xlabel("employees")
-ax.set_title("63% of US firms are tiny — and almost never the victim")
-ax.legend(frameon=False, loc="upper right")
-ax.set_ylim(0, 72)
-strip(ax, keep_x=True)
+    ax.text(i - w / 2, fsh[i] + 1.6, f"{fsh[i]:.0f}", ha="center", fontsize=15, color=MUTED)
+    ax.text(i + w / 2, vsh[i] + 1.6, f"{vsh[i]:.0f}", ha="center", fontsize=16.5,
+            color=INK, fontweight="bold")
+ax.set_xticks(list(x), bands, fontsize=15.5)
+ax.set_xlabel("employees", fontsize=15, labelpad=10)
+ax.set_ylim(0, 74)
+strip(ax, bottom=True)
 ax.yaxis.set_visible(False)
-b = method["size_model"]["elasticity_b"]
-ax.text(3.5, 50, f"fitted: rate ~ employees^{b:.2f}\n(weighted R² = "
-        f"{method['size_model']['weighted_r2']:.2f}, n = {method['size_model']['n_labelled']})",
-        fontsize=9.5, color=OX, ha="center")
-save(fig, "fig2_size",
-     "Firm shares: Census SUSB 2022, unduplicated US totals. Victim shares: the 227 leak-site "
-     "records carrying an employee label. DBIR 2026 independently finds ~96% of ransomware "
-     "victims are SMBs (<1,000 staff); this sample: 95.6%.")
+ax.text(0.99, 0.94, "% of US firms", transform=ax.transAxes, ha="right",
+        fontsize=15.5, color=MUTED)
+ax.text(0.99, 0.83, "% of victims", transform=ax.transAxes, ha="right",
+        fontsize=15.5, color=ACC, fontweight="bold")
+save(fig, "fig2_size")
 
-# ---------------------------------------------------------------- fig 3: under-reporting routes
-fig, ax = plt.subplots(figsize=(8.6, 3.6))
+# ------------------------------------------------- fig 3: under-reporting
+# Shown ~1664x430 -> figsize 14x3.6in.
+fig, ax = plt.subplots(figsize=(14, 3.6))
 rows = []
 for s in cal["strata"]:
     ds = s["dependence_sensitivity"]
-    rows.append((f"capture–recapture · {s['stratum']}",
-                 ds["kappa_0.0"]["R"], ds["kappa_0.5"]["R"], ds["kappa_0.25"]["R"]))
+    rows.append((s["stratum"], ds["kappa_0.0"]["R"], ds["kappa_0.5"]["R"],
+                 ds["kappa_0.25"]["R"]))
 h = cal["hhs_cross_check"]["headline"]
-yy = range(len(rows) + 1)
 for i, (lab, lo_, hi_, pt) in enumerate(rows):
-    ax.hlines(i, lo_, hi_, color=SKY, lw=7, zorder=2)
-    ax.plot(pt, i, "o", color=NAVY, ms=8, zorder=4)
-    ax.text(hi_ + 0.35, i, f"{pt:.1f}×", va="center", color=NAVY, fontweight="bold", fontsize=9.5)
+    ax.hlines(i, lo_, hi_, color="#DDE7F0", lw=11, zorder=2)
+    ax.plot(pt, i, "o", color=INK, ms=9, zorder=4)
+    ax.text(hi_ + 0.4, i, f"{pt:.1f}×", va="center", color=INK,
+            fontweight="bold", fontsize=17)
 i = len(rows)
-ax.plot(h["implied_R_reciprocal"], i, "D", color=OX, ms=8, zorder=4)
-ax.text(h["implied_R_reciprocal"] + 0.35, i, f"{h['implied_R_reciprocal']:.0f}×",
-        va="center", color=OX, fontweight="bold", fontsize=9.5)
-labels = [r[0] for r in rows] + ["mandatory HHS registry · capture 4.6%"]
-ax.set_yticks(list(yy), labels)
+ax.plot(h["implied_R_reciprocal"], i, "D", color=ACC, ms=10, zorder=4)
+ax.text(h["implied_R_reciprocal"] + 0.4, i, f"{h['implied_R_reciprocal']:.0f}×",
+        va="center", color=ACC, fontweight="bold", fontsize=17)
+ax.set_yticks(range(len(rows) + 1),
+              [f"list overlap · {r[0]}" for r in rows] + ["mandatory HHS registry"],
+              fontsize=15.5)
 sch = cal["published_schedule"]
-ax.axvline(sch["central"]["value"], color=GREY, lw=1, ls="--", zorder=1)
-ax.text(sch["central"]["value"] + 0.25, -0.62, f"published central {sch['central']['value']}×",
-        ha="left", fontsize=8.6, color=GREY, va="center")
-ax.set_ylim(-0.95, len(rows) + 0.45)
+ax.axvline(sch["central"]["value"], color=MUTED, lw=1.1, ls=(0, (4, 4)), zorder=1)
+ax.text(sch["central"]["value"] + 0.3, -0.72, f"published {sch['central']['value']}×",
+        ha="left", va="center", fontsize=14.5, color=MUTED)
+ax.set_ylim(-1.0, len(rows) + 0.5)
 ax.set_xlim(0, 25)
-ax.set_xlabel("under-reporting multiplier R  (true incidents per leak-site listing)")
-ax.set_title("Leak sites undercount 6–22×, measured two independent ways")
+ax.set_xlabel("true incidents per leak-site listing", fontsize=15, labelpad=10)
+ax.set_xticks([0, 5, 10, 15, 20, 25])
+ax.tick_params(axis="x", labelsize=14)
 strip(ax)
-ax.xaxis.grid(True, color="#ECEEF0", zorder=0)
-save(fig, "fig3_underreporting",
-     "Bands: Chapman capture–recapture vs the independent Comparitech list, swept over the "
-     "bounded list-dependence range (dot = published per-sector value). Diamond: reciprocal of "
-     "leak-site capture of HHS's mandatory 500+ healthcare registry. Published schedule "
-     "5.8 / 7.4 / 10.6× follows the conservative route.")
+ax.xaxis.grid(True, color="#EEF1F4", zorder=0)
+save(fig, "fig3_underreporting")
 
-# ---------------------------------------------------------------- fig 4: by year
-yr = [y for y in byyear if 2020 <= y["year"] <= 2026]
-fig, ax = plt.subplots(figsize=(8.6, 4.4))
-xs = [y["year"] for y in yr]
-cols = [CAROLINA if y["year"] == 2025 else (SKY if y["country_known_pct"] > 90 else "#D4DCE2")
-        for y in yr]
-ax.bar(xs, [y["distinct_orgs"] for y in yr], color=cols, zorder=3)
-for y in yr:
-    ax.text(y["year"], y["distinct_orgs"] + 120, f"{y['distinct_orgs']:,}",
-            ha="center", fontsize=8.8,
-            color=NAVY if y["year"] == 2025 else GREY,
-            fontweight="bold" if y["year"] == 2025 else "normal")
-    if y["distinct_orgs"] > 900:          # skip the % label on bars too short to hold it
-        ax.text(y["year"], 260, f"{y['country_known_pct']:.0f}%", ha="center", fontsize=8,
-                color="white" if y["year"] == 2025 else
-                      ("#5B7FA6" if y["country_known_pct"] > 90 else GREY))
-ax.text(2025, -820, "rate year", ha="center", fontsize=8.6, color=CAROLINA, fontweight="bold")
-ax.text(2026, -820, "partial", ha="center", fontsize=8.6, color=GREY)
-ax.set_title("Why 2025: the only complete year with usable country data")
-ax.set_xticks(xs)
-strip(ax, keep_x=True)
+# ---------------------------------------------------------------- fig 4: years
+# Shown ~920x430 -> figsize 10x4.65in -> 1.28 px/pt: 14.5pt ~ 24px min.
+yr = [yy for yy in byyear if 2020 <= yy["year"] <= 2026]
+fig, ax = plt.subplots(figsize=(10, 4.65))
+xs = [yy["year"] for yy in yr]
+cols = [ACC if yy["year"] == 2025 else ("#AFC8DC" if yy["country_known_pct"] > 90 else "#DFE4E9")
+        for yy in yr]
+ax.bar(xs, [yy["distinct_orgs"] for yy in yr], color=cols, zorder=3, width=0.68)
+for yy in yr:
+    ax.text(yy["year"], yy["distinct_orgs"] + 160, f"{yy['distinct_orgs']:,}",
+            ha="center", fontsize=16 if yy["year"] == 2025 else 14.5,
+            color=INK if yy["year"] == 2025 else MUTED,
+            fontweight="bold" if yy["year"] == 2025 else "normal")
+ax.set_xticks(xs, [str(v) for v in xs], fontsize=15)
+ax.text(2025, -1060, "rate year", ha="center", fontsize=14.5, color=ACC, fontweight="bold")
+ax.text(2026, -1060, "partial", ha="center", fontsize=14.5, color=MUTED)
+strip(ax, bottom=True)
 ax.yaxis.set_visible(False)
-ax.set_ylim(0, 8200)
-save(fig, "fig4_by_year",
-     "Distinct victim organisations per year, global, with the share carrying a confirmed "
-     "country printed at the base. Grey years lack country data (14–46% known, 2021–2023); "
-     "2026 is right-censored mid-year. 2025: 6,973 distinct orgs, 96.9% with country.")
+ax.set_ylim(0, 8100)
+save(fig, "fig4_by_year")
 
 # ---------------------------------------------------------------- fig 5: DBIR mix
-fig, ax = plt.subplots(figsize=(6.4, 6.0))
+# Shown ~940x620 -> figsize 9.4x6.2in -> 1.39 px/pt: 14pt ~ 24px min.
+fig, ax = plt.subplots(figsize=(9.4, 6.2))
 rows = dbir["industry_mix"]["rows"]
-mx = max(max(r["leak_site_share"], r["dbir_share"]) for r in rows) * 108
-ax.plot([0, mx], [0, mx], color="#D4DCE2", lw=1, zorder=1)
-OFFS = {"Healthcare": (-0.4, 0.75), "Consumer Svcs": (0.45, -0.75),
-        "Construction": (0.45, 0.35), "Transportation": (0.45, 0.45),
-        "Education": (0.5, -0.85), "Agriculture & Food": (-0.3, -1.15),
-        "Energy": (0.45, -0.4), "Hospitality": (0.45, 0.55),
-        "Manufacturing": (0.5, 0.55), "Technology + Telecom": (0.5, 0.55),
-        "Business Svcs": (-0.4, 0.8), "Financial Svcs": (0.5, 0.45),
-        "Public Sector": (0.5, -0.95)}
+ax.plot([0, 23], [0, 23], color=HAIR, lw=1.2, zorder=1)
+# Every label hand-placed in data units. At presentation type sizes an
+# auto-offset scatter always collides; thirteen explicit anchors are cheaper.
+LBL = {"Manufacturing": (14.3, 16.45, "left"),
+       "Technology + Telecom": (1.0, 16.45, "left"),
+       "Business Services": (20.9, 14.55, "right"),
+       "Financial Services": (15.1, 6.3, "left"),
+       "Public Sector": (14.3, 3.85, "left"),
+       "Healthcare": (6.1, 8.8, "left"),
+       "Consumer Services": (7.85, 7.7, "left"),
+       "Construction": (3.85, 6.85, "left"),
+       "Transportation": (0.3, 5.5, "left"),
+       "Education": (5.5, 4.3, "left"),
+       "Agriculture & Food": (0.35, 3.2, "left"),
+       "Hospitality": (4.2, 2.5, "left"),
+       "Energy": (2.4, 1.45, "left")}
 for r in rows:
     x_, y_ = 100 * r["dbir_share"], 100 * r["leak_site_share"]
     gap = abs(x_ - y_) > 5
-    ax.plot(x_, y_, "o", ms=7, color=OX if gap else CAROLINA, zorder=3)
-    short = nm(r["sector"].replace(" + Telecommunication", " + Telecom"))
-    dx, dy = OFFS.get(short, (0.5, 0.5))
-    ha = "right" if dx < 0 else "left"
-    ax.annotate(short, (x_, y_), xytext=(x_ + dx, y_ + dy), fontsize=8.2, ha=ha,
-                color=NAVY if gap else GREY)
-ax.set_xlabel("share of DBIR 2026 incidents (Table 3, p.77)")
-ax.set_ylabel("share of leak-site victims (2025)")
-ax.set_title("Two lenses, one mix — gaps follow reporting duty")
-ax.text(0.97, 0.04, f"Spearman ρ = {dbir['industry_mix']['spearman_rank_correlation']}",
-        transform=ax.transAxes, ha="right", fontsize=9.5, color=NAVY, fontweight="bold")
-strip(ax, keep_x=True)
-ax.spines["left"].set_visible(True)
-ax.xaxis.grid(True, color="#ECEEF0", zorder=0)
-ax.yaxis.grid(True, color="#ECEEF0", zorder=0)
-save(fig, "fig5_dbir_mix",
-     "Red = gap over 5pp. Public Sector and Financial Services sit far below the diagonal: "
-     "heavier in DBIR, which receives the mandatory and law-enforcement reporting that "
-     "criminal leak sites never see.")
+    ax.plot(x_, y_, "o", ms=9, color=ACC if gap else "#9FB2C4", zorder=3)
+    short = nm(r["sector"])
+    if "Technology" in r["sector"]:
+        short = "Technology + Telecom"
+    lx, ly, ha = LBL[short]
+    ax.annotate(short, (x_, y_), xytext=(lx, ly), fontsize=14, ha=ha,
+                color=INK if gap else MUTED, zorder=5)
+ax.set_xlabel("share of DBIR 2026 incidents", fontsize=15, labelpad=10)
+ax.set_ylabel("share of leak-site victims, 2025", fontsize=15, labelpad=10)
+ax.set_xlim(-0.5, 24)
+ax.set_ylim(-0.5, 24)
+ax.set_xticks([0, 5, 10, 15, 20])
+ax.set_yticks([0, 5, 10, 15, 20])
+ax.tick_params(labelsize=14)
+strip(ax, bottom=True, left=True)
+save(fig, "fig5_dbir_mix")
 
-# ---------------------------------------------------------------- fig 6: ransom ladder
-fig, ax = plt.subplots(figsize=(8.6, 3.6))
-steps = [("paid\n(DBIR 2026 median)", 139875),
-         ("demanded, tracked\n(Comparitech, n=623)", 428163),
-         ("in the news\n(researched set, n=73)", 8000000)]
+# ---------------------------------------------------------------- fig 6: ladder
+# Shown ~980x440 -> figsize 10x4.5in.
+fig, ax = plt.subplots(figsize=(10, 4.5))
+steps = [("paid", "DBIR 2026", 139875),
+         ("demanded", "Comparitech, n=623", 428163),
+         ("in the news", "researched, n=73", 8000000)]
 xs = range(len(steps))
-ax.bar(xs, [v for _, v in steps], color=[SKY, CAROLINA, NAVY], width=0.5, zorder=3)
-for i, (lab, v) in enumerate(steps):
-    ax.text(i, v * 1.25, f"${v/1e6:.2f}M" if v >= 1e6 else f"${v/1e3:.0f}k",
-            ha="center", fontsize=11, fontweight="bold", color=NAVY)
+ax.bar(xs, [v for _, _, v in steps], color=["#DFE4E9", "#AFC8DC", ACC],
+       width=0.52, zorder=3)
+for i, (lab, src, v) in enumerate(steps):
+    ax.text(i, v * 1.28, f"${v/1e6:.1f}M" if v >= 1e6 else f"${v/1e3:.0f}k",
+            ha="center", fontsize=21, fontweight="bold", color=INK)
+ax.set_xticks(list(xs),
+              [lab + "\n" + src for lab, src, _ in steps], fontsize=15, color=MUTED)
+ax.tick_params(axis="x", length=0, pad=12)
 ax.set_yscale("log")
-ax.set_ylim(5e4, 4e7)
-ax.set_xticks(list(xs), [s[0] for s in steps])
+ax.set_ylim(1e4, 5.2e7)
 ax.yaxis.set_visible(False)
-strip(ax, keep_x=True)
-ax.set_title("The ransom ladder: each list selects for bigger incidents")
-save(fig, "fig6_ransom_ladder",
-     "Medians, log scale — roughly an order of magnitude per rung. Quoting a 'typical ransom' "
-     "without naming the rung misleads by 10×. DBIR 2026 also reports 69% of victims did not pay.")
+for sp in ax.spines.values():
+    sp.set_visible(False)
+save(fig, "fig6_ransom_ladder")
 
 print(f"\n6 figures -> {FIG}")
